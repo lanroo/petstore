@@ -1,1 +1,135 @@
-<p>pet-list works!</p>
+
+<section class="hero-section">
+  <div class="hero-background">
+    <div class="hero-overlay"></div>
+  </div>
+  
+  <div class="hero-content">
+    <div class="hero-text">
+      <h1 class="hero-title">
+        Transforme a vida de um pet — 
+        <span class="hero-highlight">e a sua também</span>
+      </h1>
+      <p class="hero-subtitle">
+        Adote gratuitamente e encontre seu novo melhor amigo. 
+        Cada pet merece uma segunda chance de ser amado.
+      </p>
+      
+      <div class="hero-actions">
+        <button mat-raised-button class="hero-btn hero-btn-primary" routerLink="/">
+          <mat-icon class="btn-icon">search</mat-icon>
+          Encontre seu Amigo
+        </button>
+        <button mat-stroked-button class="hero-btn hero-btn-secondary" routerLink="/pets/new">
+          <mat-icon class="btn-icon">volunteer_activism</mat-icon>
+          Quero Cadastrar um Pet
+        </button>
+      </div>
+      
+      <div class="hero-stats">
+        <div class="stat-item">
+          <span class="stat-number">1.200+</span>
+          <span class="stat-label">Pets Adotados</span>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat-item">
+          <span class="stat-number">500+</span>
+          <span class="stat-label">Famílias Felizes</span>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat-item">
+          <span class="stat-number">100%</span>
+          <span class="stat-label">Amor Garantido</span>
+        </div>
+      </div>
+    </div>
+    
+    <div class="hero-visual">
+      <div class="hero-image-container">
+        <div class="hero-image-wrapper">
+          <img 
+            src="https://www.mogidascruzes.sp.gov.br/public/site/imagens/6/202505141353096824ca7508a09.jpg" 
+            alt="Pets aguardando adoção - cães e gatos em busca de um lar"
+            class="hero-image"
+            loading="lazy">
+        </div>
+        
+        <div class="floating-elements">
+          <div class="floating-card floating-card-1">
+            <mat-icon>favorite</mat-icon>
+            <span>Amor</span>
+          </div>
+          <div class="floating-card floating-card-2">
+            <mat-icon>home</mat-icon>
+            <span>Lar</span>
+          </div>
+          <div class="floating-card floating-card-3">
+            <mat-icon>emoji_emotions</mat-icon>
+            <span>Alegria</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="hero-scroll-indicator" [class.hidden]="!showScrollIndicator">
+    <mat-icon class="scroll-icon">keyboard_arrow_down</mat-icon>
+    <span class="scroll-text">Descubra mais</span>
+  </div>
+</section>
+
+<section class="features-section">
+  <div class="container">
+    <div class="section-header">
+      <h2 class="section-title">Por que Adotar Conosco?</h2>
+      <p class="section-subtitle">Conectamos corações e transformamos vidas através da adoção responsável</p>
+    </div>
+    
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon-wrapper">
+          <mat-icon class="feature-icon">search</mat-icon>
+        </div>
+        <h3 class="feature-title">Busca Inteligente</h3>
+        <p class="feature-description">Encontre o pet ideal por idade, porte, personalidade e localização</p>
+      </div>
+      
+      <div class="feature-card">
+        <div class="feature-icon-wrapper">
+          <mat-icon class="feature-icon">verified_user</mat-icon>
+        </div>
+        <h3 class="feature-title">Adoção Responsável</h3>
+        <p class="feature-description">Processo criterioso e acompanhamento para garantir o bem-estar</p>
+      </div>
+      
+      <div class="feature-card">
+        <div class="feature-icon-wrapper">
+          <mat-icon class="feature-icon">medical_services</mat-icon>
+        </div>
+        <h3 class="feature-title">Cuidados Veterinários</h3>
+        <p class="feature-description">Todos os pets são vacinados, vermifugados e examinados</p>
+      </div>
+      
+      <div class="feature-card">
+        <div class="feature-icon-wrapper">
+          <mat-icon class="feature-icon">support_agent</mat-icon>
+        </div>
+        <h3 class="feature-title">Suporte Contínuo</h3>
+        <p class="feature-description">Acompanhamento pós-adoção e orientações veterinárias</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="cta-section">
+  <div class="container">
+    <div class="cta-content">
+      <h2 class="cta-title">Pronto para Mudar uma Vida?</h2>
+      <p class="cta-subtitle">Milhares de pets estão esperando por você. Faça a diferença hoje mesmo.</p>
+      <button mat-raised-button class="cta-button" routerLink="/">
+        <mat-icon class="btn-icon">pets</mat-icon>
+        Ver Pets Disponíveis
+      </button>
+    </div>
+  </div>
+</section>

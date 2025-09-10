@@ -1,0 +1,70 @@
+<header class="app-header" [class.scrolled]="isScrolled">
+  <div class="header-content">
+    <div class="logo" routerLink="/">
+      <mat-icon class="logo-icon">favorite</mat-icon>
+      <div class="logo-text">
+        <h1>Adote um Amigo</h1>
+        <span class="tagline">Conectando corações</span>
+      </div>
+    </div>
+
+    <nav class="navigation">
+      <a routerLink="/" 
+         routerLinkActive="active" 
+         [routerLinkActiveOptions]="{exact: true}"
+         class="nav-link nav-link-clean">
+        <mat-icon class="nav-icon">home</mat-icon>
+        <span class="nav-text">Início</span>
+      </a>
+      
+      <a routerLink="/" 
+         routerLinkActive="active" 
+         class="nav-link nav-link-clean">
+        <mat-icon class="nav-icon">pets</mat-icon>
+        <span class="nav-text">Pets Disponíveis</span>
+      </a>
+      
+      <a routerLink="/pets/new" 
+         routerLinkActive="active" 
+         class="nav-link nav-link-button">
+        <mat-icon class="nav-icon">volunteer_activism</mat-icon>
+        <span class="nav-text">Cadastrar Pet</span>
+      </a>
+    </nav>
+
+    <button mat-icon-button 
+            class="mobile-menu-button" 
+            (click)="toggleMobileMenu()"
+            [attr.aria-expanded]="isMobileMenuOpen"
+            aria-label="Menu">
+      <mat-icon>{{ isMobileMenuOpen ? 'close' : 'menu' }}</mat-icon>
+    </button>
+  </div>
+
+  <nav class="mobile-navigation" [class.open]="isMobileMenuOpen">
+    <a routerLink="/" 
+       routerLinkActive="active" 
+       [routerLinkActiveOptions]="{exact: true}"
+       class="mobile-nav-link"
+       (click)="closeMobileMenu()">
+      <mat-icon class="nav-icon">home</mat-icon>
+      <span class="nav-text">Início</span>
+    </a>
+    
+    <a routerLink="/" 
+       routerLinkActive="active" 
+       class="mobile-nav-link"
+       (click)="closeMobileMenu()">
+      <mat-icon class="nav-icon">pets</mat-icon>
+      <span class="nav-text">Pets Disponíveis</span>
+    </a>
+    
+    <a routerLink="/pets/new" 
+       routerLinkActive="active" 
+       class="mobile-nav-link"
+       (click)="closeMobileMenu()">
+      <mat-icon class="nav-icon">volunteer_activism</mat-icon>
+      <span class="nav-text">Cadastrar Pet</span>
+    </a>
+  </nav>
+</header>
