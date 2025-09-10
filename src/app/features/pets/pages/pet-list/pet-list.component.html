@@ -1,135 +1,110 @@
-
-<section class="hero-section">
-  <div class="hero-background">
-    <div class="hero-overlay"></div>
-  </div>
-  
-  <div class="hero-content">
-    <div class="hero-text">
-      <h1 class="hero-title">
-        Transforme a vida de um pet — 
-        <span class="hero-highlight">e a sua também</span>
-      </h1>
-      <p class="hero-subtitle">
-        Adote gratuitamente e encontre seu novo melhor amigo. 
-        Cada pet merece uma segunda chance de ser amado.
-      </p>
+<div class="pet-list-container">
+  <div class="container">
+    <div class="page-header">
+      <h1 class="page-title">Pets Disponíveis</h1>
+      <p class="page-subtitle">Encontre seu novo melhor amigo</p>
       
-      <div class="hero-actions">
-        <button mat-raised-button class="hero-btn hero-btn-primary" routerLink="/">
-          <mat-icon class="btn-icon">search</mat-icon>
-          Encontre seu Amigo
+      <div class="page-actions">
+        <button mat-raised-button color="primary" routerLink="/pets/new">
+          <mat-icon class="btn-icon">add</mat-icon>
+          Cadastrar Pet
         </button>
-        <button mat-stroked-button class="hero-btn hero-btn-secondary" routerLink="/pets/new">
-          <mat-icon class="btn-icon">volunteer_activism</mat-icon>
-          Quero Cadastrar um Pet
-        </button>
-      </div>
-      
-      <div class="hero-stats">
-        <div class="stat-item">
-          <span class="stat-number">1.200+</span>
-          <span class="stat-label">Pets Adotados</span>
-        </div>
-        <div class="stat-divider"></div>
-        <div class="stat-item">
-          <span class="stat-number">500+</span>
-          <span class="stat-label">Famílias Felizes</span>
-        </div>
-        <div class="stat-divider"></div>
-        <div class="stat-item">
-          <span class="stat-number">100%</span>
-          <span class="stat-label">Amor Garantido</span>
-        </div>
       </div>
     </div>
-    
-    <div class="hero-visual">
-      <div class="hero-image-container">
-        <div class="hero-image-wrapper">
+
+    <div class="filters-section">
+      <div class="filter-group">
+        <mat-form-field appearance="outline" class="filter-field">
+          <mat-label>Buscar por nome</mat-label>
+          <input matInput [(ngModel)]="searchTerm" (input)="onSearch()" placeholder="Digite o nome do pet">
+          <mat-icon matSuffix>search</mat-icon>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="filter-field">
+          <mat-label>Status</mat-label>
+          <mat-select [(ngModel)]="selectedStatus" (selectionChange)="onStatusFilter()">
+            <mat-option value="">Todos</mat-option>
+            <mat-option value="available">Disponível</mat-option>
+            <mat-option value="pending">Pendente</mat-option>
+            <mat-option value="sold">Vendido</mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="filter-field">
+          <mat-label>Categoria</mat-label>
+          <mat-select [(ngModel)]="selectedCategory" (selectionChange)="onCategoryFilter()">
+            <mat-option value="">Todas</mat-option>
+            <mat-option value="dog">Cachorro</mat-option>
+            <mat-option value="cat">Gato</mat-option>
+            <mat-option value="other">Outros</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+    </div>
+
+    <div *ngIf="loading" class="loading-container">
+      <mat-spinner></mat-spinner>
+      <p>Carregando pets...</p>
+    </div>
+
+    <div *ngIf="!loading" class="pets-grid">
+      <div 
+        *ngFor="let pet of filteredPets; let i = index" 
+        class="pet-card"
+        [routerLink]="['/pets', pet.id]">
+        <div class="pet-image-container">
           <img 
-            src="https://www.mogidascruzes.sp.gov.br/public/site/imagens/6/202505141353096824ca7508a09.jpg" 
-            alt="Pets aguardando adoção - cães e gatos em busca de um lar"
-            class="hero-image"
-            loading="lazy">
+            [src]="pet.photoUrls[0] || 'assets/default-pet.png'" 
+            [alt]="pet.name || 'Pet disponível'"
+            (error)="onImageError($event)"
+            class="pet-card-image">
+          <div class="pet-status-badge" [ngClass]="'status-' + (pet.status || 'available')">
+            <span class="status-text">{{ getStatusText(pet.status) }}</span>
+          </div>
         </div>
-        
-        <div class="floating-elements">
-          <div class="floating-card floating-card-1">
-            <mat-icon>favorite</mat-icon>
-            <span>Amor</span>
+        <div class="pet-card-info">
+          <h3 class="pet-card-name">{{ pet.name || 'Pet ' + (i + 1) }}</h3>
+          <div class="pet-details">
+            <span class="pet-detail-item">
+              <mat-icon class="detail-icon">pets</mat-icon>
+              {{ getPetType(pet) }}
+            </span>
+            <span class="pet-detail-item">
+              <mat-icon class="detail-icon">schedule</mat-icon>
+              {{ getPetAge(pet) }}
+            </span>
           </div>
-          <div class="floating-card floating-card-2">
-            <mat-icon>home</mat-icon>
-            <span>Lar</span>
+          <div class="pet-location">
+            <mat-icon class="location-icon">location_on</mat-icon>
+            <span>{{ getPetLocation(pet) }}</span>
           </div>
-          <div class="floating-card floating-card-3">
-            <mat-icon>emoji_emotions</mat-icon>
-            <span>Alegria</span>
+          <div class="pet-actions">
+            <button mat-button color="primary" (click)="viewPet(pet.id, $event)">
+              <mat-icon>visibility</mat-icon>
+              Ver Detalhes
+            </button>
           </div>
         </div>
       </div>
     </div>
-  </div>
-  
-  <div class="hero-scroll-indicator" [class.hidden]="!showScrollIndicator">
-    <mat-icon class="scroll-icon">keyboard_arrow_down</mat-icon>
-    <span class="scroll-text">Descubra mais</span>
-  </div>
-</section>
-
-<section class="features-section">
-  <div class="container">
-    <div class="section-header">
-      <h2 class="section-title">Por que Adotar Conosco?</h2>
-      <p class="section-subtitle">Conectamos corações e transformamos vidas através da adoção responsável</p>
-    </div>
-    
-    <div class="features-grid">
-      <div class="feature-card">
-        <div class="feature-icon-wrapper">
-          <mat-icon class="feature-icon">search</mat-icon>
-        </div>
-        <h3 class="feature-title">Busca Inteligente</h3>
-        <p class="feature-description">Encontre o pet ideal por idade, porte, personalidade e localização</p>
-      </div>
-      
-      <div class="feature-card">
-        <div class="feature-icon-wrapper">
-          <mat-icon class="feature-icon">verified_user</mat-icon>
-        </div>
-        <h3 class="feature-title">Adoção Responsável</h3>
-        <p class="feature-description">Processo criterioso e acompanhamento para garantir o bem-estar</p>
-      </div>
-      
-      <div class="feature-card">
-        <div class="feature-icon-wrapper">
-          <mat-icon class="feature-icon">medical_services</mat-icon>
-        </div>
-        <h3 class="feature-title">Cuidados Veterinários</h3>
-        <p class="feature-description">Todos os pets são vacinados, vermifugados e examinados</p>
-      </div>
-      
-      <div class="feature-card">
-        <div class="feature-icon-wrapper">
-          <mat-icon class="feature-icon">support_agent</mat-icon>
-        </div>
-        <h3 class="feature-title">Suporte Contínuo</h3>
-        <p class="feature-description">Acompanhamento pós-adoção e orientações veterinárias</p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<section class="cta-section">
-  <div class="container">
-    <div class="cta-content">
-      <h2 class="cta-title">Pronto para Mudar uma Vida?</h2>
-      <p class="cta-subtitle">Milhares de pets estão esperando por você. Faça a diferença hoje mesmo.</p>
-      <button mat-raised-button class="cta-button" routerLink="/">
-        <mat-icon class="btn-icon">pets</mat-icon>
-        Ver Pets Disponíveis
+    <div *ngIf="!loading && filteredPets.length === 0" class="no-pets-message">
+      <mat-icon class="no-pets-icon">pets</mat-icon>
+      <h3>Nenhum pet encontrado</h3>
+      <p>Tente ajustar os filtros ou cadastre um novo pet.</p>
+      <button mat-raised-button color="primary" routerLink="/pets/new">
+        <mat-icon>add</mat-icon>
+        Cadastrar Pet
       </button>
     </div>
+
+    <div *ngIf="!loading && filteredPets.length > 0" class="pagination-container">
+      <mat-paginator
+        [length]="totalPets"
+        [pageSize]="pageSize"
+        [pageSizeOptions]="[6, 12, 24, 48]"
+        (page)="onPageChange($event)"
+        showFirstLastButtons>
+      </mat-paginator>
+    </div>
   </div>
-</section>
+</div>

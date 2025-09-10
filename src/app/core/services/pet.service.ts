@@ -100,9 +100,6 @@ export class PetService {
       );
   }
 
-  getAvailablePets(): Observable<Pet[]> {
-    return this.getPetsByStatus(PetStatus.AVAILABLE);
-  }
 
   uploadPetImage(petId: number, file: File): Observable<ApiResponse<{ photoUrls?: string[] }>> {
     const formData = new FormData();
@@ -112,6 +109,54 @@ export class PetService {
       .pipe(
         catchError(this.handleError)
       );
+  }
+
+  updatePetWithFormData(petId: number, petData: { name?: string; status?: string }): Observable<ApiResponse> {
+    const params = new HttpParams()
+      .set('name', petData.name || '')
+      .set('status', petData.status || '');
+
+    return this.http.post<ApiResponse>(`${this.apiUrl}/pet/${petId}`, params)
+      .pipe(
+        catchError(this.handleError)
+      );
+  }
+
+  getPetStats(): Observable<{
+    available: number;
+    pending: number;
+    sold: number;
+    total: number;
+  }> {
+    return this.getPets().pipe(
+      map((pets) => {
+        const stats = {
+          available: 0,
+          pending: 0,
+          sold: 0,
+          total: pets.length
+        };
+
+        pets.forEach(pet => {
+          switch (pet.status) {
+            case PetStatus.AVAILABLE:
+              stats.available++;
+              break;
+            case PetStatus.PENDING:
+              stats.pending++;
+              break;
+            case PetStatus.SOLD:
+              stats.sold++;
+              break;
+          }
+        });
+
+        return stats;
+      }),
+      catchError(() => {
+        return throwError(() => new Error('Erro ao carregar estatísticas dos pets'));
+      })
+    );
   }
 
   private handleError(error: any): Observable<never> {
@@ -141,4 +186,5 @@ export class PetService {
     console.error('PetService Error:', error);
     return throwError(() => new Error(errorMessage));
   }
+
 }
