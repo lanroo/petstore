@@ -17,19 +17,25 @@
         <span class="nav-text">Início</span>
       </a>
       
-      <a routerLink="/" 
+      <a routerLink="/pets" 
          routerLinkActive="active" 
          class="nav-link nav-link-clean">
         <mat-icon class="nav-icon">pets</mat-icon>
         <span class="nav-text">Pets Disponíveis</span>
       </a>
       
-      <a routerLink="/pets/new" 
-         routerLinkActive="active" 
-         class="nav-link nav-link-button">
-        <mat-icon class="nav-icon">volunteer_activism</mat-icon>
-        <span class="nav-text">Cadastrar Pet</span>
-      </a>
+        <a routerLink="/store"
+           routerLinkActive="active"
+           class="nav-link nav-link-clean">
+          <mat-icon class="nav-icon">inventory</mat-icon>
+          <span class="nav-text">Inventário</span>
+        </a>
+        <a routerLink="/pets/new"
+           routerLinkActive="active"
+           class="nav-link nav-link-button">
+          <mat-icon class="nav-icon">volunteer_activism</mat-icon>
+          <span class="nav-text">Cadastrar Pet</span>
+        </a>
     </nav>
 
     <button mat-icon-button 
@@ -51,7 +57,7 @@
       <span class="nav-text">Início</span>
     </a>
     
-    <a routerLink="/" 
+    <a routerLink="/pets" 
        routerLinkActive="active" 
        class="mobile-nav-link"
        (click)="closeMobileMenu()">
@@ -59,12 +65,19 @@
       <span class="nav-text">Pets Disponíveis</span>
     </a>
     
-    <a routerLink="/pets/new" 
-       routerLinkActive="active" 
-       class="mobile-nav-link"
-       (click)="closeMobileMenu()">
-      <mat-icon class="nav-icon">volunteer_activism</mat-icon>
-      <span class="nav-text">Cadastrar Pet</span>
-    </a>
+      <a routerLink="/store"
+         routerLinkActive="active"
+         class="mobile-nav-link"
+         (click)="closeMobileMenu()">
+        <mat-icon class="nav-icon">inventory</mat-icon>
+        <span class="nav-text">Inventário</span>
+      </a>
+      <a routerLink="/pets/new"
+         routerLinkActive="active"
+         class="mobile-nav-link"
+         (click)="closeMobileMenu()">
+        <mat-icon class="nav-icon">volunteer_activism</mat-icon>
+        <span class="nav-text">Cadastrar Pet</span>
+      </a>
   </nav>
 </header>

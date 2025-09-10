@@ -13,7 +13,6 @@ import { MainLayoutComponent } from './layouts/main-layout/main-layout.component
 import { HeaderComponent } from './shared/components/header/header.component';
 import { HttpErrorInterceptor } from './core/interceptors/http-error.interceptor';
 import { FooterComponent } from './shared/components/footer/footer.component';
-
 @NgModule({
   declarations: [
     AppComponent,

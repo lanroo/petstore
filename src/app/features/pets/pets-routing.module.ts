@@ -10,15 +10,19 @@ const routes: Routes = [
     component: PetListComponent
   },
   {
-    path: 'new',
+    path: 'pets',
+    component: PetListComponent
+  },
+  {
+    path: 'pets/new',
     component: PetFormComponent
   },
   {
-    path: ':id',
+    path: 'pets/:id',
     component: PetDetailComponent
   },
   {
-    path: ':id/edit',
+    path: 'pets/:id/edit',
     component: PetFormComponent
   }
 ];
