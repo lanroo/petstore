@@ -1,0 +1,92 @@
+<div class="inventory-container">
+  <div class="inventory-header">
+    <h2 class="inventory-title">
+      <mat-icon class="title-icon">inventory</mat-icon>
+      Inventário da Loja
+    </h2>
+    <button mat-raised-button 
+            color="primary" 
+            (click)="refreshInventory()"
+            [disabled]="loading">
+      <mat-icon>refresh</mat-icon>
+      Atualizar
+    </button>
+  </div>
+
+  <div *ngIf="loading" class="loading-container">
+    <mat-spinner diameter="50"></mat-spinner>
+    <p>Carregando inventário...</p>
+  </div>
+
+  <div *ngIf="error && !loading" class="error-container">
+    <mat-icon class="error-icon">error</mat-icon>
+    <p class="error-message">{{ error }}</p>
+    <button mat-raised-button color="primary" (click)="refreshInventory()">
+      Tentar Novamente
+    </button>
+  </div>
+
+  <div *ngIf="!loading && !error" class="inventory-content">
+    <div class="stats-grid">
+      <div class="stat-card available">
+        <div class="stat-icon">
+          <mat-icon>check_circle</mat-icon>
+        </div>
+        <div class="stat-content">
+          <span class="stat-number">{{ stats.available }}</span>
+          <span class="stat-label">Disponíveis</span>
+        </div>
+      </div>
+
+      <div class="stat-card pending">
+        <div class="stat-icon">
+          <mat-icon>schedule</mat-icon>
+        </div>
+        <div class="stat-content">
+          <span class="stat-number">{{ stats.pending }}</span>
+          <span class="stat-label">Pendentes</span>
+        </div>
+      </div>
+
+      <div class="stat-card sold">
+        <div class="stat-icon">
+          <mat-icon>pets</mat-icon>
+        </div>
+        <div class="stat-content">
+          <span class="stat-number">{{ stats.sold }}</span>
+          <span class="stat-label">Vendidos</span>
+        </div>
+      </div>
+
+      <div class="stat-card total">
+        <div class="stat-icon">
+          <mat-icon>inventory_2</mat-icon>
+        </div>
+        <div class="stat-content">
+          <span class="stat-number">{{ stats.total }}</span>
+          <span class="stat-label">Total</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="inventory-details">
+      <h3 class="details-title">Detalhes do Inventário</h3>
+      <div class="inventory-list">
+        <div *ngFor="let item of inventory | keyvalue" 
+             class="inventory-item"
+             [style.border-left-color]="getStatusColor(item.key)">
+          <div class="item-status">
+            <mat-icon [style.color]="getStatusColor(item.key)">
+              {{ getStatusIcon(item.key) }}
+            </mat-icon>
+            <span class="status-label">{{ getStatusLabel(item.key) }}</span>
+          </div>
+          <div class="item-count">
+            <span class="count-number">{{ item.value }}</span>
+            <span class="count-label">itens</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
