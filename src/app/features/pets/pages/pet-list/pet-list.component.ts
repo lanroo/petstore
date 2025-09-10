@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, HostListener } from '@angular/core';
 
 @Component({
   selector: 'app-pet-list',
@@ -7,5 +7,11 @@ import { Component } from '@angular/core';
   styleUrl: './pet-list.component.scss'
 })
 export class PetListComponent {
+  showScrollIndicator = true;
 
+  @HostListener('window:scroll', ['$event'])
+  onWindowScroll(): void {
+    const scrollPosition = window.scrollY;
+    this.showScrollIndicator = scrollPosition < 100;
+  }
 }
