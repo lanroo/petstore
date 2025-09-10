@@ -113,4 +113,8 @@ export class PetListComponent implements OnInit {
   }
 
   onImageError = (event: Event): void => this.imageService.handleImageError(event);
+
+  getPetImage(pet: Pet): string {
+    return this.imageService.getPetImage(pet, 'small');
+  }
 }

@@ -118,6 +118,10 @@
 <section class="pets-for-adoption-section">
   <div class="container">
     <div class="section-header">
+      <div class="section-badge">
+        <mat-icon>favorite</mat-icon>
+        <span>Adoção Responsável</span>
+      </div>
       <h2 class="section-title">Pets para Adoção</h2>
       <p class="section-subtitle">Encontre seu novo melhor amigo entre nossos pets disponíveis</p>
     </div>
@@ -129,41 +133,84 @@
         [routerLink]="['/pets', pet.id]">
         <div class="pet-image-container">
           <img 
-            [src]="pet.photoUrls[0] || 'assets/default-pet.png'" 
+            [src]="getPetImage(pet)" 
             [alt]="pet.name || 'Pet disponível'"
             (error)="onImageError($event)"
             class="pet-card-image">
           <div class="pet-status-badge">
+            <mat-icon class="status-icon">check_circle</mat-icon>
             <span class="status-text">Disponível</span>
+          </div>
+          <div class="pet-overlay">
+            <div class="overlay-content">
+              <mat-icon class="overlay-icon">visibility</mat-icon>
+              <span>Ver Detalhes</span>
+            </div>
           </div>
         </div>
         <div class="pet-card-info">
-          <h3 class="pet-card-name">{{ pet.name || 'Pet ' + (i + 1) }}</h3>
+          <div class="pet-header">
+            <h3 class="pet-card-name">{{ pet.name || 'Pet ' + (i + 1) }}</h3>
+            <div class="pet-heart">
+              <mat-icon>favorite_border</mat-icon>
+            </div>
+          </div>
           <div class="pet-details">
-            <span class="pet-detail-item">
-              <mat-icon class="detail-icon">pets</mat-icon>
-              {{ getPetType(pet) }}
-            </span>
-            <span class="pet-detail-item">
-              <mat-icon class="detail-icon">schedule</mat-icon>
-              {{ getPetAge(pet) }}
-            </span>
+            <div class="pet-detail-item">
+              <div class="detail-icon-wrapper">
+                <mat-icon class="detail-icon">pets</mat-icon>
+              </div>
+              <div class="detail-content">
+                <span class="detail-label">Tipo</span>
+                <span class="detail-value">{{ getPetType(pet) }}</span>
+              </div>
+            </div>
+            <div class="pet-detail-item">
+              <div class="detail-icon-wrapper">
+                <mat-icon class="detail-icon">schedule</mat-icon>
+              </div>
+              <div class="detail-content">
+                <span class="detail-label">Idade</span>
+                <span class="detail-value">{{ getPetAge(pet) }}</span>
+              </div>
+            </div>
           </div>
           <div class="pet-location">
             <mat-icon class="location-icon">location_on</mat-icon>
             <span>{{ getPetLocation(pet) }}</span>
+          </div>
+          <div class="pet-actions">
+            <button mat-stroked-button class="adopt-button">
+              <mat-icon>favorite</mat-icon>
+              Adotar
+            </button>
           </div>
         </div>
       </div>
     </div>
 
     <div class="view-all-pets">
+      <div class="stats-row">
+        <div class="stat-item">
+          <div class="stat-number">{{ availablePets.length }}+</div>
+          <div class="stat-label">Pets Disponíveis</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number">100%</div>
+          <div class="stat-label">Amor Garantido</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number">24h</div>
+          <div class="stat-label">Suporte</div>
+        </div>
+      </div>
       <button mat-raised-button 
               color="primary" 
               class="view-all-button"
               routerLink="/pets">
         <mat-icon class="btn-icon">pets</mat-icon>
         Ver Todos os Pets
+        <mat-icon class="btn-arrow">arrow_forward</mat-icon>
       </button>
       <p class="view-all-description">
         Explore nossa coleção completa com filtros por cidade, estado, sexo, tipo e porte

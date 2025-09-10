@@ -64,4 +64,8 @@ export class PetDetailComponent implements OnInit {
     event.stopPropagation();
     this.router.navigate(['/pets', id]);
   }
+
+  getPetImage(pet: Pet): string {
+    return this.imageService.getPetImage(pet, 'small');
+  }
 }

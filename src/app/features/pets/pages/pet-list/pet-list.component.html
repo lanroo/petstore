@@ -54,7 +54,7 @@
         [routerLink]="['/pets', pet.id]">
         <div class="pet-image-container">
           <img 
-            [src]="pet.photoUrls[0] || 'assets/default-pet.png'" 
+            [src]="getPetImage(pet)" 
             [alt]="pet.name || 'Pet disponível'"
             (error)="onImageError($event)"
             class="pet-card-image">

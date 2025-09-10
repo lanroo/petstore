@@ -180,10 +180,6 @@ export class HomeComponent implements OnInit {
     return cities[((pet.id || 1) % cities.length)];
   }
 
-  onImageError(event: Event): void {
-    const img = event.target as HTMLImageElement;
-    img.src = 'https://picsum.photos/200/200?random=' + Math.floor(Math.random() * 1000);
-  }
 
   @HostListener('window:scroll', ['$event'])
   onScroll(): void {
@@ -194,5 +190,11 @@ export class HomeComponent implements OnInit {
   @HostListener('window:resize', ['$event'])
   onResize(): void {
 
+  }
+
+  onImageError = (event: Event): void => this.imageService.handleImageError(event);
+
+  getPetImage(pet: Pet): string {
+    return this.imageService.getPetImage(pet, 'small');
   }
 }

@@ -80,22 +80,61 @@ export class ImageService {
     const adjustedUrls = size === 'large' 
       ? imageUrls.map(url => url.replace('w=200&h=200', sizeParam))
       : imageUrls;
-
+    
     const imageIndex = ((pet.id || 1) % adjustedUrls.length);
     return [adjustedUrls[imageIndex]];
+  }
+
+
+  getPetImage(pet: Pet, size: 'small' | 'large' = 'small'): string {
+    const petType = this.determinePetType(pet);
+    const validUrls = this.getValidPhotoUrls(pet, size);
+      
+    console.log(`🐾 Pet: ${pet.name || 'Unnamed'} (ID: ${pet.id}) - Type: ${petType} - Image: ${validUrls[0]}`);
+    
+    return validUrls[0];
+  }
+
+  validateImageForPet(pet: Pet, imageUrl: string): boolean {
+    const petType = this.determinePetType(pet);
+    const validUrls = this.getValidPhotoUrls(pet);
+    
+    return validUrls.includes(imageUrl);
   }
 
   private determinePetType(pet: Pet): 'dog' | 'cat' | 'other' {
     if (pet.category?.name) {
       const categoryName = pet.category.name.toLowerCase();
-      if (categoryName.includes('dog') || categoryName.includes('cachorro')) return 'dog';
-      if (categoryName.includes('cat') || categoryName.includes('gato')) return 'cat';
+      if (categoryName.includes('dog') || categoryName.includes('cachorro') || 
+          categoryName.includes('canine') || categoryName.includes('puppy')) {
+        return 'dog';
+      }
+      if (categoryName.includes('cat') || categoryName.includes('gato') || 
+          categoryName.includes('feline') || categoryName.includes('kitten')) {
+        return 'cat';
+      }
     }
     
-    if (pet.name) {
-      const name = pet.name.toLowerCase();
-      if (name.includes('dog') || name.includes('cachorro')) return 'dog';
-      if (name.includes('cat') || name.includes('gato')) return 'cat';
+      if (pet.name) {
+        const name = pet.name.toLowerCase();
+        
+        if (name.includes('dog') || name.includes('cachorro') || name.includes('puppy')) {
+          return 'dog';
+        }
+        if (name.includes('cat') || name.includes('gato') || name.includes('kitten')) {
+          return 'cat';
+        }
+      }
+    
+    if (pet.tags && pet.tags.length > 0) {
+      const tagText = pet.tags.map(tag => tag.name?.toLowerCase()).join(' ');
+      
+      if (tagText.includes('dog') || tagText.includes('cachorro') || tagText.includes('puppy')) {
+        return 'dog';
+      }
+      if (tagText.includes('cat') || tagText.includes('gato') || tagText.includes('kitten')) {
+        return 'cat';
+      }
     }
     
     return ((pet.id || 1) % 2 === 0) ? 'dog' : 'cat';
