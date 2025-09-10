@@ -1,1 +1,88 @@
-<p>pet-detail works!</p>
+<div class="pets-showcase-container">
+  <div class="container">
+    <div class="page-header">
+      <button mat-icon-button class="back-button" (click)="goBack()">
+        <mat-icon>arrow_back</mat-icon>
+      </button>
+      <h1 class="page-title">Pets em Destaque</h1>
+      <p class="page-subtitle">Conheça nossos pets mais especiais</p>
+    </div>
+
+    <div *ngIf="loading" class="loading-container">
+      <mat-spinner></mat-spinner>
+      <p>Carregando pets...</p>
+    </div>
+
+    <div *ngIf="error && !loading" class="error-container">
+      <mat-icon class="error-icon">error</mat-icon>
+      <h2>Ops! Algo deu errado</h2>
+      <p>{{ error }}</p>
+      <button mat-raised-button color="primary" (click)="goBack()">
+        <mat-icon>arrow_back</mat-icon>
+        Voltar para Lista
+      </button>
+    </div>
+
+    <div *ngIf="pets.length > 0 && !loading" class="pets-showcase-content">
+      <div class="pets-grid">
+        <div 
+          *ngFor="let pet of pets; let i = index" 
+          class="pet-card"
+          [routerLink]="['/pets', pet.id || 0]">
+          <div class="pet-image-container">
+            <img 
+              [src]="pet.photoUrls[0] || 'assets/default-pet.png'" 
+              [alt]="pet.name || 'Pet disponível'"
+              (error)="onImageError($event)"
+              class="pet-card-image">
+            <div class="pet-status-badge" [ngClass]="'status-' + (pet.status || 'available')">
+              <span class="status-text">{{ getStatusText(pet.status) }}</span>
+            </div>
+          </div>
+          <div class="pet-card-info">
+            <h3 class="pet-card-name">{{ pet.name || 'Pet ' + (i + 1) }}</h3>
+            <div class="pet-details">
+              <span class="pet-detail-item">
+                <mat-icon class="detail-icon">pets</mat-icon>
+                {{ getPetType(pet) }}
+              </span>
+              <span class="pet-detail-item">
+                <mat-icon class="detail-icon">schedule</mat-icon>
+                {{ getPetAge(pet) }}
+              </span>
+            </div>
+            <div class="pet-location">
+              <mat-icon class="location-icon">location_on</mat-icon>
+              <span>{{ getPetLocation(pet) }}</span>
+            </div>
+            <div class="pet-actions">
+              <button mat-button color="primary" (click)="viewPet(pet.id || 0, $event)">
+                <mat-icon>visibility</mat-icon>
+                Ver Detalhes
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="showcase-cta">
+        <h2 class="cta-title">Não encontrou seu pet ideal?</h2>
+        <p class="cta-subtitle">Explore nossa lista completa com mais opções e filtros avançados</p>
+        <button mat-raised-button color="primary" class="cta-button" routerLink="/pets">
+          <mat-icon class="btn-icon">pets</mat-icon>
+          Ver Todos os Pets
+        </button>
+      </div>
+    </div>
+
+    <div *ngIf="pets.length === 0 && !loading" class="no-pets-message">
+      <mat-icon class="no-pets-icon">pets</mat-icon>
+      <h3>Nenhum pet encontrado</h3>
+      <p>Não há pets disponíveis no momento.</p>
+      <button mat-raised-button color="primary" routerLink="/pets">
+        <mat-icon>refresh</mat-icon>
+        Tentar Novamente
+      </button>
+    </div>
+  </div>
+</div>
