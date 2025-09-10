@@ -35,7 +35,7 @@ export class PetService {
       params = params.set('offset', filters.offset.toString());
     }
 
-    return this.http.get<Pet[]>(`${this.config.apiUrl}/pet/findByStatus`, { params })
+    return this.http.get<Pet[]>(`${this.apiUrl}/pet/findByStatus`, { params })
       .pipe(
         map((pets: Pet[]) => {
           if (filters?.name) {
@@ -55,28 +55,28 @@ export class PetService {
   }
 
   getPetById(id: number): Observable<Pet> {
-    return this.http.get<Pet>(`${this.config.apiUrl}/pet/${id}`)
+    return this.http.get<Pet>(`${this.apiUrl}/pet/${id}`)
       .pipe(
         catchError(this.handleError)
       );
   }
 
   createPet(pet: Omit<Pet, 'id'>): Observable<Pet> {
-    return this.http.post<Pet>(`${this.config.apiUrl}/pet`, pet)
+    return this.http.post<Pet>(`${this.apiUrl}/pet`, pet)
       .pipe(
         catchError(this.handleError)
       );
   }
 
   updatePet(pet: Pet): Observable<Pet> {
-    return this.http.put<Pet>(`${this.config.apiUrl}/pet`, pet)
+    return this.http.put<Pet>(`${this.apiUrl}/pet`, pet)
       .pipe(
         catchError(this.handleError)
       );
   }
 
   deletePet(id: number): Observable<ApiResponse<{ id: number }>> {
-    return this.http.delete<ApiResponse<{ id: number }>>(`${this.config.apiUrl}/pet/${id}`)
+    return this.http.delete<ApiResponse<{ id: number }>>(`${this.apiUrl}/pet/${id}`)
       .pipe(
         catchError(this.handleError)
       );
@@ -85,7 +85,7 @@ export class PetService {
   getPetsByStatus(status: PetStatus): Observable<Pet[]> {
     const params = new HttpParams().set('status', status);
     
-    return this.http.get<Pet[]>(`${this.config.apiUrl}/pet/findByStatus`, { params })
+    return this.http.get<Pet[]>(`${this.apiUrl}/pet/findByStatus`, { params })
       .pipe(
         catchError(this.handleError)
       );
@@ -94,7 +94,7 @@ export class PetService {
   searchPetsByTags(tags: string[]): Observable<Pet[]> {
     const params = new HttpParams().set('tags', tags.join(','));
     
-    return this.http.get<Pet[]>(`${this.config.apiUrl}/pet/findByTags`, { params })
+    return this.http.get<Pet[]>(`${this.apiUrl}/pet/findByTags`, { params })
       .pipe(
         catchError(this.handleError)
       );
@@ -108,7 +108,7 @@ export class PetService {
     const formData = new FormData();
     formData.append('file', file);
     
-    return this.http.post<ApiResponse<{ photoUrls?: string[] }>>(`${this.config.apiUrl}/pet/${petId}/uploadImage`, formData)
+    return this.http.post<ApiResponse<{ photoUrls?: string[] }>>(`${this.apiUrl}/pet/${petId}/uploadImage`, formData)
       .pipe(
         catchError(this.handleError)
       );
