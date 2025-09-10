@@ -12,15 +12,15 @@ import { LoadingSpinnerComponent } from './shared/components/loading-spinner/loa
 import { MainLayoutComponent } from './layouts/main-layout/main-layout.component';
 import { HeaderComponent } from './shared/components/header/header.component';
 import { HttpErrorInterceptor } from './core/interceptors/http-error.interceptor';
-import { APP_INITIALIZER } from '@angular/core';
-import { ConfigService } from './core/services/config.service';
+import { FooterComponent } from './shared/components/footer/footer.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     LoadingSpinnerComponent,
     MainLayoutComponent,
-    HeaderComponent
+    HeaderComponent,
+    FooterComponent
   ],
   imports: [
     BrowserModule,
@@ -32,12 +32,6 @@ import { ConfigService } from './core/services/config.service';
     MatToolbarModule
   ],
   providers: [
-    {
-      provide: APP_INITIALIZER,
-      useFactory: (configService: ConfigService) => () => configService.load(),
-      deps: [ConfigService],
-      multi: true
-    },
     {
       provide: HTTP_INTERCEPTORS,
       useClass: HttpErrorInterceptor,

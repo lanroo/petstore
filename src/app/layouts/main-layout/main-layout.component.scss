@@ -9,22 +9,11 @@
 .main-content {
   flex: 1;
   padding: 0;
-  padding-top: 80px; // Space for fixed header
+  padding-top: 80px;
   width: 100%;
 }
 
-.footer {
-  background: #ffffff;
-  border-top: 1px solid #e5e7eb;
-  padding: 1.5rem 0;
-  text-align: center;
-  color: #6b7280;
-}
 
-.footer p {
-  margin: 0;
-  font-size: 0.9rem;
-}
   
 @media (max-width: 768px) {
   .header-content {
