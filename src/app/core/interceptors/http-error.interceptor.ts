@@ -10,13 +10,15 @@ import { Observable, throwError } from 'rxjs';
 import { catchError, finalize } from 'rxjs/operators';
 import { LoadingService } from '../services/loading.service';
 import { NotificationService } from '../services/notification.service';
+import { ErrorService } from '../services/error.service';
 
 @Injectable()
 export class HttpErrorInterceptor implements HttpInterceptor {
 
   constructor(
     private loadingService: LoadingService,
-    private notificationService: NotificationService
+    private notificationService: NotificationService,
+    private errorService: ErrorService
   ) {}
 
   intercept(
@@ -40,23 +42,31 @@ export class HttpErrorInterceptor implements HttpInterceptor {
         return throwError(() => error);
       }),
       finalize(() => {
-        
         this.loadingService.hide();
       })
     );
   }
 
   private handleHttpError(error: HttpErrorResponse): void {
+    console.error('HTTP Error:', {
+      status: error.status,
+      message: error.message,
+      url: error.url,
+      error: error.error
+    });
+
+    if (this.shouldRedirectToErrorPage(error.status)) {
+      this.errorService.handleHttpError(error, 'HTTP Request');
+      return;
+    }
+
     let errorTitle = 'Erro na Requisição';
     let errorMessage = 'Algo deu errado. Tente novamente.';
-    let showNotification = true;
 
     if (error.error instanceof ErrorEvent) {
-      
       errorTitle = 'Erro de Conexão';
       errorMessage = 'Verifique sua conexão com a internet.';
     } else {
-      
       switch (error.status) {
         case 400:
           errorTitle = 'Dados Inválidos';
@@ -65,14 +75,6 @@ export class HttpErrorInterceptor implements HttpInterceptor {
         case 401:
           errorTitle = 'Não Autorizado';
           errorMessage = 'Você precisa estar logado para acessar este recurso.';
-          break;
-        case 403:
-          errorTitle = 'Acesso Negado';
-          errorMessage = 'Você não tem permissão para realizar esta ação.';
-          break;
-        case 404:
-          errorTitle = 'Não Encontrado';
-          errorMessage = 'O recurso solicitado não foi encontrado.';
           break;
         case 405:
           errorTitle = 'Método Não Permitido';
@@ -85,10 +87,6 @@ export class HttpErrorInterceptor implements HttpInterceptor {
         case 429:
           errorTitle = 'Muitas Requisições';
           errorMessage = 'Aguarde um momento antes de tentar novamente.';
-          break;
-        case 500:
-          errorTitle = 'Erro do Servidor';
-          errorMessage = 'Erro interno do servidor. Nossa equipe foi notificada.';
           break;
         case 502:
           errorTitle = 'Serviço Indisponível';
@@ -107,17 +105,10 @@ export class HttpErrorInterceptor implements HttpInterceptor {
       }
     }
 
-    
-    console.error('HTTP Error:', {
-      status: error.status,
-      message: error.message,
-      url: error.url,
-      error: error.error
-    });
+    this.notificationService.showError(errorTitle, errorMessage);
+  }
 
-    
-    if (showNotification) {
-      this.notificationService.showError(errorTitle, errorMessage);
-    }
+  private shouldRedirectToErrorPage(status: number): boolean {
+    return [404, 500].includes(status);
   }
 }
