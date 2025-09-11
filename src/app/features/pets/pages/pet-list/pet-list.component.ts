@@ -23,6 +23,7 @@ export class PetListComponent implements OnInit {
   totalPets = 0;
   pageSize = 12;
   currentPage = 0;
+  
 
   constructor(
     private petService: PetService,
@@ -39,10 +40,7 @@ export class PetListComponent implements OnInit {
 
     this.petService.getPetsByStatus(PetStatus.AVAILABLE).subscribe({
       next: (pets) => {
-        this.pets = pets.map(pet => ({
-          ...pet,
-          photoUrls: this.imageService.getValidPhotoUrls(pet, 'small')
-        }));
+        this.pets = pets;
         this.filteredPets = [...this.pets];
         this.totalPets = this.pets.length;
         this.loading = false;
@@ -117,4 +115,5 @@ export class PetListComponent implements OnInit {
   getPetImage(pet: Pet): string {
     return this.imageService.getPetImage(pet, 'small');
   }
+
 }

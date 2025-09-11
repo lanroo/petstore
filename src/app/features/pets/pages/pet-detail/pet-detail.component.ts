@@ -32,12 +32,7 @@ export class PetDetailComponent implements OnInit {
 
     this.petService.getPetsByStatus(PetStatus.AVAILABLE).subscribe({
       next: (pets) => {
-        this.pets = pets
-          .slice(0, 10)
-          .map(pet => ({
-            ...pet,
-            photoUrls: this.imageService.getValidPhotoUrls(pet, 'large')
-          }));
+        this.pets = pets.slice(0, 10);
         this.loading = false;
       },
       error: (error) => {
