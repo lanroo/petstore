@@ -1,136 +1,261 @@
-<div class="pet-list-container">
-  <div class="container">
-    <div class="page-header">
-      <h1 class="page-title">Pets Disponíveis</h1>
-      <p class="page-subtitle">Encontre seu novo melhor amigo</p>
-      
-      <div class="page-actions">
-        <button mat-raised-button color="primary" routerLink="/pets/new">
-          <mat-icon class="btn-icon">add</mat-icon>
+<div class="pets-page">
+
+  <div class="hero-section">
+    <div class="hero-content">
+      <div class="hero-text">
+        <h1 class="hero-title">
+          Encontre seu <span class="hero-highlight">melhor amigo</span>
+        </h1>
+        <p class="hero-subtitle">
+          Conectamos famílias amorosas com pets que precisam de um lar. 
+          Cada adoção é uma história de amor que começa aqui.
+        </p>
+        <div class="hero-stats">
+          <div class="stat-chips">
+            <span class="stat-chip">{{ totalPets }} Pets Disponíveis</span>
+            <span class="stat-chip">10 Cidades</span>
+            <span class="stat-chip">100% Gratuito</span>
+          </div>
+        </div>
+      </div>
+      <div class="hero-actions">
+        <button mat-raised-button color="accent" routerLink="/pets/new">
+          <mat-icon>add</mat-icon>
           Cadastrar Pet
+        </button>
+        <button mat-stroked-button color="accent" (click)="scrollToFilters()">
+          <mat-icon>search</mat-icon>
+          Buscar Pets
         </button>
       </div>
     </div>
+  </div>
 
-    <div class="filters-section">
-      <div class="filter-group">
-        <mat-form-field appearance="outline" class="filter-field">
-          <mat-label>Buscar por nome</mat-label>
-          <input matInput [(ngModel)]="searchTerm" (input)="onSearch()" placeholder="Digite o nome do pet">
-          <mat-icon matSuffix>search</mat-icon>
-        </mat-form-field>
-
-        <mat-form-field appearance="outline" class="filter-field">
-          <mat-label>Status</mat-label>
-          <mat-select [(ngModel)]="selectedStatus" (selectionChange)="onStatusFilter()">
-            <mat-option value="">Todos</mat-option>
-            <mat-option value="available">Disponível</mat-option>
-            <mat-option value="adopted">Adotado</mat-option>
-          </mat-select>
-        </mat-form-field>
-
-        <mat-form-field appearance="outline" class="filter-field">
-          <mat-label>Espécie</mat-label>
-          <mat-select [(ngModel)]="selectedSpecies" (selectionChange)="onSpeciesFilter()">
-            <mat-option value="">Todas</mat-option>
-            <mat-option value="dog">Cachorro</mat-option>
-            <mat-option value="cat">Gato</mat-option>
-          </mat-select>
-        </mat-form-field>
-
-        <mat-form-field appearance="outline" class="filter-field">
-          <mat-label>Cidade</mat-label>
-          <mat-select [(ngModel)]="selectedCity" (selectionChange)="onCityFilter()">
-            <mat-option value="">Todas</mat-option>
-            <mat-option value="São Paulo">São Paulo</mat-option>
-            <mat-option value="Rio de Janeiro">Rio de Janeiro</mat-option>
-            <mat-option value="Belo Horizonte">Belo Horizonte</mat-option>
-            <mat-option value="Salvador">Salvador</mat-option>
-            <mat-option value="Brasília">Brasília</mat-option>
-            <mat-option value="Fortaleza">Fortaleza</mat-option>
-            <mat-option value="Manaus">Manaus</mat-option>
-            <mat-option value="Curitiba">Curitiba</mat-option>
-            <mat-option value="Recife">Recife</mat-option>
-            <mat-option value="Porto Alegre">Porto Alegre</mat-option>
-          </mat-select>
-        </mat-form-field>
+  <div class="filters-panel">
+    <div class="filters-header" (click)="toggleFiltersExpanded()">
+      <div class="filters-title">
+        <mat-icon>filter_list</mat-icon>
+        <span>Filtros e Ordenação</span>
+        <mat-icon class="expand-icon" [class.rotated]="filtersExpanded">keyboard_arrow_down</mat-icon>
+      </div>
+      <div class="filters-count">
+        {{ filteredPets.length }} pets encontrados
       </div>
     </div>
 
-    <div *ngIf="loading" class="loading-container">
-      <mat-spinner></mat-spinner>
-      <p>Carregando pets...</p>
-    </div>
+    <div class="filters-content" [class.expanded]="filtersExpanded">
+   
+      <div class="search-container">
+        <label class="search-label">Buscar pets</label>
+        <div class="search-input-wrapper">
+          <input 
+            type="text" 
+            class="search-input" 
+            [(ngModel)]="searchTerm" 
+            (input)="onFilterChange()" 
+            placeholder="Nome, raça, descrição...">
+          <mat-icon class="search-icon">search</mat-icon>
+        </div>
+      </div>
 
-    <div *ngIf="!loading" class="pets-grid">
-          <div 
-            *ngFor="let pet of filteredPets; let i = index" 
-            class="pet-card"
-            [routerLink]="['/pets', pet.id]">
-            <div class="pet-image-container">
-              <img 
-                [src]="getPetImage(pet)" 
-                [alt]="pet.name || 'Pet disponível'"
-                (error)="onImageError($event)"
-                class="pet-card-image">
-              <div class="pet-status-badge" [ngClass]="'status-' + (pet.status || 'available')">
-                <span class="status-text">{{ getStatusText(pet.status) }}</span>
-              </div>
-              <div class="pet-overlay">
-                <div class="overlay-content">
-                  <mat-icon class="overlay-icon">visibility</mat-icon>
-                  <span>Ver Detalhes</span>
-                </div>
-              </div>
-            </div>
-            <div class="pet-card-info">
-              <div class="pet-header">
-                <h3 class="pet-card-name">{{ pet.name || 'Pet ' + (i + 1) }}</h3>
-                <div class="pet-heart">
-                  <mat-icon>favorite_border</mat-icon>
-                </div>
-              </div>
-              <div class="pet-details">
-                <span class="pet-detail-item">
-                  <mat-icon class="detail-icon">pets</mat-icon>
-                  {{ getPetType(pet) }}
-                </span>
-                <span class="pet-detail-item">
-                  <mat-icon class="detail-icon">schedule</mat-icon>
-                  {{ getPetAge(pet) }}
-                </span>
-              </div>
-              <div class="pet-location">
-                <mat-icon class="location-icon">location_on</mat-icon>
-                <span>{{ getPetLocation(pet) }}</span>
-              </div>
-              <div class="pet-actions">
-                <button mat-button color="primary" class="adopt-button" (click)="viewPet(pet.id, $event)">
-                  <mat-icon>favorite</mat-icon>
-                  Adotar
+      <div class="filters-row">
+        <div class="filter-group">
+          <label class="filter-label">Status</label>
+          <select class="filter-select" [(ngModel)]="selectedStatus" (change)="onFilterChange()">
+            <option value="">Todos</option>
+            <option value="available">Disponível</option>
+            <option value="adopted">Adotado</option>
+          </select>
+        </div>
+
+        <div class="filter-group">
+          <label class="filter-label">Espécie</label>
+          <select class="filter-select" [(ngModel)]="selectedSpecies" (change)="onFilterChange()">
+            <option value="">Todas</option>
+            <option value="dog">Cachorro</option>
+            <option value="cat">Gato</option>
+          </select>
+        </div>
+
+        <div class="filter-group">
+          <label class="filter-label">Gênero</label>
+          <select class="filter-select" [(ngModel)]="selectedGender" (change)="onFilterChange()">
+            <option value="">Todos</option>
+            <option value="male">Macho</option>
+            <option value="female">Fêmea</option>
+          </select>
+        </div>
+
+        <div class="filter-group">
+          <label class="filter-label">Cidade</label>
+          <select class="filter-select" [(ngModel)]="selectedCity" (change)="onFilterChange()">
+            <option value="">Todas</option>
+            <option value="São Paulo">São Paulo</option>
+            <option value="Rio de Janeiro">Rio de Janeiro</option>
+            <option value="Belo Horizonte">Belo Horizonte</option>
+            <option value="Salvador">Salvador</option>
+            <option value="Brasília">Brasília</option>
+            <option value="Fortaleza">Fortaleza</option>
+            <option value="Manaus">Manaus</option>
+            <option value="Curitiba">Curitiba</option>
+            <option value="Recife">Recife</option>
+            <option value="Porto Alegre">Porto Alegre</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="actions-row">
+        <div class="sort-controls">
+          <div class="sort-dropdown">
+            <label class="filter-label">Ordenar por</label>
+            <div class="dropdown-container">
+              <button class="dropdown-trigger" (click)="toggleSortDropdown()">
+                <span class="dropdown-text">{{ getSortLabel(sortBy) }}</span>
+                <mat-icon class="dropdown-arrow" [class.rotated]="sortDropdownOpen">keyboard_arrow_down</mat-icon>
+              </button>
+              <div class="dropdown-menu" [class.open]="sortDropdownOpen">
+                <button class="dropdown-item" (click)="selectSortOption('name')" [class.active]="sortBy === 'name'">
+                  <mat-icon>sort_by_alpha</mat-icon>
+                  <span>Nome</span>
+                </button>
+                <button class="dropdown-item" (click)="selectSortOption('age')" [class.active]="sortBy === 'age'">
+                  <mat-icon>cake</mat-icon>
+                  <span>Idade</span>
+                </button>
+                <button class="dropdown-item" (click)="selectSortOption('species')" [class.active]="sortBy === 'species'">
+                  <mat-icon>pets</mat-icon>
+                  <span>Espécie</span>
+                </button>
+                <button class="dropdown-item" (click)="selectSortOption('city')" [class.active]="sortBy === 'city'">
+                  <mat-icon>location_on</mat-icon>
+                  <span>Cidade</span>
                 </button>
               </div>
             </div>
           </div>
+          
+          <button class="sort-order-btn" (click)="toggleSortOrder()" [title]="sortOrder === 'asc' ? 'Ordem crescente' : 'Ordem decrescente'">
+            <mat-icon [class.rotated]="sortOrder === 'desc'">{{ sortOrder === 'asc' ? 'arrow_upward' : 'arrow_downward' }}</mat-icon>
+          </button>
         </div>
-    <div *ngIf="!loading && filteredPets.length === 0" class="no-pets-message">
-      <mat-icon class="no-pets-icon">pets</mat-icon>
-      <h3>Nenhum pet encontrado</h3>
-      <p>Tente ajustar os filtros ou cadastre um novo pet.</p>
-      <button mat-raised-button color="primary" routerLink="/pets/new">
-        <mat-icon>add</mat-icon>
-        Cadastrar Pet
-      </button>
-    </div>
 
-    <div *ngIf="!loading && filteredPets.length > 0" class="pagination-container">
-      <mat-paginator
-        [length]="totalPets"
-        [pageSize]="pageSize"
-        [pageSizeOptions]="[6, 12, 24, 48]"
-        (page)="onPageChange($event)"
-        showFirstLastButtons>
-      </mat-paginator>
+        <div class="view-controls">
+          <button class="view-btn" (click)="setViewMode('grid')" [class.active]="viewMode === 'grid'" title="Visualização em grade">
+            <mat-icon>grid_view</mat-icon>
+            <span>Grade</span>
+          </button>
+          <button class="view-btn" (click)="setViewMode('list')" [class.active]="viewMode === 'list'" title="Visualização em lista">
+            <mat-icon>list</mat-icon>
+            <span>Lista</span>
+          </button>
+        </div>
+
+        <button class="clear-btn" (click)="clearFilters()">
+          <mat-icon>refresh</mat-icon>
+          <span>Limpar Filtros</span>
+        </button>
+      </div>
     </div>
   </div>
+  
+  <section class="pets-section">
+    <div class="container">
+      <div *ngIf="loading" class="loading-state">
+        <div class="loading-spinner">
+          <mat-spinner diameter="60"></mat-spinner>
+        </div>
+        <h3>Encontrando pets incríveis...</h3>
+        <p>Aguarde enquanto carregamos os melhores amigos para você</p>
+      </div>
+
+      <div *ngIf="loading" class="skeleton-container" [ngClass]="'view-' + viewMode">
+        <div *ngFor="let item of [1,2,3,4,5,6]" class="skeleton-card">
+          <div class="skeleton-image"></div>
+          <div class="skeleton-content">
+            <div class="skeleton-title"></div>
+            <div class="skeleton-subtitle"></div>
+            <div class="skeleton-details">
+              <div class="skeleton-detail"></div>
+              <div class="skeleton-detail"></div>
+              <div class="skeleton-detail"></div>
+            </div>
+            <div class="skeleton-description"></div>
+            <div class="skeleton-button"></div>
+          </div>
+        </div>
+      </div>
+
+      <div *ngIf="!loading && filteredPets.length > 0" class="pets-container" [ngClass]="'view-' + viewMode">
+        <mat-card 
+          *ngFor="let pet of filteredPets; let i = index" 
+          class="pet-card"
+          [routerLink]="['/pets', pet.id]">
+          
+          <mat-card-header>
+            <div mat-card-avatar class="pet-avatar">
+              <img [src]="getPetImage(pet)" [alt]="pet.name" (error)="onImageError($event)">
+            </div>
+            <mat-card-title>{{ pet.name || 'Pet ' + (i + 1) }}</mat-card-title>
+            <mat-card-subtitle>{{ getPetBreed(pet) }}</mat-card-subtitle>
+            <button mat-icon-button class="favorite-btn" (click)="toggleFavorite(pet.id, $event)" [class.favorited]="isFavorite(pet.id)">
+              <mat-icon>{{ isFavorite(pet.id) ? 'favorite' : 'favorite_border' }}</mat-icon>
+            </button>
+          </mat-card-header>
+
+          <img mat-card-image [src]="getPetImage(pet)" [alt]="pet.name" (error)="onImageError($event)">
+          
+          <mat-card-content>
+            <div class="pet-details">
+              <mat-chip-set>
+                <mat-chip>{{ getPetType(pet) }}</mat-chip>
+                <mat-chip>{{ getPetAge(pet) }}</mat-chip>
+                <mat-chip [ngClass]="'gender-' + pet.gender">{{ getPetGender(pet) }}</mat-chip>
+                <mat-chip>{{ getPetLocation(pet) }}</mat-chip>
+              </mat-chip-set>
+            </div>
+      
+            <p class="pet-description">{{ getPetDescription(pet) }}</p>
+          </mat-card-content>
+          
+          <mat-card-actions>
+            <button mat-button color="primary" (click)="viewPet(pet.id, $event)">
+              <mat-icon>visibility</mat-icon>
+              Ver Detalhes
+            </button>
+            <button mat-button (click)="sharePet(pet, $event)">
+              <mat-icon>share</mat-icon>
+              Compartilhar
+            </button>
+            <span class="spacer"></span>
+            <mat-chip [ngClass]="'status-' + (pet.status || 'available')">
+              {{ getStatusText(pet.status) }}
+            </mat-chip>
+          </mat-card-actions>
+        </mat-card>
+      </div>
+
+      <mat-card *ngIf="!loading && filteredPets.length === 0" class="empty-state">
+        <mat-card-content class="empty-content">
+          <mat-icon class="empty-icon">pets</mat-icon>
+          <h2>Nenhum pet encontrado</h2>
+          <p>Não encontramos pets com os filtros selecionados. Tente ajustar os critérios de busca.</p>
+          <button mat-raised-button color="primary" (click)="clearFilters()">
+            <mat-icon>refresh</mat-icon>
+            Limpar Filtros
+          </button>
+        </mat-card-content>
+      </mat-card>
+
+      <div *ngIf="!loading && filteredPets.length > 0" class="pagination-section">
+        <mat-paginator
+          [length]="totalPets"
+          [pageSize]="pageSize"
+          [pageSizeOptions]="[12, 24, 48]"
+          (page)="onPageChange($event)"
+          showFirstLastButtons
+          class="modern-paginator">
+        </mat-paginator>
+      </div>
+    </div>
+  </section>
 </div>

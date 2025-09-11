@@ -10,6 +10,9 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatToolbarModule } from '@angular/material/toolbar';
+import { MatChipsModule } from '@angular/material/chips';
+import { MatExpansionModule } from '@angular/material/expansion';
 
 import { PetsRoutingModule } from './pets-routing.module';
 import { PetListComponent } from './pages/pet-list/pet-list.component';
@@ -35,7 +38,10 @@ import { PetFormComponent } from './pages/pet-form/pet-form.component';
     MatInputModule,
     MatSelectModule,
     MatPaginatorModule,
-    MatProgressSpinnerModule
+    MatProgressSpinnerModule,
+    MatToolbarModule,
+    MatChipsModule,
+    MatExpansionModule
   ]
 })
 export class PetsModule { }
