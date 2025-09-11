@@ -48,45 +48,56 @@
     </div>
 
     <div *ngIf="!loading" class="pets-grid">
-      <div 
-        *ngFor="let pet of filteredPets; let i = index" 
-        class="pet-card"
-        [routerLink]="['/pets', pet.id]">
-        <div class="pet-image-container">
-          <img 
-            [src]="getPetImage(pet)" 
-            [alt]="pet.name || 'Pet disponível'"
-            (error)="onImageError($event)"
-            class="pet-card-image">
-          <div class="pet-status-badge" [ngClass]="'status-' + (pet.status || 'available')">
-            <span class="status-text">{{ getStatusText(pet.status) }}</span>
+          <div 
+            *ngFor="let pet of filteredPets; let i = index" 
+            class="pet-card"
+            [routerLink]="['/pets', pet.id]">
+            <div class="pet-image-container">
+              <img 
+                [src]="getPetImage(pet)" 
+                [alt]="pet.name || 'Pet disponível'"
+                (error)="onImageError($event)"
+                class="pet-card-image">
+              <div class="pet-status-badge" [ngClass]="'status-' + (pet.status || 'available')">
+                <span class="status-text">{{ getStatusText(pet.status) }}</span>
+              </div>
+              <div class="pet-overlay">
+                <div class="overlay-content">
+                  <mat-icon class="overlay-icon">visibility</mat-icon>
+                  <span>Ver Detalhes</span>
+                </div>
+              </div>
+            </div>
+            <div class="pet-card-info">
+              <div class="pet-header">
+                <h3 class="pet-card-name">{{ pet.name || 'Pet ' + (i + 1) }}</h3>
+                <div class="pet-heart">
+                  <mat-icon>favorite_border</mat-icon>
+                </div>
+              </div>
+              <div class="pet-details">
+                <span class="pet-detail-item">
+                  <mat-icon class="detail-icon">pets</mat-icon>
+                  {{ getPetType(pet) }}
+                </span>
+                <span class="pet-detail-item">
+                  <mat-icon class="detail-icon">schedule</mat-icon>
+                  {{ getPetAge(pet) }}
+                </span>
+              </div>
+              <div class="pet-location">
+                <mat-icon class="location-icon">location_on</mat-icon>
+                <span>{{ getPetLocation(pet) }}</span>
+              </div>
+              <div class="pet-actions">
+                <button mat-button color="primary" class="adopt-button" (click)="viewPet(pet.id, $event)">
+                  <mat-icon>favorite</mat-icon>
+                  Adotar
+                </button>
+              </div>
+            </div>
           </div>
         </div>
-        <div class="pet-card-info">
-          <h3 class="pet-card-name">{{ pet.name || 'Pet ' + (i + 1) }}</h3>
-          <div class="pet-details">
-            <span class="pet-detail-item">
-              <mat-icon class="detail-icon">pets</mat-icon>
-              {{ getPetType(pet) }}
-            </span>
-            <span class="pet-detail-item">
-              <mat-icon class="detail-icon">schedule</mat-icon>
-              {{ getPetAge(pet) }}
-            </span>
-          </div>
-          <div class="pet-location">
-            <mat-icon class="location-icon">location_on</mat-icon>
-            <span>{{ getPetLocation(pet) }}</span>
-          </div>
-          <div class="pet-actions">
-            <button mat-button color="primary" (click)="viewPet(pet.id, $event)">
-              <mat-icon>visibility</mat-icon>
-              Ver Detalhes
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
     <div *ngIf="!loading && filteredPets.length === 0" class="no-pets-message">
       <mat-icon class="no-pets-icon">pets</mat-icon>
       <h3>Nenhum pet encontrado</h3>
