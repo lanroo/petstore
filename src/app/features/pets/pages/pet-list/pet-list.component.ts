@@ -19,7 +19,8 @@ export class PetListComponent implements OnInit {
   
   searchTerm = '';
   selectedStatus = '';
-  selectedCategory = '';
+  selectedSpecies = '';
+  selectedCity = '';
   totalPets = 0;
   pageSize = 12;
   currentPage = 0;
@@ -69,11 +70,12 @@ export class PetListComponent implements OnInit {
       filtered = filtered.filter(pet => pet.status === this.selectedStatus);
     }
 
-    if (this.selectedCategory) {
-      filtered = filtered.filter(pet => {
-        const petType = PetUtils.getPetType(pet).toLowerCase();
-        return petType.includes(this.selectedCategory);
-      });
+    if (this.selectedSpecies) {
+      filtered = filtered.filter(pet => pet.species === this.selectedSpecies);
+    }
+
+    if (this.selectedCity) {
+      filtered = filtered.filter(pet => pet.city === this.selectedCity);
     }
 
     this.filteredPets = filtered;
@@ -94,7 +96,11 @@ export class PetListComponent implements OnInit {
     this.applyFilters();
   }
 
-  onCategoryFilter(): void {
+  onSpeciesFilter(): void {
+    this.applyFilters();
+  }
+
+  onCityFilter(): void {
     this.applyFilters();
   }
 

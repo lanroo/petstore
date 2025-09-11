@@ -25,18 +25,33 @@
           <mat-select [(ngModel)]="selectedStatus" (selectionChange)="onStatusFilter()">
             <mat-option value="">Todos</mat-option>
             <mat-option value="available">Disponível</mat-option>
-            <mat-option value="pending">Pendente</mat-option>
-            <mat-option value="sold">Vendido</mat-option>
+            <mat-option value="adopted">Adotado</mat-option>
           </mat-select>
         </mat-form-field>
 
         <mat-form-field appearance="outline" class="filter-field">
-          <mat-label>Categoria</mat-label>
-          <mat-select [(ngModel)]="selectedCategory" (selectionChange)="onCategoryFilter()">
+          <mat-label>Espécie</mat-label>
+          <mat-select [(ngModel)]="selectedSpecies" (selectionChange)="onSpeciesFilter()">
             <mat-option value="">Todas</mat-option>
             <mat-option value="dog">Cachorro</mat-option>
             <mat-option value="cat">Gato</mat-option>
-            <mat-option value="other">Outros</mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="filter-field">
+          <mat-label>Cidade</mat-label>
+          <mat-select [(ngModel)]="selectedCity" (selectionChange)="onCityFilter()">
+            <mat-option value="">Todas</mat-option>
+            <mat-option value="São Paulo">São Paulo</mat-option>
+            <mat-option value="Rio de Janeiro">Rio de Janeiro</mat-option>
+            <mat-option value="Belo Horizonte">Belo Horizonte</mat-option>
+            <mat-option value="Salvador">Salvador</mat-option>
+            <mat-option value="Brasília">Brasília</mat-option>
+            <mat-option value="Fortaleza">Fortaleza</mat-option>
+            <mat-option value="Manaus">Manaus</mat-option>
+            <mat-option value="Curitiba">Curitiba</mat-option>
+            <mat-option value="Recife">Recife</mat-option>
+            <mat-option value="Porto Alegre">Porto Alegre</mat-option>
           </mat-select>
         </mat-form-field>
       </div>
