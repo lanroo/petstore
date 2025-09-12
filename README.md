@@ -60,11 +60,11 @@ src/
 
 ## API Integration
 
-The application consumes the PetStore Swagger API with intelligent adaptations:
+The application consumes a custom Pet Adoption API with intelligent adaptations:
 
-- **Pet Endpoints**: Transformed for adoption context
-- **Store Endpoints**: Product inventory management
-- **User Endpoints**: Account management capabilities
+- **Pet Endpoints**: Real pet adoption data
+- **Store Endpoints**: Pet product inventory management
+- **User Endpoints**: Adoption account management
 - **Error Handling**: Comprehensive HTTP error management
 
 ## Development Features
@@ -132,8 +132,8 @@ The application is ready for deployment with:
 
 ## API Configuration
 
-The application uses the PetStore Swagger API:
-- **Base URL**: `https://petstore.swagger.io/v2`
+The application uses a custom Pet Adoption API:
+- **Base URL**: `https://projeto-jornadadados-pet-api-adoptt.zjnxkg.easypanel.host`
 - **Authentication**: Not required for demo purposes
 - **Rate Limiting**: Implemented with retry mechanisms
 

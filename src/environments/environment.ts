@@ -1,6 +1,6 @@
 export const environment = {
   production: false,
-  apiUrl: 'https://petstore.swagger.io/v2',
+  apiUrl: 'https://projeto-jornadadados-pet-api-adoptt.zjnxkg.easypanel.host',
   appName: 'Adote um Amigo',
   version: '1.0.0',
   features: {
