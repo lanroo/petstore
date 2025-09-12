@@ -23,7 +23,7 @@
 
   <div class="filters-panel">
     <div class="filters-toolbar">
-      <!-- Busca Principal -->
+
       <div class="search-container">
         <div class="search-input-wrapper">
           <input 
@@ -31,7 +31,7 @@
             class="search-input" 
             [(ngModel)]="searchTerm" 
 (input)="onFilterChange()"
-            placeholder="Buscar pets por nome, raça...">
+            placeholder="Buscar pets por nome...">
           <mat-icon class="search-icon">search</mat-icon>
         </div>
       </div>
@@ -61,7 +61,7 @@
         </div>
       </div>
 
-      <!-- Ações -->
+
       <div class="toolbar-actions">
         <button class="clear-btn" (click)="clearFilters()" title="Limpar todos os filtros">
           <mat-icon>clear_all</mat-icon>
@@ -70,7 +70,6 @@
       </div>
     </div>
 
-    <!-- Contador de Resultados -->
     <div class="results-info">
       <span class="results-count">{{ totalPets || 0 }} pets encontrados</span>
     </div>

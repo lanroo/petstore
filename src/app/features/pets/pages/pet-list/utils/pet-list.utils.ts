@@ -35,7 +35,6 @@ export const matchesSearchTerm = (pet: Pet, searchTerm: string): boolean => {
   
   return (
     pet.name?.toLowerCase().includes(term) ||
-    pet.breed?.toLowerCase().includes(term) ||
     pet.description?.toLowerCase().includes(term)
   );
 };
