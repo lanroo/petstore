@@ -13,6 +13,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatExpansionModule } from '@angular/material/expansion';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { PaginatorModule } from 'primeng/paginator';
 
 import { PetsRoutingModule } from './pets-routing.module';
@@ -45,6 +46,7 @@ import { CustomPaginationComponent } from '../../shared/components/custom-pagina
     MatToolbarModule,
     MatChipsModule,
     MatExpansionModule,
+    MatTooltipModule,
     PaginatorModule
   ]
 })
