@@ -13,17 +13,20 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatExpansionModule } from '@angular/material/expansion';
+import { PaginatorModule } from 'primeng/paginator';
 
 import { PetsRoutingModule } from './pets-routing.module';
 import { PetListComponent } from './pages/pet-list/pet-list.component';
 import { PetDetailComponent } from './pages/pet-detail/pet-detail.component';
 import { PetFormComponent } from './pages/pet-form/pet-form.component';
+import { CustomPaginationComponent } from '../../shared/components/custom-pagination/custom-pagination.component';
 
 @NgModule({
   declarations: [
     PetListComponent,
     PetDetailComponent,
-    PetFormComponent
+    PetFormComponent,
+    CustomPaginationComponent
   ],
   imports: [
     CommonModule,
@@ -41,7 +44,8 @@ import { PetFormComponent } from './pages/pet-form/pet-form.component';
     MatProgressSpinnerModule,
     MatToolbarModule,
     MatChipsModule,
-    MatExpansionModule
+    MatExpansionModule,
+    PaginatorModule
   ]
 })
 export class PetsModule { }
