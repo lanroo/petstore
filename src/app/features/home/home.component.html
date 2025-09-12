@@ -1,27 +1,38 @@
 <section class="hero-section">
   <div class="hero-background">
-    <div class="hero-overlay"></div>
+    <div class="hero-pattern"></div>
+    <div class="hero-gradient"></div>
   </div>
   
   <div class="hero-content">
     <div class="hero-text">
+      <div class="hero-badge">
+        <mat-icon>pets</mat-icon>
+        <span>Plataforma #1 de Adoção</span>
+      </div>
+      
       <h1 class="hero-title">
-        Transforme a vida de um pet — 
-        <span class="hero-highlight">e a sua também</span>
+        Conecte 
+        <span class="hero-highlight">corações</span>
+        <br>e transforme 
+        <span class="hero-highlight-2">vidas</span>
       </h1>
+      
       <p class="hero-subtitle">
-        Adote gratuitamente e encontre seu novo melhor amigo. 
-        Cada pet merece uma segunda chance de ser amado.
+        Conectamos famílias amorosas com pets que precisam de um lar. 
+        <strong>Cada adoção é uma história de amor</strong> que começa aqui.
       </p>
+      
       
       <div class="hero-actions">
         <button mat-raised-button class="hero-btn hero-btn-primary" routerLink="/pets">
           <mat-icon class="btn-icon">search</mat-icon>
-          Encontre seu Amigo
+          <span>Encontrar Pet</span>
+          <mat-icon class="btn-arrow">arrow_forward</mat-icon>
         </button>
-        <button mat-stroked-button class="hero-btn hero-btn-secondary" routerLink="/pets/new">
-          <mat-icon class="btn-icon">volunteer_activism</mat-icon>
-          Quero Cadastrar um Pet
+        <button mat-button class="hero-btn hero-btn-secondary" routerLink="/pets">
+          <mat-icon class="btn-icon">play_circle</mat-icon>
+          <span>Como funciona</span>
         </button>
       </div>
       
@@ -82,30 +93,45 @@
     </div>
     
     <div class="hero-visual">
-      <div class="hero-image-container">
-        <div class="hero-image-wrapper">
-          <img 
-            src="https://www.mogidascruzes.sp.gov.br/public/site/imagens/6/202505141353096824ca7508a09.jpg" 
-            alt="Pets aguardando adoção - cães e gatos em busca de um lar"
-            class="hero-image"
-            loading="eager">
-        </div>
+        <div class="hero-background-image"></div>
         
-        <div class="floating-elements">
-          <div class="floating-card floating-card-1">
-            <mat-icon>favorite</mat-icon>
-            <span>Amor</span>
+        <div class="floating-cards">
+          <div class="floating-card card-1">
+            <div class="card-icon">
+              <mat-icon>favorite</mat-icon>
+            </div>
+            <div class="card-content">
+              <span class="card-number">{{ todayAdoptions }}</span>
+              <span class="card-label">Adoções hoje</span>
+            </div>
           </div>
-          <div class="floating-card floating-card-2">
-            <mat-icon>home</mat-icon>
-            <span>Lar</span>
+          
+          <div class="floating-card card-2">
+            <div class="card-icon">
+              <mat-icon>pets</mat-icon>
+            </div>
+            <div class="card-content">
+              <span class="card-number">{{ totalPetsAvailable }}+</span>
+              <span class="card-label">Disponíveis</span>
+            </div>
           </div>
-          <div class="floating-card floating-card-3">
-            <mat-icon>emoji_emotions</mat-icon>
-            <span>Alegria</span>
+          
+          <div class="floating-card card-3">
+            <div class="card-icon">
+              <mat-icon>verified</mat-icon>
+            </div>
+            <div class="card-content">
+              <span class="card-number">100%</span>
+              <span class="card-label">Verificados</span>
+            </div>
           </div>
         </div>
-      </div>
+
+        <div class="hero-decoration">
+          <div class="decoration-circle circle-1"></div>
+          <div class="decoration-circle circle-2"></div>
+          <div class="decoration-circle circle-3"></div>
+        </div>
     </div>
   </div>
   
@@ -126,95 +152,144 @@
       <p class="section-subtitle">Encontre seu novo melhor amigo entre nossos pets disponíveis</p>
     </div>
 
-    <div class="pets-preview-grid">
+    <div class="pets-carousel-container">
+      <div class="carousel-controls">
+        <button 
+          mat-icon-button 
+          class="carousel-btn carousel-prev"
+          (click)="previousSlide()"
+          [disabled]="currentSlide === 0">
+          <mat-icon>chevron_left</mat-icon>
+        </button>
+        <button 
+          mat-icon-button 
+          class="carousel-btn carousel-next"
+          (click)="nextSlide()"
+          [disabled]="currentSlide >= maxSlide">
+          <mat-icon>chevron_right</mat-icon>
+        </button>
+      </div>
+      
       <div 
-        *ngFor="let pet of availablePets.slice(0, 6); let i = index" 
-        class="pet-card"
-        [routerLink]="['/pets', pet.id]">
-        <div class="pet-image-container">
-          <img 
-            [src]="getPetImage(pet)" 
-            [alt]="pet.name || 'Pet disponível'"
-            (error)="onImageError($event)"
-            class="pet-card-image">
-          <div class="pet-status-badge">
-            <mat-icon class="status-icon">check_circle</mat-icon>
-            <span class="status-text">Disponível</span>
-          </div>
-          <div class="pet-overlay">
-            <div class="overlay-content">
-              <mat-icon class="overlay-icon">visibility</mat-icon>
-              <span>Ver Detalhes</span>
+        class="pets-carousel" 
+        #petsCarousel
+        (touchstart)="onTouchStart($event)"
+        (touchmove)="onTouchMove($event)"
+        (touchend)="onTouchEnd()"
+        (mousedown)="onMouseDown($event)"
+        (mousemove)="onMouseMove($event)"
+        (mouseup)="onMouseUp()"
+        (mouseleave)="onMouseUp()">
+        <div 
+          class="carousel-track" 
+          [style.transform]="'translateX(' + translateX + 'px)'"
+          [class.dragging]="isDragging">
+          <div 
+            *ngFor="let pet of availablePets; let i = index; trackBy: trackByPetId" 
+            class="pet-card"
+            [routerLink]="['/pets', pet.id]">
+            
+            <div class="pet-image-container">
+              <img 
+                [src]="getPetImage(pet)" 
+                [alt]="pet.name || 'Pet disponível'"
+                (error)="onImageError($event)"
+                class="pet-image"
+                loading="lazy">
+              
+              <div class="pet-status">
+                <mat-chip class="status-chip available">Disponível</mat-chip>
+              </div>
+              
+              <button 
+                mat-icon-button 
+                class="favorite-btn"
+                (click)="toggleFavorite(pet.id, $event)"
+                [class.active]="isFavorite(pet.id)"
+                [attr.aria-label]="isFavorite(pet.id) ? 'Remover dos favoritos' : 'Adicionar aos favoritos'">
+                <mat-icon>{{ isFavorite(pet.id) ? 'favorite' : 'favorite_border' }}</mat-icon>
+              </button>
+            </div>
+            
+            <div class="pet-info">
+              <div class="pet-header">
+                <h3 class="pet-name">{{ pet.name || 'Pet ' + (i + 1) }}</h3>
+                <div class="pet-gender">
+                  <mat-icon class="gender-icon">{{ pet.gender === 'male' ? 'male' : 'female' }}</mat-icon>
+                </div>
+              </div>
+              
+              <div class="pet-info-list">
+                <div class="info-item">
+                  <mat-icon class="info-icon">pets</mat-icon>
+                  <div class="info-details">
+                    <span class="info-label">TIPO</span>
+                    <span class="info-value">{{ getPetType(pet) }}</span>
+                  </div>
+                </div>
+                
+                <div class="info-item">
+                  <mat-icon class="info-icon">schedule</mat-icon>
+                  <div class="info-details">
+                    <span class="info-label">Idade</span>
+                    <span class="info-value">{{ getPetAge(pet) }}</span>
+                  </div>
+                </div>
+                
+                <div class="info-item location-info">
+                  <mat-icon class="info-icon">location_on</mat-icon>
+                  <div class="info-details">
+                    <span class="info-value">{{ getPetLocation(pet) }}</span>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="pet-actions">
+                <button 
+                  mat-raised-button 
+                  color="primary"
+                  class="details-btn"
+                  (click)="viewPet(pet.id, $event)">
+                  Ver Detalhes
+                </button>
+                <button 
+                  mat-icon-button 
+                  class="share-btn"
+                  (click)="sharePet(pet, $event)"
+                  [attr.aria-label]="'Compartilhar ' + pet.name">
+                  <mat-icon>share</mat-icon>
+                </button>
+              </div>
             </div>
           </div>
         </div>
-        <div class="pet-card-info">
-          <div class="pet-header">
-            <h3 class="pet-card-name">{{ pet.name || 'Pet ' + (i + 1) }}</h3>
-            <div class="pet-heart">
-              <mat-icon>favorite_border</mat-icon>
-            </div>
-          </div>
-          <div class="pet-details">
-            <div class="pet-detail-item">
-              <div class="detail-icon-wrapper">
-                <mat-icon class="detail-icon">pets</mat-icon>
-              </div>
-              <div class="detail-content">
-                <span class="detail-label">Tipo</span>
-                <span class="detail-value">{{ getPetType(pet) }}</span>
-              </div>
-            </div>
-            <div class="pet-detail-item">
-              <div class="detail-icon-wrapper">
-                <mat-icon class="detail-icon">schedule</mat-icon>
-              </div>
-              <div class="detail-content">
-                <span class="detail-label">Idade</span>
-                <span class="detail-value">{{ getPetAge(pet) }}</span>
-              </div>
-            </div>
-          </div>
-          <div class="pet-location">
-            <mat-icon class="location-icon">location_on</mat-icon>
-            <span>{{ getPetLocation(pet) }}</span>
-          </div>
-          <div class="pet-actions">
-            <button mat-stroked-button class="adopt-button">
-              <mat-icon>favorite</mat-icon>
-              Adotar
-            </button>
-          </div>
-        </div>
+      </div>
+
+      <div class="carousel-indicators">
+        <button 
+          *ngFor="let dot of dots; let i = index"
+          class="indicator-dot"
+          [class.active]="i === currentSlide"
+          (click)="goToSlide(i)"
+          [attr.aria-label]="'Ir para slide ' + (i + 1)">
+        </button>
       </div>
     </div>
 
     <div class="view-all-pets">
-      <div class="stats-row">
-        <div class="stat-item">
-          <div class="stat-number">{{ availablePets.length }}+</div>
-          <div class="stat-label">Pets Disponíveis</div>
-        </div>
-        <div class="stat-item">
-          <div class="stat-number">100%</div>
-          <div class="stat-label">Amor Garantido</div>
-        </div>
-        <div class="stat-item">
-          <div class="stat-number">24h</div>
-          <div class="stat-label">Suporte</div>
-        </div>
+      <div class="view-all-actions">
+        <button mat-flat-button 
+                class="view-all-button"
+                routerLink="/pets">
+          <mat-icon class="btn-icon">search</mat-icon>
+          <span>Ver Todos os Pets</span>
+          <mat-icon class="btn-arrow">arrow_forward</mat-icon>
+        </button>
+        
+        <p class="view-all-description">
+          Explore nossa coleção completa com filtros por cidade, estado, sexo, tipo e porte
+        </p>
       </div>
-      <button mat-raised-button 
-              color="primary" 
-              class="view-all-button"
-              routerLink="/pets">
-        <mat-icon class="btn-icon">pets</mat-icon>
-        Ver Todos os Pets
-        <mat-icon class="btn-arrow">arrow_forward</mat-icon>
-      </button>
-      <p class="view-all-description">
-        Explore nossa coleção completa com filtros por cidade, estado, sexo, tipo e porte
-      </p>
     </div>
   </div>
 </section>
