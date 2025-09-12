@@ -12,229 +12,154 @@
         </p>
         <div class="hero-stats">
           <div class="stat-chips">
-            <span class="stat-chip">{{ totalPets }} Pets Disponíveis</span>
-            <span class="stat-chip">10 Cidades</span>
-            <span class="stat-chip">100% Gratuito</span>
+            <span class="stat-chip">{{ totalPets || 0 }} Pets Disponíveis</span>
+            <span class="stat-chip">{{ config.UI.HERO_STATS.CITIES_COUNT }} Cidades</span>
+            <span class="stat-chip">{{ config.UI.HERO_STATS.IS_FREE ? '100% Gratuito' : 'Taxa de Adoção' }}</span>
           </div>
         </div>
-      </div>
-      <div class="hero-actions">
-        <button mat-raised-button color="accent" routerLink="/pets/new">
-          <mat-icon>add</mat-icon>
-          Cadastrar Pet
-        </button>
-        <button mat-stroked-button color="accent" (click)="scrollToFilters()">
-          <mat-icon>search</mat-icon>
-          Buscar Pets
-        </button>
       </div>
     </div>
   </div>
 
   <div class="filters-panel">
-    <div class="filters-header" (click)="toggleFiltersExpanded()">
-      <div class="filters-title">
-        <mat-icon>filter_list</mat-icon>
-        <span>Filtros e Ordenação</span>
-        <mat-icon class="expand-icon" [class.rotated]="filtersExpanded">keyboard_arrow_down</mat-icon>
-      </div>
-      <div class="filters-count">
-        {{ filteredPets.length }} pets encontrados
-      </div>
-    </div>
-
-    <div class="filters-content" [class.expanded]="filtersExpanded">
-   
+    <div class="filters-toolbar">
+      <!-- Busca Principal -->
       <div class="search-container">
-        <label class="search-label">Buscar pets</label>
         <div class="search-input-wrapper">
           <input 
             type="text" 
             class="search-input" 
             [(ngModel)]="searchTerm" 
-            (input)="onFilterChange()" 
-            placeholder="Nome, raça, descrição...">
+(input)="onFilterChange()"
+            placeholder="Buscar pets por nome, raça...">
           <mat-icon class="search-icon">search</mat-icon>
         </div>
       </div>
 
-      <div class="filters-row">
-        <div class="filter-group">
-          <label class="filter-label">Status</label>
-          <select class="filter-select" [(ngModel)]="selectedStatus" (change)="onFilterChange()">
-            <option value="">Todos</option>
-            <option value="available">Disponível</option>
-            <option value="adopted">Adotado</option>
+      <!-- Filtros Estilizados -->
+      <div class="styled-filters">
+        <div class="filter-item">
+          <mat-icon class="filter-icon">pets</mat-icon>
+          <select class="styled-select" [(ngModel)]="selectedSpecies" (change)="onSelectChange()">
+            <option *ngFor="let option of config.FILTERS.SPECIES_OPTIONS" [value]="option.value">{{ option.label }}</option>
           </select>
         </div>
 
-        <div class="filter-group">
-          <label class="filter-label">Espécie</label>
-          <select class="filter-select" [(ngModel)]="selectedSpecies" (change)="onFilterChange()">
-            <option value="">Todas</option>
-            <option value="dog">Cachorro</option>
-            <option value="cat">Gato</option>
+        <div class="filter-item">
+          <mat-icon class="filter-icon">favorite</mat-icon>
+          <select class="styled-select" [(ngModel)]="selectedGender" (change)="onSelectChange()">
+            <option *ngFor="let option of config.FILTERS.GENDER_OPTIONS" [value]="option.value">{{ option.label }}</option>
           </select>
         </div>
 
-        <div class="filter-group">
-          <label class="filter-label">Gênero</label>
-          <select class="filter-select" [(ngModel)]="selectedGender" (change)="onFilterChange()">
-            <option value="">Todos</option>
-            <option value="male">Macho</option>
-            <option value="female">Fêmea</option>
-          </select>
-        </div>
-
-        <div class="filter-group">
-          <label class="filter-label">Cidade</label>
-          <select class="filter-select" [(ngModel)]="selectedCity" (change)="onFilterChange()">
-            <option value="">Todas</option>
-            <option value="São Paulo">São Paulo</option>
-            <option value="Rio de Janeiro">Rio de Janeiro</option>
-            <option value="Belo Horizonte">Belo Horizonte</option>
-            <option value="Salvador">Salvador</option>
-            <option value="Brasília">Brasília</option>
-            <option value="Fortaleza">Fortaleza</option>
-            <option value="Manaus">Manaus</option>
-            <option value="Curitiba">Curitiba</option>
-            <option value="Recife">Recife</option>
-            <option value="Porto Alegre">Porto Alegre</option>
+        <div class="filter-item">
+          <mat-icon class="filter-icon">location_on</mat-icon>
+          <select class="styled-select" [(ngModel)]="selectedCity" (change)="onSelectChange()">
+            <option value="">Todas as cidades</option>
+            <option *ngFor="let city of config.FILTERS.CITIES" [value]="city">{{ city }}</option>
           </select>
         </div>
       </div>
 
-      <div class="actions-row">
-        <div class="sort-controls">
-          <div class="sort-dropdown">
-            <label class="filter-label">Ordenar por</label>
-            <div class="dropdown-container">
-              <button class="dropdown-trigger" (click)="toggleSortDropdown()">
-                <span class="dropdown-text">{{ getSortLabel(sortBy) }}</span>
-                <mat-icon class="dropdown-arrow" [class.rotated]="sortDropdownOpen">keyboard_arrow_down</mat-icon>
-              </button>
-              <div class="dropdown-menu" [class.open]="sortDropdownOpen">
-                <button class="dropdown-item" (click)="selectSortOption('name')" [class.active]="sortBy === 'name'">
-                  <mat-icon>sort_by_alpha</mat-icon>
-                  <span>Nome</span>
-                </button>
-                <button class="dropdown-item" (click)="selectSortOption('age')" [class.active]="sortBy === 'age'">
-                  <mat-icon>cake</mat-icon>
-                  <span>Idade</span>
-                </button>
-                <button class="dropdown-item" (click)="selectSortOption('species')" [class.active]="sortBy === 'species'">
-                  <mat-icon>pets</mat-icon>
-                  <span>Espécie</span>
-                </button>
-                <button class="dropdown-item" (click)="selectSortOption('city')" [class.active]="sortBy === 'city'">
-                  <mat-icon>location_on</mat-icon>
-                  <span>Cidade</span>
-                </button>
-              </div>
-            </div>
-          </div>
-          
-          <button class="sort-order-btn" (click)="toggleSortOrder()" [title]="sortOrder === 'asc' ? 'Ordem crescente' : 'Ordem decrescente'">
-            <mat-icon [class.rotated]="sortOrder === 'desc'">{{ sortOrder === 'asc' ? 'arrow_upward' : 'arrow_downward' }}</mat-icon>
-          </button>
-        </div>
-
-        <div class="view-controls">
-          <button class="view-btn" (click)="setViewMode('grid')" [class.active]="viewMode === 'grid'" title="Visualização em grade">
-            <mat-icon>grid_view</mat-icon>
-            <span>Grade</span>
-          </button>
-          <button class="view-btn" (click)="setViewMode('list')" [class.active]="viewMode === 'list'" title="Visualização em lista">
-            <mat-icon>list</mat-icon>
-            <span>Lista</span>
-          </button>
-        </div>
-
-        <button class="clear-btn" (click)="clearFilters()">
-          <mat-icon>refresh</mat-icon>
+      <!-- Ações -->
+      <div class="toolbar-actions">
+        <button class="clear-btn" (click)="clearFilters()" title="Limpar todos os filtros">
+          <mat-icon>clear_all</mat-icon>
           <span>Limpar Filtros</span>
         </button>
       </div>
+    </div>
+
+    <!-- Contador de Resultados -->
+    <div class="results-info">
+      <span class="results-count">{{ totalPets || 0 }} pets encontrados</span>
     </div>
   </div>
   
   <section class="pets-section">
     <div class="container">
-      <div *ngIf="loading" class="loading-state">
+      <div *ngIf="loading" class="simple-loading">
         <div class="loading-spinner">
-          <mat-spinner diameter="60"></mat-spinner>
+          <mat-spinner diameter="32" class="blue-spinner"></mat-spinner>
         </div>
-        <h3>Encontrando pets incríveis...</h3>
-        <p>Aguarde enquanto carregamos os melhores amigos para você</p>
+        <span>Carregando pets...</span>
       </div>
 
-      <div *ngIf="loading" class="skeleton-container" [ngClass]="'view-' + viewMode">
-        <div *ngFor="let item of [1,2,3,4,5,6]" class="skeleton-card">
-          <div class="skeleton-image"></div>
-          <div class="skeleton-content">
-            <div class="skeleton-title"></div>
-            <div class="skeleton-subtitle"></div>
-            <div class="skeleton-details">
-              <div class="skeleton-detail"></div>
-              <div class="skeleton-detail"></div>
-              <div class="skeleton-detail"></div>
+      <div *ngIf="!loading && totalPets > 0" class="pets-container">
+        <div 
+          *ngFor="let pet of filteredPets; let i = index; trackBy: trackByPetId" 
+          class="pet-card"
+          [routerLink]="['/pets', pet.id]">
+          
+          <div class="pet-image">
+            <img [src]="getPetImage(pet)" [alt]="pet.name" (error)="onImageError($event)">
+            <button class="favorite-btn" (click)="toggleFavorite(pet.id, $event)" [class.favorited]="isFavorite(pet.id)">
+              <mat-icon>{{ isFavorite(pet.id) ? 'favorite' : 'favorite_border' }}</mat-icon>
+            </button>
+            <div class="status-badge" [ngClass]="'status-' + (pet.status || 'available')">
+              {{ getStatusText(pet.status) }}
             </div>
-            <div class="skeleton-description"></div>
-            <div class="skeleton-button"></div>
+          </div>
+          
+          <div class="pet-content">
+            <div class="pet-header">
+              <h3 class="pet-name">{{ pet.name || 'Pet ' + (i + 1) }}</h3>
+            </div>
+            
+            <div class="pet-info-list">
+              <div class="info-item">
+                <div class="info-icon tipo">
+                  <mat-icon>pets</mat-icon>
+                </div>
+                <div class="info-details">
+                  <span class="info-label">TIPO</span>
+                  <span class="info-value">{{ getPetType(pet) }}</span>
+                </div>
+              </div>
+              
+              <div class="info-item">
+                <div class="info-icon idade">
+                  <mat-icon>schedule</mat-icon>
+                </div>
+                <div class="info-details">
+                  <span class="info-label">IDADE</span>
+                  <span class="info-value">{{ getPetAge(pet) }}</span>
+                </div>
+              </div>
+              
+              <div class="info-item">
+                <div class="info-icon genero" [ngClass]="'gender-' + pet.gender">
+                  <mat-icon>{{ pet.gender === 'male' ? 'male' : 'female' }}</mat-icon>
+                </div>
+                <div class="info-details">
+                  <span class="info-label">GÊNERO</span>
+                  <span class="info-value">{{ getPetGender(pet) }}</span>
+                </div>
+              </div>
+            </div>
+            
+            <div class="location-info">
+              <mat-icon class="location-icon">location_on</mat-icon>
+              <span class="location-text">{{ getPetLocation(pet) }}</span>
+            </div>
+      
+            <p class="pet-description">{{ getPetDescription(pet) }}</p>
+            
+            <div class="pet-actions">
+              <button mat-button color="primary" (click)="viewPet(pet.id, $event)">
+                <mat-icon>visibility</mat-icon>
+                Ver Detalhes
+              </button>
+              <button mat-button (click)="sharePet(pet, $event)">
+                <mat-icon>share</mat-icon>
+                Compartilhar
+              </button>
+            </div>
           </div>
         </div>
       </div>
 
-      <div *ngIf="!loading && filteredPets.length > 0" class="pets-container" [ngClass]="'view-' + viewMode">
-        <mat-card 
-          *ngFor="let pet of filteredPets; let i = index" 
-          class="pet-card"
-          [routerLink]="['/pets', pet.id]">
-          
-          <mat-card-header>
-            <div mat-card-avatar class="pet-avatar">
-              <img [src]="getPetImage(pet)" [alt]="pet.name" (error)="onImageError($event)">
-            </div>
-            <mat-card-title>{{ pet.name || 'Pet ' + (i + 1) }}</mat-card-title>
-            <mat-card-subtitle>{{ getPetBreed(pet) }}</mat-card-subtitle>
-            <button mat-icon-button class="favorite-btn" (click)="toggleFavorite(pet.id, $event)" [class.favorited]="isFavorite(pet.id)">
-              <mat-icon>{{ isFavorite(pet.id) ? 'favorite' : 'favorite_border' }}</mat-icon>
-            </button>
-          </mat-card-header>
-
-          <img mat-card-image [src]="getPetImage(pet)" [alt]="pet.name" (error)="onImageError($event)">
-          
-          <mat-card-content>
-            <div class="pet-details">
-              <mat-chip-set>
-                <mat-chip>{{ getPetType(pet) }}</mat-chip>
-                <mat-chip>{{ getPetAge(pet) }}</mat-chip>
-                <mat-chip [ngClass]="'gender-' + pet.gender">{{ getPetGender(pet) }}</mat-chip>
-                <mat-chip>{{ getPetLocation(pet) }}</mat-chip>
-              </mat-chip-set>
-            </div>
-      
-            <p class="pet-description">{{ getPetDescription(pet) }}</p>
-          </mat-card-content>
-          
-          <mat-card-actions>
-            <button mat-button color="primary" (click)="viewPet(pet.id, $event)">
-              <mat-icon>visibility</mat-icon>
-              Ver Detalhes
-            </button>
-            <button mat-button (click)="sharePet(pet, $event)">
-              <mat-icon>share</mat-icon>
-              Compartilhar
-            </button>
-            <span class="spacer"></span>
-            <mat-chip [ngClass]="'status-' + (pet.status || 'available')">
-              {{ getStatusText(pet.status) }}
-            </mat-chip>
-          </mat-card-actions>
-        </mat-card>
-      </div>
-
-      <mat-card *ngIf="!loading && filteredPets.length === 0" class="empty-state">
+      <mat-card *ngIf="!loading && totalPets === 0" class="empty-state">
         <mat-card-content class="empty-content">
           <mat-icon class="empty-icon">pets</mat-icon>
           <h2>Nenhum pet encontrado</h2>
@@ -246,16 +171,14 @@
         </mat-card-content>
       </mat-card>
 
-      <div *ngIf="!loading && filteredPets.length > 0" class="pagination-section">
-        <mat-paginator
-          [length]="totalPets"
-          [pageSize]="pageSize"
-          [pageSizeOptions]="[12, 24, 48]"
-          (page)="onPageChange($event)"
-          showFirstLastButtons
-          class="modern-paginator">
-        </mat-paginator>
-      </div>
+      <app-custom-pagination
+        *ngIf="!loading && totalPets > 0"
+        [totalRecords]="totalPets || 0"
+        [rows]="rows"
+        [first]="first"
+        [rowsPerPageOptions]="pageSizeOptions"
+        (onPageChange)="onPageChange($event)">
+      </app-custom-pagination>
     </div>
   </section>
 </div>
