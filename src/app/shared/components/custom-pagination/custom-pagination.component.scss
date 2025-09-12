@@ -1,0 +1,194 @@
+.custom-pagination {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  align-items: center;
+  padding: var(--space-6) var(--space-4);
+  background: var(--neutral-0);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--neutral-150);
+
+  @media (max-width: 768px) {
+    padding: var(--space-4) var(--space-3);
+  }
+
+  .pagination-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    flex-wrap: wrap;
+    gap: var(--space-4);
+
+    @media (max-width: 768px) {
+      flex-direction: column;
+      gap: var(--space-3);
+    }
+
+    .records-info {
+      font-size: var(--font-size-sm);
+      color: var(--neutral-600);
+      font-weight: var(--font-weight-medium);
+
+      @media (max-width: 768px) {
+        text-align: center;
+      }
+    }
+
+    .page-size-selector {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+
+      label {
+        font-size: var(--font-size-sm);
+        color: var(--neutral-700);
+        font-weight: var(--font-weight-medium);
+      }
+
+      select {
+        padding: var(--space-2) var(--space-3);
+        border: 1px solid var(--neutral-300);
+        border-radius: var(--radius-lg);
+        background: var(--neutral-0);
+        color: var(--neutral-700);
+        font-size: var(--font-size-sm);
+        cursor: pointer;
+        transition: all var(--transition-fast);
+
+        &:focus {
+          outline: none;
+          border-color: var(--primary-500);
+          box-shadow: 0 0 0 3px var(--primary-100);
+        }
+
+        &:hover {
+          border-color: var(--neutral-400);
+        }
+      }
+    }
+  }
+
+  .pagination-controls {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    flex-wrap: wrap;
+    justify-content: center;
+
+    .pagination-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 40px;
+      height: 40px;
+      border: 1px solid var(--neutral-300);
+      border-radius: var(--radius-lg);
+      background: var(--neutral-0);
+      color: var(--neutral-600);
+      cursor: pointer;
+      transition: all var(--transition-fast);
+
+      &:hover:not(:disabled) {
+        background: var(--primary-50);
+        border-color: var(--primary-300);
+        color: var(--primary-700);
+        transform: translateY(-1px);
+      }
+
+      &:disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+        background: var(--neutral-100);
+        color: var(--neutral-400);
+      }
+
+      mat-icon {
+        font-size: 20px;
+      }
+    }
+
+    .page-numbers {
+      display: flex;
+      align-items: center;
+      gap: var(--space-1);
+      margin: 0 var(--space-2);
+
+      @media (max-width: 480px) {
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+
+      .page-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 40px;
+        height: 40px;
+        padding: 0 var(--space-3);
+        border: 1px solid var(--neutral-300);
+        border-radius: var(--radius-lg);
+        background: var(--neutral-0);
+        color: var(--neutral-700);
+        font-size: var(--font-size-sm);
+        font-weight: var(--font-weight-medium);
+        cursor: pointer;
+        transition: all var(--transition-fast);
+
+        &:hover:not(:disabled):not(.active) {
+          background: var(--neutral-50);
+          border-color: var(--neutral-400);
+          color: var(--neutral-800);
+          transform: translateY(-1px);
+        }
+
+        &.active {
+          background: var(--primary-600);
+          border-color: var(--primary-600);
+          color: var(--neutral-0);
+          font-weight: var(--font-weight-semibold);
+          box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+        }
+
+        &.dots {
+          border: none;
+          background: transparent;
+          color: var(--neutral-500);
+          cursor: default;
+
+          &:hover {
+            background: transparent;
+            transform: none;
+          }
+        }
+
+        &:disabled {
+          cursor: not-allowed;
+        }
+      }
+    }
+  }
+
+  // Responsive adjustments
+  @media (max-width: 480px) {
+    .pagination-controls {
+      .page-numbers {
+        .page-btn {
+          min-width: 35px;
+          height: 35px;
+          font-size: var(--font-size-xs);
+        }
+      }
+
+      .pagination-btn {
+        width: 35px;
+        height: 35px;
+
+        mat-icon {
+          font-size: 18px;
+        }
+      }
+    }
+  }
+}
