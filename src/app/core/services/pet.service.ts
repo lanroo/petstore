@@ -8,8 +8,12 @@ export interface PetFilters {
   species?: 'dog' | 'cat';
   city?: string;
   status?: PetStatus;
+  gender?: 'male' | 'female';
+  min_age?: number;
+  max_age?: number;
   page?: number;
   limit?: number;
+  q?: string;
 }
 
 @Injectable({
@@ -46,8 +50,20 @@ export class PetService {
     if (filters.status) {
       params = params.set('status', filters.status);
     }
+    if (filters.gender) {
+      params = params.set('gender', filters.gender);
+    }
+    if (filters.min_age) {
+      params = params.set('min_age', filters.min_age.toString());
+    }
+    if (filters.max_age) {
+      params = params.set('max_age', filters.max_age.toString());
+    }
     if (filters.page) {
       params = params.set('page', filters.page.toString());
+    }
+    if (filters.q) {
+      params = params.set('q', filters.q);
     }
     
     const limit = filters.limit || this.defaultLimit;
@@ -88,6 +104,13 @@ export class PetService {
     return this.getPets({ status, limit: 100 }).pipe(
       map(response => response.pets)
     );
+  }
+
+  getFilterOptions(): Observable<any> {
+    return this.http.get(`${this.apiUrl}/pets/filters/options`)
+      .pipe(
+        catchError(this.handleError)
+      );
   }
 
   searchPets(query: string): Observable<Pet[]> {

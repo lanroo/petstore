@@ -1,197 +1,176 @@
-import { Component, OnInit, HostListener } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { Router } from '@angular/router';
+import { Subject, takeUntil, debounceTime, distinctUntilChanged } from 'rxjs';
 import { PetService } from '../../../../core/services/pet.service';
 import { ImageService } from '../../../../core/services/image.service';
-import { Pet, PetStatus } from '../../../../core/models/pet.model';
+import { Pet } from '../../../../core/models/pet.model';
 import { PetUtils } from '../../../../core/utils/pet.utils';
-import { PageEvent } from '@angular/material/paginator';
-
-interface FilterCriteria {
-  searchTerm: string;
-  status: string;
-  species: string;
-  city: string;
-  gender: string;
-}
-
-const DEFAULT_PAGE_SIZE = 12;
-const DEFAULT_SORT_BY = 'name';
-const DEFAULT_SORT_ORDER: 'asc' | 'desc' = 'asc';
-const DEFAULT_VIEW_MODE: 'grid' | 'list' = 'grid';
+import { PET_LIST_CONFIG } from './constants/pet-list.constants';
+import { FilterState } from './interfaces/pet-list.interfaces';
+import { createShareData, getSortLabel } from './utils/pet-list.utils';
+import { PetListStorageService } from './services/pet-list-storage.service';
 
 @Component({
   selector: 'app-pet-list',
   standalone: false,
   templateUrl: './pet-list.component.html',
-  styleUrl: './pet-list.component.scss'
+  styleUrl: './pet-list.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class PetListComponent implements OnInit {
-  pets: Pet[] = [];
-  filteredPets: Pet[] = [];
-  loading = true;
+export class PetListComponent implements OnInit, OnDestroy {
+  readonly config = PET_LIST_CONFIG;
+  
+  private readonly destroy$ = new Subject<void>();
+  private readonly filterSubject$ = new Subject<void>();
+  private lastRequestTime = 0;
+  
+  pets: readonly Pet[] = [];
+  filteredPets: readonly Pet[] = [];
+  favoritePets: ReadonlySet<number> = new Set();
   
   searchTerm = '';
-  selectedStatus = '';
-  selectedSpecies = '';
+  selectedStatus: FilterState['selectedStatus'] = '';
+  selectedSpecies: FilterState['selectedSpecies'] = '';
   selectedCity = '';
-  selectedGender = '';
-  sortBy = DEFAULT_SORT_BY;
-  sortOrder: 'asc' | 'desc' = DEFAULT_SORT_ORDER;
+  selectedGender: FilterState['selectedGender'] = '';
+  
+  
   totalPets = 0;
-  pageSize = DEFAULT_PAGE_SIZE;
+  pageSize: number = PET_LIST_CONFIG.PAGINATION.DEFAULT_PAGE_SIZE;
   currentPage = 0;
-  favoritePets: Set<number> = new Set();
-  viewMode: 'grid' | 'list' = DEFAULT_VIEW_MODE;
-  sortDropdownOpen = false;
-  filtersExpanded = true;
+  first: number = PET_LIST_CONFIG.PAGINATION.DEFAULT_FIRST;
+  rows: number = PET_LIST_CONFIG.PAGINATION.DEFAULT_PAGE_SIZE;
+  
+  loading = true;
+  
   
 
   constructor(
-    private petService: PetService,
-    private imageService: ImageService,
-    private router: Router
-  ) {}
+    private readonly petService: PetService,
+    private readonly imageService: ImageService,
+    private readonly router: Router,
+    private readonly storageService: PetListStorageService,
+    private readonly cdr: ChangeDetectorRef
+  ) {
+    this.filterSubject$
+      .pipe(
+        debounceTime(50),
+        distinctUntilChanged(),
+        takeUntil(this.destroy$)
+      )
+      .subscribe(() => this.loadPets());
+  }
 
   ngOnInit(): void {
-    this.loadFavorites();
-    this.loadViewMode();
+    this.initializeComponent();
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
+
+  private initializeComponent(): void {
+    this.loadPersistedData();
     this.loadPets();
   }
 
-  private loadPets(): void {
-    this.loading = true;
+  private loadPersistedData(): void {
+    this.favoritePets = this.storageService.loadFavorites();
+  }
 
-    this.petService.getPetsByStatus(PetStatus.AVAILABLE).subscribe({
-      next: (pets) => {
-        this.pets = pets;
-        this.filteredPets = [...this.pets];
-        this.totalPets = this.pets.length;
-        this.loading = false;
-      },
-      error: (error) => {
-        console.error('Erro ao carregar pets:', error);
-        this.loading = false;
-      }
-    });
+  private loadPets(): void {
+    // Evitar múltiplas requisições simultâneas
+    const currentTime = Date.now();
+    this.lastRequestTime = currentTime;
+    
+    this.setLoadingState(true);
+
+    const filters = this.buildApiFilters();
+    this.petService.getPets(filters)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (response) => {
+          // Só processar se for a requisição mais recente
+          if (this.lastRequestTime === currentTime) {
+            this.handlePetsLoaded(response.pets, response.total);
+          }
+        },
+        error: (error) => {
+          if (this.lastRequestTime === currentTime) {
+            this.handlePetsLoadError(error);
+          }
+        }
+      });
+  }
+
+  private handlePetsLoaded(pets: Pet[], total?: number): void {
+    this.pets = pets;
+    this.totalPets = total || pets.length; 
+    this.filteredPets = pets;
+    this.setLoadingState(false);
+  }
+
+  private handlePetsLoadError(error: any): void {
+    console.error('Error loading pets:', error);
+    this.setLoadingState(false);
+  }
+
+  private setLoadingState(loading: boolean): void {
+    this.loading = loading;
+    this.cdr.markForCheck();
   }
 
   onFilterChange(): void {
-    this.applyFilters();
-  }
-
-  private applyFilters(): void {
-    const filterCriteria = this.buildFilterCriteria();
-    let filtered = this.filterPetsByCriteria(this.pets, filterCriteria);
-    filtered = this.applySorting(filtered);
-    this.updateFilteredResults(filtered);
-  }
-
-  private buildFilterCriteria(): FilterCriteria {
-    return {
-      searchTerm: this.searchTerm,
-      status: this.selectedStatus,
-      species: this.selectedSpecies,
-      city: this.selectedCity,
-      gender: this.selectedGender
-    };
-  }
-
-  private filterPetsByCriteria(pets: Pet[], criteria: FilterCriteria): Pet[] {
-    return pets.filter(pet => {
-      if (criteria.searchTerm && !this.matchesSearchTerm(pet, criteria.searchTerm)) {
-        return false;
-      }
-      if (criteria.status && pet.status !== criteria.status) {
-        return false;
-      }
-      if (criteria.species && pet.species !== criteria.species) {
-        return false;
-      }
-      if (criteria.city && pet.city !== criteria.city) {
-        return false;
-      }
-      if (criteria.gender && pet.gender !== criteria.gender) {
-        return false;
-      }
-      return true;
-    });
-  }
-
-  private matchesSearchTerm(pet: Pet, searchTerm: string): boolean {
-    const term = searchTerm.toLowerCase();
-    return (
-      pet.name?.toLowerCase().includes(term) ||
-      pet.breed?.toLowerCase().includes(term) ||
-      pet.description?.toLowerCase().includes(term)
-    );
-  }
-
-  private updateFilteredResults(filtered: Pet[]): void {
-    this.filteredPets = filtered;
-    this.totalPets = filtered.length;
+    this.first = 0; // Reset para primeira página
     this.currentPage = 0;
+    this.filterSubject$.next();
   }
 
-  private applySorting(pets: Pet[]): Pet[] {
-    return pets.sort((a, b) => {
-      const aValue = this.getSortValue(a, this.sortBy);
-      const bValue = this.getSortValue(b, this.sortBy);
-      return this.compareValues(aValue, bValue);
-    });
+  onSelectChange(): void {
+    this.first = 0; // Reset para primeira página
+    this.currentPage = 0;
+    this.loadPets();
   }
 
-  private getSortValue(pet: Pet, sortBy: string): any {
-    switch (sortBy) {
-      case 'name':
-        return pet.name?.toLowerCase() || '';
-      case 'age':
-        return pet.age || 0;
-      case 'species':
-        return pet.species || '';
-      case 'city':
-        return pet.city?.toLowerCase() || '';
-      default:
-        return pet.name?.toLowerCase() || '';
+  private buildApiFilters(): any {
+    const filters: any = {
+      status: 'available',
+      limit: this.pageSize,
+      page: this.currentPage
+    };
+
+    if (this.selectedStatus) {
+      filters.status = this.selectedStatus;
     }
-  }
-
-  private compareValues(aValue: any, bValue: any): number {
-    if (aValue < bValue) {
-      return this.sortOrder === 'asc' ? -1 : 1;
+    if (this.selectedSpecies) {
+      filters.species = this.selectedSpecies;
     }
-    if (aValue > bValue) {
-      return this.sortOrder === 'asc' ? 1 : -1;
+    if (this.selectedCity) {
+      filters.city = this.selectedCity;
     }
-    return 0;
+    if (this.selectedGender) {
+      filters.gender = this.selectedGender;
+    }
+    if (this.searchTerm?.trim()) {
+      filters.q = this.searchTerm.trim();
+    }
+
+    return filters;
   }
 
-  onPageChange(event: PageEvent): void {
-    this.currentPage = event.pageIndex;
-    this.pageSize = event.pageSize;
-  }
 
-  toggleSortOrder(): void {
-    this.sortOrder = this.sortOrder === 'asc' ? 'desc' : 'asc';
-    this.applyFilters();
-  }
 
   clearFilters(): void {
-    this.resetFilterValues();
-    this.resetSortingValues();
-    this.applyFilters();
-  }
-
-  private resetFilterValues(): void {
     this.searchTerm = '';
     this.selectedStatus = '';
     this.selectedSpecies = '';
     this.selectedCity = '';
     this.selectedGender = '';
-  }
-
-  private resetSortingValues(): void {
-    this.sortBy = DEFAULT_SORT_BY;
-    this.sortOrder = DEFAULT_SORT_ORDER;
+    this.first = 0;
+    this.currentPage = 0;
+    this.loadPets();
   }
 
   getPetType = PetUtils.getPetType;
@@ -201,99 +180,64 @@ export class PetListComponent implements OnInit {
   getPetGender = PetUtils.getPetGender;
   getPetDescription = PetUtils.getPetDescription;
   getStatusText = PetUtils.getStatusText;
-
-  scrollToFilters(): void {
-    const filtersElement = document.getElementById('filters');
-    if (filtersElement) {
-      filtersElement.scrollIntoView({ behavior: 'smooth' });
-    }
-  }
-
-  private loadFavorites(): void {
-    const saved = localStorage.getItem('favoritePets');
-    if (saved) {
-      try {
-        const favoriteIds = JSON.parse(saved);
-        this.favoritePets = new Set(favoriteIds);
-      } catch (error) {
-        console.error('Error loading favorites:', error);
-        this.favoritePets = new Set();
-      }
-    }
-  }
-
-  private saveFavorites(): void {
-    const favoriteIds = Array.from(this.favoritePets);
-    localStorage.setItem('favoritePets', JSON.stringify(favoriteIds));
+  
+  get pageSizeOptions(): number[] {
+    return [...this.config.PAGINATION.PAGE_SIZE_OPTIONS];
   }
 
   toggleFavorite(petId: number | undefined, event: Event): void {
     event.stopPropagation();
-    if (petId) {
-      if (this.favoritePets.has(petId)) {
-        this.favoritePets.delete(petId);
-      } else {
-        this.favoritePets.add(petId);
-      }
-      this.saveFavorites();
+    if (!petId) return;
+
+    const newFavorites = new Set(this.favoritePets);
+    if (newFavorites.has(petId)) {
+      newFavorites.delete(petId);
+    } else {
+      newFavorites.add(petId);
     }
+    
+    this.favoritePets = newFavorites;
+    this.storageService.saveFavorites(newFavorites);
+    this.cdr.markForCheck();
   }
 
   isFavorite(petId: number | undefined): boolean {
     return petId ? this.favoritePets.has(petId) : false;
   }
 
-  private loadViewMode(): void {
-    const saved = localStorage.getItem('petViewMode');
-    if (saved && (saved === 'grid' || saved === 'list')) {
-      this.viewMode = saved;
-    }
-  }
 
-  private saveViewMode(): void {
-    localStorage.setItem('petViewMode', this.viewMode);
-  }
-
-  toggleViewMode(): void {
-    this.viewMode = this.viewMode === 'grid' ? 'list' : 'grid';
-    this.saveViewMode();
-  }
 
   showFavorites(): void {
     if (this.favoritePets.size > 0) {
       this.filteredPets = this.pets.filter(pet => pet.id && this.favoritePets.has(pet.id));
       this.totalPets = this.filteredPets.length;
     } else {
-      this.filteredPets = [...this.pets];
+      this.filteredPets = this.pets;
       this.totalPets = this.pets.length;
     }
-    this.scrollToFilters();
+    this.cdr.markForCheck();
   }
 
   sharePet(pet: Pet, event: Event): void {
     event.stopPropagation();
     
-    const shareData = {
-      title: `${pet.name} - Pet para Adoção`,
-      text: `Conheça ${pet.name}, um ${this.getPetType(pet).toLowerCase()} ${this.getPetAge(pet)} em ${pet.city}. ${pet.description}`,
-      url: `${window.location.origin}/pets/${pet.id}`
-    };
+    const shareData = createShareData(pet, window.location.origin);
 
     if (navigator.share) {
       navigator.share(shareData).catch(console.error);
     } else {
       const shareText = `${shareData.title}\n\n${shareData.text}\n\n${shareData.url}`;
-      navigator.clipboard.writeText(shareText).then(() => {
-        console.log('Link copiado para a área de transferência!');
-      }).catch(console.error);
+      navigator.clipboard.writeText(shareText)
+        .then(() => console.log('Link copiado para a área de transferência!'))
+        .catch(console.error);
     }
   }
 
   viewPet(id: number | undefined, event: Event): void {
-    if (id) {
-      event.stopPropagation();
-      this.router.navigate(['/pets', id]);
-    }
+    if (!id) return;
+    
+    event.stopPropagation();
+    this.router.navigate(['/pets', id]);
   }
 
   onImageError = (event: Event): void => this.imageService.handleImageError(event);
@@ -302,41 +246,23 @@ export class PetListComponent implements OnInit {
     return this.imageService.getPetImage(pet, 'small');
   }
   
-  toggleSortDropdown(): void {
-    this.sortDropdownOpen = !this.sortDropdownOpen;
+
+
+
+  onPageChange(event: any): void {
+    this.first = event.first;
+    this.rows = event.rows;
+    this.currentPage = event.page;
+    this.pageSize = event.rows;
+    this.loadPets(); // Carregar nova página
   }
 
-  selectSortOption(option: string): void {
-    this.sortBy = option;
-    this.sortDropdownOpen = false;
-    this.onFilterChange();
+  trackByPetId(index: number, pet: Pet): number | undefined {
+    return pet.id;
   }
 
-  getSortLabel(sortBy: string): string {
-    const labels: { [key: string]: string } = {
-      'name': 'Nome',
-      'age': 'Idade',
-      'species': 'Espécie',
-      'city': 'Cidade'
-    };
-    return labels[sortBy] || 'Nome';
-  }
-
-  setViewMode(mode: 'grid' | 'list'): void {
-    this.viewMode = mode;
-    this.saveViewMode();
-  }
-
-  toggleFiltersExpanded(): void {
-    this.filtersExpanded = !this.filtersExpanded;
-  }
-
-  @HostListener('document:click', ['$event'])
-  onDocumentClick(event: Event): void {
-    const target = event.target as HTMLElement;
-    if (!target.closest('.dropdown-container')) {
-      this.sortDropdownOpen = false;
-    }
+  trackByIndex(index: number): number {
+    return index;
   }
 
 }
