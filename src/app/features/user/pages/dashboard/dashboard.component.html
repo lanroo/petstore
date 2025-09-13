@@ -1,0 +1,122 @@
+<div class="dashboard-container">
+  <header class="dashboard-header">
+    <div class="header-content">
+      <div class="header-left">
+        <mat-icon class="logo-icon">pets</mat-icon>
+        <h1>Meu Dashboard</h1>
+      </div>
+      <div class="header-right">
+        <div class="user-info">
+          <mat-icon>account_circle</mat-icon>
+          <span>{{ currentUser?.name }}</span>
+        </div>
+        <button class="logout-btn" (click)="logout()">
+          <mat-icon>logout</mat-icon>
+          <span>Sair</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="dashboard-main">
+
+    <section class="welcome-section">
+      <div class="welcome-card">
+        <div class="welcome-content">
+          <h2>
+            <mat-icon>waving_hand</mat-icon>
+            Olá, {{ currentUser?.name }}!
+          </h2>
+          <p>Acompanhe suas solicitações de adoção e encontre novos amigos para sua família.</p>
+          <button class="cta-btn" (click)="goToPets()">
+            <mat-icon>search</mat-icon>
+            <span>Encontrar Pets</span>
+          </button>
+        </div>
+        <div class="welcome-image">
+          <mat-icon class="hero-icon">pets</mat-icon>
+        </div>
+      </div>
+    </section>
+
+
+    <section class="my-adoptions">
+      <div class="section-header">
+        <h2>
+          <mat-icon>favorite</mat-icon>
+          Minhas Adoções
+        </h2>
+        <span class="count-badge">{{ userAdoptions.length }}</span>
+      </div>
+
+      <div class="adoptions-list" *ngIf="!isLoading; else loadingTemplate">
+        <div class="adoption-card" *ngFor="let adoption of userAdoptions">
+          <div class="pet-image">
+            <img [src]="getPetImage(adoption)" [alt]="getPetName(adoption)" (error)="onImageError($event)">
+          </div>
+          <div class="adoption-info">
+            <h3>{{ getPetName(adoption) }}</h3>
+            <div class="adoption-meta">
+              <span class="date">
+                <mat-icon>schedule</mat-icon>
+                {{ formatDate(adoption.created_at) }}
+              </span>
+              <span class="status-badge" [class]="getStatusBadgeClass(adoption.status)">
+                {{ getStatusText(adoption.status) }}
+              </span>
+            </div>
+          </div>
+          <div class="adoption-actions">
+            <button class="action-btn" [disabled]="adoption.status === 'pending'">
+              <mat-icon>visibility</mat-icon>
+              <span>Ver Detalhes</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="empty-state" *ngIf="userAdoptions.length === 0">
+          <mat-icon class="empty-icon">favorite_border</mat-icon>
+          <h3>Nenhuma adoção ainda</h3>
+          <p>Você ainda não fez nenhuma solicitação de adoção.</p>
+          <button class="cta-btn" (click)="goToPets()">
+            <mat-icon>add</mat-icon>
+            <span>Encontrar um Pet</span>
+          </button>
+        </div>
+      </div>
+
+      <ng-template #loadingTemplate>
+        <div class="loading-container">
+          <mat-icon class="loading-icon">refresh</mat-icon>
+          <p>Carregando suas adoções...</p>
+        </div>
+      </ng-template>
+    </section>
+
+      
+    <section class="quick-actions">
+      <h2>
+        <mat-icon>flash_on</mat-icon>
+        Ações Rápidas
+      </h2>
+      <div class="actions-grid">
+        <button class="action-card" (click)="goToPets()">
+          <mat-icon>search</mat-icon>
+          <span>Buscar Pets</span>
+        </button>
+        <button class="action-card">
+          <mat-icon>help</mat-icon>
+          <span>Dúvidas Frequentes</span>
+        </button>
+        <button class="action-card">
+          <mat-icon>contact_support</mat-icon>
+          <span>Suporte</span>
+        </button>
+        <button class="action-card">
+          <mat-icon>settings</mat-icon>
+          <span>Configurações</span>
+        </button>
+      </div>
+    </section>
+  </main>
+</div>
