@@ -1,88 +1,491 @@
-<div class="pets-showcase-container">
-  <div class="container">
-    <div class="page-header">
-      <button mat-icon-button class="back-button" (click)="goBack()">
+<div class="pet-detail-container">
+
+  <div class="pet-detail-header">
+    <div class="container">
+      <button 
+        mat-stroked-button 
+        class="back-button" 
+        (click)="goBack()"
+        matTooltip="Voltar à página anterior">
         <mat-icon>arrow_back</mat-icon>
+        <span>Voltar</span>
       </button>
-      <h1 class="page-title">Pets em Destaque</h1>
-      <p class="page-subtitle">Conheça nossos pets mais especiais</p>
+      <div class="header-actions">
+        <button 
+          mat-stroked-button 
+          (click)="shareProfile()" 
+          matTooltip="Compartilhar perfil do pet"
+          class="share-button">
+          <mat-icon>share</mat-icon>
+          <span>Compartilhar</span>
+        </button>
+      </div>
     </div>
+  </div>
 
-    <div *ngIf="loading" class="loading-container">
-      <mat-spinner></mat-spinner>
-      <p>Carregando pets...</p>
+  <div *ngIf="loading" class="loading-container">
+    <div class="container">
+      <div class="loading-content">
+        <mat-spinner diameter="60"></mat-spinner>
+        <h3>Carregando detalhes do pet...</h3>
+        <p>Por favor, aguarde um momento</p>
+      </div>
     </div>
+  </div>
 
-    <div *ngIf="error && !loading" class="error-container">
-      <mat-icon class="error-icon">error</mat-icon>
-      <h2>Ops! Algo deu errado</h2>
-      <p>{{ error }}</p>
-      <button mat-raised-button color="primary" (click)="goBack()">
-        <mat-icon>arrow_back</mat-icon>
-        Voltar para Lista
-      </button>
+
+  <div *ngIf="error && !loading" class="error-container">
+    <div class="container">
+      <div class="error-content">
+        <mat-icon class="error-icon">error_outline</mat-icon>
+        <h2>Oops! Algo deu errado</h2>
+        <p class="error-message">{{ error }}</p>
+        <div class="error-actions">
+          <button mat-raised-button color="primary" (click)="goBack()">
+            <mat-icon>arrow_back</mat-icon>
+            Voltar para Lista
+          </button>
+          <button mat-button (click)="loadPetDetails()">
+            <mat-icon>refresh</mat-icon>
+            Tentar Novamente
+          </button>
+        </div>
+      </div>
     </div>
+  </div>
 
-    <div *ngIf="pets.length > 0 && !loading" class="pets-showcase-content">
-      <div class="pets-grid">
-        <div 
-          *ngFor="let pet of pets; let i = index" 
-          class="pet-card"
-          [routerLink]="['/pets', pet.id || 0]">
-          <div class="pet-image-container">
+
+  <div *ngIf="pet && !loading" class="pet-detail-content">
+    <div class="container">
+
+      <div class="pet-main-section">
+        <div class="pet-gallery">
+          <div class="main-image-container">
             <img 
-              [src]="getPetImage(pet)" 
-              [alt]="pet.name || 'Pet disponível'"
+              [src]="getPetImage(currentImageIndex)" 
+              [alt]="pet.name"
               (error)="onImageError($event)"
-              class="pet-card-image">
-            <div class="pet-status-badge" [ngClass]="'status-' + (pet.status || 'available')">
-              <span class="status-text">{{ getStatusText(pet.status) }}</span>
-            </div>
-          </div>
-          <div class="pet-card-info">
-            <h3 class="pet-card-name">{{ pet.name || 'Pet ' + (i + 1) }}</h3>
-            <div class="pet-details">
-              <span class="pet-detail-item">
-                <mat-icon class="detail-icon">pets</mat-icon>
-                {{ getPetType(pet) }}
-              </span>
-              <span class="pet-detail-item">
-                <mat-icon class="detail-icon">schedule</mat-icon>
-                {{ getPetAge(pet) }}
-              </span>
-            </div>
-            <div class="pet-location">
-              <mat-icon class="location-icon">location_on</mat-icon>
-              <span>{{ getPetLocation(pet) }}</span>
-            </div>
-            <div class="pet-actions">
-              <button mat-button color="primary" (click)="viewPet(pet.id || 0, $event)">
-                <mat-icon>visibility</mat-icon>
-                Ver Detalhes
+              (click)="openImageFullscreen(currentImageIndex)"
+              class="main-image">
+            
+            <div class="image-overlay">
+              <div class="status-badge" [ngClass]="'status-' + (pet.status || 'available')">
+                <span class="status-text">{{ getStatusText(pet.status) }}</span>
+              </div>
+
+              <div *ngIf="pet.photos && pet.photos.length > 1" class="image-counter">
+                {{ currentImageIndex + 1 }} / {{ pet.photos.length }}
+              </div>
+
+              <button mat-icon-button class="fullscreen-btn" (click)="openImageFullscreen(currentImageIndex)" matTooltip="Ver em tela cheia">
+                <mat-icon>fullscreen</mat-icon>
+              </button>
+
+              <button mat-icon-button class="favorite-btn" (click)="togglePetFavorite()" [class.favorited]="isPetFavorite">
+                <mat-icon>{{ isPetFavorite ? 'favorite' : 'favorite_border' }}</mat-icon>
               </button>
             </div>
+            
+            <div *ngIf="pet.photos && pet.photos.length > 1" class="image-navigation">
+              <button mat-icon-button class="nav-button nav-prev" (click)="previousImage()" matTooltip="Foto anterior">
+                <mat-icon>chevron_left</mat-icon>
+              </button>
+              <button mat-icon-button class="nav-button nav-next" (click)="nextImage()" matTooltip="Próxima foto">
+                <mat-icon>chevron_right</mat-icon>
+              </button>
+            </div>
+          </div>
+
+          <div *ngIf="pet.photos && pet.photos.length > 1" class="thumbnail-gallery">
+            <div class="thumbnails-container">
+              <div 
+                *ngFor="let photo of pet.photos; let i = index" 
+                class="thumbnail-item"
+                [class.active]="i === currentImageIndex"
+                (click)="selectImage(i)">
+                <img [src]="photo" [alt]="pet.name + ' - Foto ' + (i + 1)" (error)="onImageError($event)">
+                <div class="thumbnail-overlay"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="pet-info-section">
+          <div class="pet-header">
+            <div class="name-badge-container">
+              <h1 class="pet-name">{{ pet.name }}</h1>
+              <div class="verification-badge" matTooltip="Perfil verificado">
+                <mat-icon>verified</mat-icon>
+              </div>
+            </div>
+            <div class="pet-breed-info">
+              <div class="breed-details">
+                <span class="species-tag">{{ getPetType(pet) }}</span>
+                <span class="age-tag">{{ getPetAge(pet) }}</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="quick-info-grid">
+            <div class="info-card animated" [style.animation-delay]="'0.1s'">
+              <div class="card-icon-wrapper">
+                <mat-icon class="info-icon">pets</mat-icon>
+              </div>
+              <div class="info-content">
+                <span class="info-label">Espécie</span>
+                <span class="info-value">{{ getPetType(pet) }}</span>
+                <div class="info-extra">Ideal para famílias</div>
+              </div>
+            </div>
+            <div class="info-card animated" [style.animation-delay]="'0.2s'">
+              <div class="card-icon-wrapper">
+                <mat-icon class="info-icon">cake</mat-icon>
+              </div>
+              <div class="info-content">
+                <span class="info-label">Idade</span>
+                <span class="info-value">{{ getPetAge(pet) }}</span>
+                <div class="info-extra">{{ getAgeCategory(pet) }}</div>
+              </div>
+            </div>
+            <div class="info-card animated" [style.animation-delay]="'0.3s'">
+              <div class="card-icon-wrapper gender-icon" [ngClass]="'gender-' + pet.gender">
+                <mat-icon class="info-icon">{{ pet.gender === 'male' ? 'male' : 'female' }}</mat-icon>
+              </div>
+              <div class="info-content">
+                <span class="info-label">Sexo</span>
+                <span class="info-value">{{ getPetGender(pet) }}</span>
+                <div class="info-extra">{{ pet.gender === 'male' ? 'Castrado' : 'Castrada' }}</div>
+              </div>
+            </div>
+            <div class="info-card animated" [style.animation-delay]="'0.4s'">
+              <div class="card-icon-wrapper">
+                <mat-icon class="info-icon">location_on</mat-icon>
+              </div>
+              <div class="info-content">
+                <span class="info-label">Localização</span>
+                <span class="info-value">{{ getPetLocation(pet) }}</span>
+                <div class="info-extra">Disponível para visita</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="pet-info-card">
+            <div class="tab-navigation">
+              <button 
+                class="tab-button" 
+                [class.active]="activeTab === 'info'"
+                (click)="switchTab('info')">
+                <mat-icon>info</mat-icon>
+                <span>Sobre</span>
+              </button>
+              <button 
+                class="tab-button" 
+                [class.active]="activeTab === 'characteristics'"
+                (click)="switchTab('characteristics')">
+                <mat-icon>star</mat-icon>
+                <span>Características</span>
+              </button>
+              <button 
+                class="tab-button" 
+                [class.active]="activeTab === 'health'"
+                (click)="switchTab('health')">
+                <mat-icon>medical_services</mat-icon>
+                <span>Saúde</span>
+              </button>
+              <button 
+                class="tab-button" 
+                [class.active]="activeTab === 'adoption'"
+                (click)="switchTab('adoption')">
+                <mat-icon>timeline</mat-icon>
+                <span>Adoção</span>
+              </button>
+              <button 
+                class="tab-button" 
+                [class.active]="activeTab === 'care'"
+                (click)="switchTab('care')">
+                <mat-icon>checklist</mat-icon>
+                <span>Cuidados</span>
+              </button>
+            </div>
+
+            <div class="tab-content">
+              <div *ngIf="activeTab === 'info'" class="tab-panel">
+                <h3>Sobre {{ pet.name }}</h3>
+                <p>{{ getPetDescription(pet) }}</p>
+              </div>
+
+              <div *ngIf="activeTab === 'characteristics'" class="tab-panel">
+                <h3>Características</h3>
+                <div class="characteristics-grid">
+                  <div class="characteristic-chip">
+                    <mat-icon>favorite</mat-icon>
+                    <span>Carinhoso</span>
+                  </div>
+                  <div class="characteristic-chip">
+                    <mat-icon>sports_tennis</mat-icon>
+                    <span>Brincalhão</span>
+                  </div>
+                  <div class="characteristic-chip">
+                    <mat-icon>child_friendly</mat-icon>
+                    <span>Bom com crianças</span>
+                  </div>
+                  <div class="characteristic-chip">
+                    <mat-icon>pets</mat-icon>
+                    <span>Sociável</span>
+                  </div>
+                  <div class="characteristic-chip">
+                    <mat-icon>home</mat-icon>
+                    <span>Adaptável</span>
+                  </div>
+                  <div class="characteristic-chip">
+                    <mat-icon>health_and_safety</mat-icon>
+                    <span>Vacinado</span>
+                  </div>
+                </div>
+              </div>
+
+              <div *ngIf="activeTab === 'health'" class="tab-panel">
+                <h3>Saúde & Cuidados</h3>
+                <div class="health-grid">
+                  <div class="health-item">
+                    <div class="health-icon vaccinated">
+                      <mat-icon>shield</mat-icon>
+                    </div>
+                    <div class="health-info">
+                      <span class="health-title">Vacinado</span>
+                      <span class="health-desc">Vacinas em dia</span>
+                    </div>
+                    <div class="health-status checked">
+                      <mat-icon>check_circle</mat-icon>
+                    </div>
+                  </div>
+                  <div class="health-item">
+                    <div class="health-icon neutered">
+                      <mat-icon>healing</mat-icon>
+                    </div>
+                    <div class="health-info">
+                      <span class="health-title">{{ pet.gender === 'male' ? 'Castrado' : 'Castrada' }}</span>
+                      <span class="health-desc">Procedimento realizado</span>
+                    </div>
+                    <div class="health-status checked">
+                      <mat-icon>check_circle</mat-icon>
+                    </div>
+                  </div>
+                  <div class="health-item">
+                    <div class="health-icon microchip">
+                      <mat-icon>memory</mat-icon>
+                    </div>
+                    <div class="health-info">
+                      <span class="health-title">Microchipado</span>
+                      <span class="health-desc">Identificação permanente</span>
+                    </div>
+                    <div class="health-status checked">
+                      <mat-icon>check_circle</mat-icon>
+                    </div>
+                  </div>
+                  <div class="health-item">
+                    <div class="health-icon health-check">
+                      <mat-icon>favorite</mat-icon>
+                    </div>
+                    <div class="health-info">
+                      <span class="health-title">Check-up</span>
+                      <span class="health-desc">Exame veterinário recente</span>
+                    </div>
+                    <div class="health-status checked">
+                      <mat-icon>check_circle</mat-icon>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div *ngIf="activeTab === 'adoption'" class="tab-panel">
+                <h3>Processo de Adoção</h3>
+                <div class="process-timeline">
+                  <div class="timeline-item active">
+                    <div class="timeline-icon">
+                      <mat-icon>search</mat-icon>
+                    </div>
+                    <div class="timeline-content">
+                      <span class="timeline-title">1. Escolha do Pet</span>
+                      <span class="timeline-desc">Você encontrou {{ pet.name }}!</span>
+                    </div>
+                  </div>
+                  <div class="timeline-item">
+                    <div class="timeline-icon">
+                      <mat-icon>assignment</mat-icon>
+                    </div>
+                    <div class="timeline-content">
+                      <span class="timeline-title">2. Formulário</span>
+                      <span class="timeline-desc">Preencha o formulário de interesse</span>
+                    </div>
+                  </div>
+                  <div class="timeline-item">
+                    <div class="timeline-icon">
+                      <mat-icon>chat</mat-icon>
+                    </div>
+                    <div class="timeline-content">
+                      <span class="timeline-title">3. Entrevista</span>
+                      <span class="timeline-desc">Conversa com nossa equipe</span>
+                    </div>
+                  </div>
+                  <div class="timeline-item">
+                    <div class="timeline-icon">
+                      <mat-icon>home</mat-icon>
+                    </div>
+                    <div class="timeline-content">
+                      <span class="timeline-title">4. Visita</span>
+                      <span class="timeline-desc">Conheça {{ pet.name }} pessoalmente</span>
+                    </div>
+                  </div>
+                  <div class="timeline-item">
+                    <div class="timeline-icon">
+                      <mat-icon>favorite</mat-icon>
+                    </div>
+                    <div class="timeline-content">
+                      <span class="timeline-title">5. Adoção</span>
+                      <span class="timeline-desc">Leve {{ pet.name }} para casa!</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div *ngIf="activeTab === 'care'" class="tab-panel">
+                <h3>Cuidados Necessários</h3>
+                <div class="requirements-grid">
+                  <div class="requirement-card">
+                    <mat-icon class="req-icon">home</mat-icon>
+                    <h4>Espaço</h4>
+                    <p>Ambiente seguro com espaço adequado para {{ pet.species === 'dog' ? 'brincadeiras' : 'exploração' }}</p>
+                  </div>
+                  <div class="requirement-card">
+                    <mat-icon class="req-icon">schedule</mat-icon>
+                    <h4>Tempo</h4>
+                    <p>Dedicação diária para {{ pet.species === 'dog' ? 'passeios e exercícios' : 'brincadeiras e carinho' }}</p>
+                  </div>
+                  <div class="requirement-card">
+                    <mat-icon class="req-icon">medical_services</mat-icon>
+                    <h4>Veterinário</h4>
+                    <p>Acompanhamento veterinário regular e emergencial</p>
+                  </div>
+                  <div class="requirement-card">
+                    <mat-icon class="req-icon">attach_money</mat-icon>
+                    <h4>Financeiro</h4>
+                    <p>Recursos para ração, medicamentos e cuidados veterinários</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="action-buttons">
+            <button 
+              *ngIf="isAvailable(pet)"
+              mat-raised-button 
+              color="primary" 
+              class="adopt-button"
+              (click)="navigateToAdoption()">
+              <mat-icon>favorite</mat-icon>
+              Quero Adotar
+            </button>
+            
+            <button 
+              *ngIf="!isAvailable(pet)"
+              mat-raised-button 
+              disabled 
+              class="adopted-button">
+              <mat-icon>check_circle</mat-icon>
+              Já Adotado
+            </button>
+            
+            <button 
+              mat-button 
+              color="accent" 
+              class="contact-button"
+              (click)="contactAboutPet()">
+              <mat-icon>chat</mat-icon>
+              Entrar em Contato
+            </button>
           </div>
         </div>
       </div>
 
-      <div class="showcase-cta">
-        <h2 class="cta-title">Não encontrou seu pet ideal?</h2>
-        <p class="cta-subtitle">Explore nossa lista completa com mais opções e filtros avançados</p>
-        <button mat-raised-button color="primary" class="cta-button" routerLink="/pets">
-          <mat-icon class="btn-icon">pets</mat-icon>
-          Ver Todos os Pets
+    </div>
+  </div>
+</div>
+
+<div *ngIf="showShareModal" class="modal-backdrop" (click)="closeShareModal()">
+  <div class="share-modal" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3>Como deseja compartilhar?</h3>
+      <button mat-icon-button (click)="closeShareModal()" class="close-button">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+    <div class="modal-content">
+      <div class="share-options">
+        <button 
+          mat-raised-button 
+          color="primary" 
+          (click)="shareWithFullInfoModal()"
+          class="share-option-button">
+          <mat-icon>share</mat-icon>
+          <div class="option-text">
+            <span class="option-title">Compartilhar informações completas</span>
+            <span class="option-desc">Inclui nome, descrição e link do pet</span>
+          </div>
+        </button>
+        
+        <button 
+          mat-stroked-button 
+          color="primary" 
+          (click)="copyLinkOnlyModal()"
+          class="share-option-button">
+          <mat-icon>link</mat-icon>
+          <div class="option-text">
+            <span class="option-title">Copiar apenas o link</span>
+            <span class="option-desc">Copia somente a URL da página</span>
+          </div>
         </button>
       </div>
     </div>
+  </div>
+</div>
 
-    <div *ngIf="pets.length === 0 && !loading" class="no-pets-message">
-      <mat-icon class="no-pets-icon">pets</mat-icon>
-      <h3>Nenhum pet encontrado</h3>
-      <p>Não há pets disponíveis no momento.</p>
-      <button mat-raised-button color="primary" routerLink="/pets">
-        <mat-icon>refresh</mat-icon>
-        Tentar Novamente
+
+<div *ngIf="showFullscreenModal" class="fullscreen-modal" (click)="closeFullscreenModal()">
+  <div class="fullscreen-content" (click)="$event.stopPropagation()">
+    <div class="fullscreen-header">
+      <h3>{{ pet?.name }} - Foto {{ fullscreenImageIndex + 1 }}</h3>
+      <button mat-icon-button (click)="closeFullscreenModal()">
+        <mat-icon>close</mat-icon>
       </button>
+    </div>
+    
+    <div class="fullscreen-image-container">
+      <img 
+        [src]="getPetImage(fullscreenImageIndex)" 
+        [alt]="pet?.name"
+        (error)="onImageError($event)"
+        class="fullscreen-image">
+      
+      <div *ngIf="pet && pet.photos && pet.photos.length > 1" class="fullscreen-navigation">
+        <button mat-icon-button class="fullscreen-nav-btn prev" (click)="previousFullscreenImage($event)">
+          <mat-icon>chevron_left</mat-icon>
+        </button>
+        <button mat-icon-button class="fullscreen-nav-btn next" (click)="nextFullscreenImage($event)">
+          <mat-icon>chevron_right</mat-icon>
+        </button>
+      </div>
+    </div>
+    
+    <div *ngIf="pet && pet.photos && pet.photos.length > 1" class="fullscreen-thumbnails">
+      <div 
+        *ngFor="let photo of pet.photos; let i = index" 
+        class="fullscreen-thumbnail"
+        [class.active]="i === fullscreenImageIndex"
+        (click)="selectFullscreenImage(i, $event)">
+        <img [src]="photo" [alt]="(pet.name || 'Pet') + ' - Miniatura ' + (i + 1)" (error)="onImageError($event)">
+      </div>
     </div>
   </div>
 </div>
