@@ -6,13 +6,12 @@ import { environment } from '../../../environments/environment';
 
 export interface User {
   id?: number;
-  username: string;
-  firstName?: string;
-  lastName?: string;
+  full_name?: string;
   email?: string;
   password?: string;
   phone?: string;
-  userStatus?: UserStatus;
+  city?: string;
+  created_at?: string;
 }
 
 export enum UserStatus {
@@ -35,7 +34,7 @@ export class UserService {
   constructor(private http: HttpClient) {}
 
   createUser(user: User): Observable<User> {
-    return this.http.post<User>(`${this.apiUrl}/user`, user)
+    return this.http.post<User>(`${this.apiUrl}/users`, user)
       .pipe(
         catchError(this.handleError)
       );
@@ -56,32 +55,43 @@ export class UserService {
   }
 
   getUserByUsername(username: string): Observable<User> {
-    return this.http.get<User>(`${this.apiUrl}/user/${username}`)
+    return this.http.get<User>(`${this.apiUrl}/users/${username}`)
       .pipe(
         catchError(this.handleError)
       );
   }
 
   updateUser(username: string, user: User): Observable<User> {
-    return this.http.put<User>(`${this.apiUrl}/user/${username}`, user)
+    return this.http.put<User>(`${this.apiUrl}/users/${username}`, user)
       .pipe(
         catchError(this.handleError)
       );
   }
 
   deleteUser(username: string): Observable<{ message?: string }> {
-    return this.http.delete<{ message?: string }>(`${this.apiUrl}/user/${username}`)
+    return this.http.delete<{ message?: string }>(`${this.apiUrl}/users/${username}`)
       .pipe(
         catchError(this.handleError)
       );
   }
 
-  loginUser(username: string, password: string): Observable<LoginResponse> {
-    const params = new HttpParams()
-      .set('username', username)
-      .set('password', password);
+  loginUser(username: string, password: string): Observable<any> {
+    const loginData = {
+      username: username,
+      password: password
+    };
 
-    return this.http.get<LoginResponse>(`${this.apiUrl}/user/login`, { params })
+    return this.http.post<any>(`${this.apiUrl}/api/auth/login`, loginData)
+      .pipe(
+        catchError(this.handleError)
+      );
+  }
+
+  getCurrentUserProfile(): Observable<User> {
+    const token = localStorage.getItem('access_token');
+    const headers = token ? { 'Authorization': `Bearer ${token}` } : undefined;
+    
+    return this.http.get<User>(`${this.apiUrl}/api/auth/me`, { headers })
       .pipe(
         catchError(this.handleError)
       );
