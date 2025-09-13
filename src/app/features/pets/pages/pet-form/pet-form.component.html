@@ -1,1 +1,220 @@
-<p>pet-form works!</p>
+<div class="pet-form-container">
+  <div class="form-header">
+    <h1>{{ isEditMode ? 'Editar Pet' : 'Adicionar Novo Pet' }}</h1>
+    <p class="form-subtitle">
+      {{ isEditMode ? 'Atualize as informações do pet' : 'Preencha os dados do pet para adicionar à nossa plataforma' }}
+    </p>
+  </div>
+
+  <form [formGroup]="petForm" (ngSubmit)="onSubmit()" class="pet-form">
+    
+    <div class="form-section">
+      <h3 class="section-title">
+        <mat-icon>pets</mat-icon>
+        Informações Básicas
+      </h3>
+      
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="name">Nome do Pet *</label>
+          <input 
+            type="text" 
+            id="name"
+            formControlName="name"
+            placeholder="Ex: Rex, Luna, Max..."
+            [class.error]="isFieldInvalid('name')"
+          >
+          <span class="error-message" *ngIf="isFieldInvalid('name')">
+            Nome é obrigatório
+          </span>
+        </div>
+
+        <div class="form-group">
+          <label for="species">Espécie *</label>
+          <select 
+            id="species"
+            formControlName="species"
+            [class.error]="isFieldInvalid('species')"
+          >
+            <option value="">Selecione a espécie</option>
+            <option value="dog">Cachorro</option>
+            <option value="cat">Gato</option>
+          </select>
+          <span class="error-message" *ngIf="isFieldInvalid('species')">
+            Espécie é obrigatória
+          </span>
+        </div>
+
+        <div class="form-group">
+          <label for="breed">Raça *</label>
+          <input 
+            type="text" 
+            id="breed"
+            formControlName="breed"
+            placeholder="Ex: Golden Retriever, Persa..."
+            [class.error]="isFieldInvalid('breed')"
+          >
+          <span class="error-message" *ngIf="isFieldInvalid('breed')">
+            Raça é obrigatória
+          </span>
+        </div>
+
+        <div class="form-group">
+          <label for="age">Idade (meses) *</label>
+          <input 
+            type="number" 
+            id="age"
+            formControlName="age"
+            placeholder="Ex: 12"
+            min="0"
+            max="300"
+            [class.error]="isFieldInvalid('age')"
+          >
+          <span class="error-message" *ngIf="isFieldInvalid('age')">
+            Idade é obrigatória
+          </span>
+        </div>
+
+        <div class="form-group">
+          <label for="gender">Gênero *</label>
+          <select 
+            id="gender"
+            formControlName="gender"
+            [class.error]="isFieldInvalid('gender')"
+          >
+            <option value="">Selecione o gênero</option>
+            <option value="male">Macho</option>
+            <option value="female">Fêmea</option>
+          </select>
+          <span class="error-message" *ngIf="isFieldInvalid('gender')">
+            Gênero é obrigatório
+          </span>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="form-section">
+      <h3 class="section-title">
+        <mat-icon>location_on</mat-icon>
+        Localização
+      </h3>
+      
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="city">Cidade *</label>
+          <input 
+            type="text" 
+            id="city"
+            formControlName="city"
+            placeholder="Ex: São Paulo, Rio de Janeiro..."
+            [class.error]="isFieldInvalid('city')"
+          >
+          <span class="error-message" *ngIf="isFieldInvalid('city')">
+            Cidade é obrigatória
+          </span>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="form-section">
+      <h3 class="section-title">
+        <mat-icon>description</mat-icon>
+        Descrição e Características
+      </h3>
+      
+      <div class="form-group full-width">
+        <label for="description">Descrição *</label>
+        <textarea 
+          id="description"
+          formControlName="description"
+          placeholder="Conte um pouco sobre o pet: personalidade, cuidados especiais, histórico..."
+          rows="4"
+          [class.error]="isFieldInvalid('description')"
+        ></textarea>
+        <span class="error-message" *ngIf="isFieldInvalid('description')">
+          Descrição é obrigatória (mínimo 10 caracteres)
+        </span>
+      </div>
+
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="status">Status</label>
+          <select 
+            id="status"
+            formControlName="status"
+          >
+            <option value="available">Disponível</option>
+            <option value="adopted">Adotado</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-section">
+      <h3 class="section-title">
+        <mat-icon>image</mat-icon>
+        Foto do Pet
+      </h3>
+      
+      <div class="image-upload-section">
+        <div class="image-preview" *ngIf="imagePreview">
+          <img [src]="imagePreview" alt="Preview da imagem">
+          <button type="button" class="remove-image" (click)="removeImage()">
+            <mat-icon>close</mat-icon>
+          </button>
+        </div>
+        
+        <div class="image-upload" *ngIf="!imagePreview">
+          <input 
+            type="file" 
+            id="image"
+            accept="image/*"
+            (change)="onImageSelected($event)"
+            #fileInput
+          >
+          <label for="image" class="upload-label">
+            <mat-icon>add_photo_alternate</mat-icon>
+            <span>Adicionar Foto</span>
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button 
+        type="button" 
+        mat-stroked-button 
+        color="primary" 
+        (click)="onCancel()"
+        [disabled]="isLoading"
+      >
+        <mat-icon>cancel</mat-icon>
+        Cancelar
+      </button>
+      
+      <button 
+        type="submit" 
+        mat-raised-button 
+        color="primary"
+        [disabled]="petForm.invalid || isLoading"
+      >
+        <mat-icon *ngIf="!isLoading">{{ isEditMode ? 'save' : 'add' }}</mat-icon>
+        <mat-spinner *ngIf="isLoading" diameter="20"></mat-spinner>
+        {{ isLoading ? 'Salvando...' : (isEditMode ? 'Atualizar Pet' : 'Adicionar Pet') }}
+      </button>
+    </div>
+    
+    <div class="form-feedback" *ngIf="successMessage || errorMessage">
+      <div class="success-message" *ngIf="successMessage">
+        <mat-icon>check_circle</mat-icon>
+        {{ successMessage }}
+      </div>
+      <div class="error-message" *ngIf="errorMessage">
+        <mat-icon>error</mat-icon>
+        {{ errorMessage }}
+      </div>
+    </div>
+  </form>
+</div>
