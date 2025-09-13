@@ -1,0 +1,148 @@
+<div class="dashboard-container">
+  <header class="dashboard-header">
+    <div class="header-content">
+      <div class="header-left">
+        <mat-icon class="logo-icon">pets</mat-icon>
+        <h1>Dashboard Admin</h1>
+      </div>
+      <div class="header-right">
+        <div class="user-info">
+          <mat-icon>account_circle</mat-icon>
+          <span>{{ currentUser?.name }}</span>
+          <span class="user-role">{{ currentUser?.role }}</span>
+        </div>
+        <button class="logout-btn" (click)="logout()">
+          <mat-icon>logout</mat-icon>
+          <span>Sair</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="dashboard-main">
+    <section class="stats-section">
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon">
+            <mat-icon>people</mat-icon>
+          </div>
+          <div class="stat-content">
+            <h3>{{ stats.totalUsers }}</h3>
+            <p>Total de Usuários</p>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon">
+            <mat-icon>pets</mat-icon>
+          </div>
+          <div class="stat-content">
+            <h3>{{ stats.totalPets }}</h3>
+            <p>Pets Cadastrados</p>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon">
+            <mat-icon>favorite</mat-icon>
+          </div>
+          <div class="stat-content">
+            <h3>{{ stats.totalAdoptions }}</h3>
+            <p>Adoções Realizadas</p>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon">
+            <mat-icon>pending_actions</mat-icon>
+          </div>
+          <div class="stat-content">
+            <h3>{{ stats.pendingAdoptions }}</h3>
+            <p>Adoções Pendentes</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="recent-adoptions">
+      <div class="section-header">
+        <h2>
+          <mat-icon>history</mat-icon>
+          Adoções Recentes
+        </h2>
+        <button class="view-all-btn">
+          <mat-icon>arrow_forward</mat-icon>
+          Ver Todas
+        </button>
+      </div>
+
+      <div class="adoptions-table" *ngIf="!isLoading; else loadingTemplate">
+        <div class="table-header">
+          <div class="col-pet">Pet</div>
+          <div class="col-user">Usuário</div>
+          <div class="col-contact">Contato</div>
+          <div class="col-status">Status</div>
+          <div class="col-date">Data</div>
+        </div>
+
+        <div class="table-body">
+          <div class="table-row" *ngFor="let adoption of recentAdoptions">
+            <div class="col-pet">
+              <mat-icon class="pet-icon">pets</mat-icon>
+              <span>{{ getPetName(adoption) }}</span>
+            </div>
+            <div class="col-user">
+              <strong>{{ getUserName(adoption) }}</strong>
+            </div>
+            <div class="col-contact">
+              <div class="contact-info">
+                <span class="email">{{ adoption.email }}</span>
+                <span class="phone">{{ adoption.phone }}</span>
+              </div>
+            </div>
+            <div class="col-status">
+              <span class="status-badge" [class]="getStatusBadgeClass(adoption.status)">
+                {{ getStatusText(adoption.status) }}
+              </span>
+            </div>
+            <div class="col-date">
+              {{ formatDate(adoption.created_at) }}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <ng-template #loadingTemplate>
+        <div class="loading-container">
+          <mat-icon class="loading-icon">refresh</mat-icon>
+          <p>Carregando adoções...</p>
+        </div>
+      </ng-template>
+    </section>
+
+    <section class="quick-actions">
+      <h2>
+        <mat-icon>flash_on</mat-icon>
+        Ações Rápidas
+      </h2>
+      <div class="actions-grid">
+        <button class="action-card">
+          <mat-icon>add</mat-icon>
+          <span>Cadastrar Pet</span>
+        </button>
+        <button class="action-card">
+          <mat-icon>people</mat-icon>
+          <span>Gerenciar Usuários</span>
+        </button>
+        <button class="action-card">
+          <mat-icon>favorite</mat-icon>
+          <span>Adoções Pendentes</span>
+        </button>
+        <button class="action-card">
+          <mat-icon>settings</mat-icon>
+          <span>Configurações</span>
+        </button>
+      </div>
+    </section>
+  </main>
+</div>
