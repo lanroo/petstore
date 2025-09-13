@@ -13,13 +13,16 @@ import { MainLayoutComponent } from './layouts/main-layout/main-layout.component
 import { HeaderComponent } from './shared/components/header/header.component';
 import { HttpErrorInterceptor } from './core/interceptors/http-error.interceptor';
 import { FooterComponent } from './shared/components/footer/footer.component';
+import { AuthLayoutComponent } from './layouts/auth-layout/auth-layout.component';
+
 @NgModule({
   declarations: [
     AppComponent,
     LoadingSpinnerComponent,
     MainLayoutComponent,
     HeaderComponent,
-    FooterComponent
+    FooterComponent,
+    AuthLayoutComponent
   ],
   imports: [
     BrowserModule,
