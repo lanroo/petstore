@@ -77,14 +77,23 @@ export class HomeComponent implements OnInit {
     
     this.petService.getPets(filters).subscribe({
       next: (response) => {
-        this.availablePets = response.pets; 
-        this.totalPetsAvailable = response.total || response.pets.length;
+        console.log('🏠 Home - API Response:', response);
+        if (response && response.pets && Array.isArray(response.pets)) {
+          this.availablePets = response.pets; 
+          this.totalPetsAvailable = response.total || response.pets.length;
+        } else {
+          console.warn('⚠️ Home - Invalid response structure:', response);
+          this.availablePets = [];
+          this.totalPetsAvailable = 0;
+        }
         this.updateCarouselSettings();
         this.cdr.markForCheck();
       },
       error: (error) => {
-        console.error('Erro ao carregar pets disponíveis:', error);
-        this.totalPetsAvailable = 30; 
+        console.error('❌ Home - Erro ao carregar pets disponíveis:', error);
+        this.availablePets = [];
+        this.totalPetsAvailable = 0;
+        this.cdr.markForCheck();
       }
     });
   }

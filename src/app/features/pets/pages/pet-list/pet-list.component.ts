@@ -81,23 +81,26 @@ export class PetListComponent implements OnInit, OnDestroy {
   }
 
   private loadPets(): void {
-    // Evitar múltiplas requisições simultâneas
     const currentTime = Date.now();
     this.lastRequestTime = currentTime;
     
+    console.log('🔄 Pet List - Loading pets...');
     this.setLoadingState(true);
 
     const filters = this.buildApiFilters();
+    console.log('🔍 Pet List - Filters:', filters);
+    
     this.petService.getPets(filters)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (response) => {
-          // Só processar se for a requisição mais recente
+          console.log('✅ Pet List - API Response received:', response);
           if (this.lastRequestTime === currentTime) {
             this.handlePetsLoaded(response.pets, response.total);
           }
         },
         error: (error) => {
+          console.error('❌ Pet List - API Error:', error);
           if (this.lastRequestTime === currentTime) {
             this.handlePetsLoadError(error);
           }
@@ -106,9 +109,17 @@ export class PetListComponent implements OnInit, OnDestroy {
   }
 
   private handlePetsLoaded(pets: Pet[], total?: number): void {
-    this.pets = pets;
-    this.totalPets = total || pets.length; 
-    this.filteredPets = pets;
+    console.log('🐾 Pet List - Pets loaded:', pets);
+    if (pets && Array.isArray(pets)) {
+      this.pets = pets;
+      this.totalPets = total || pets.length; 
+      this.filteredPets = pets;
+    } else {
+      console.warn('⚠️ Pet List - Invalid pets data:', pets);
+      this.pets = [];
+      this.totalPets = 0;
+      this.filteredPets = [];
+    }
     this.setLoadingState(false);
   }
 
@@ -123,13 +134,13 @@ export class PetListComponent implements OnInit, OnDestroy {
   }
 
   onFilterChange(): void {
-    this.first = 0; // Reset para primeira página
+    this.first = 0; 
     this.currentPage = 0;
     this.filterSubject$.next();
   }
 
   onSelectChange(): void {
-    this.first = 0; // Reset para primeira página
+    this.first = 0; 
     this.currentPage = 0;
     this.loadPets();
   }
@@ -254,7 +265,7 @@ export class PetListComponent implements OnInit, OnDestroy {
     this.rows = event.rows;
     this.currentPage = event.page;
     this.pageSize = event.rows;
-    this.loadPets(); // Carregar nova página
+    this.loadPets(); 
   }
 
   trackByPetId(index: number, pet: Pet): number | undefined {

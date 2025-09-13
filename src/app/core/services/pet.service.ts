@@ -28,8 +28,38 @@ export class PetService {
   getPets(filters?: PetFilters): Observable<PetResponse> {
     const params = this.buildQueryParams(filters);
     
-    return this.http.get<PetResponse>(`${this.apiUrl}/pets`, { params })
+    return this.http.get<any>(`${this.apiUrl}/pets`, { params })
       .pipe(
+        map(response => {
+          console.log('🔍 PetService - Raw API response:', response);
+          
+          if (Array.isArray(response)) {
+            console.log('✅ PetService - Processing array response with', response.length, 'pets');
+            return {
+              pets: response,
+              total: response.length,
+              page: 1,
+              limit: this.defaultLimit
+            };
+          } else if (response && response.pets && Array.isArray(response.pets)) {
+            console.log('✅ PetService - Processing object response with pets array');
+            return {
+              pets: response.pets,
+              total: response.total || response.pets.length,
+              page: response.page || 1,
+              limit: response.limit || this.defaultLimit
+            };
+          } else {
+
+            console.warn('⚠️ PetService - Unexpected response structure:', response);
+            return {
+              pets: [],
+              total: 0,
+              page: 1,
+              limit: this.defaultLimit
+            };
+          }
+        }),
         catchError(this.handleError)
       );
   }
