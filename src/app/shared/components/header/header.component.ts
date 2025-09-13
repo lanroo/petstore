@@ -1,5 +1,6 @@
 import { Component, HostListener } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, NavigationEnd } from '@angular/router';
+import { filter } from 'rxjs/operators';
 
 @Component({
   selector: 'app-header',
@@ -10,8 +11,17 @@ import { Router } from '@angular/router';
 export class HeaderComponent {
   isMobileMenuOpen = false;
   isScrolled = false;
+  isAdoptionDropdownOpen = false;
+  isMobileAdoptionDropdownOpen = false;
+  isOnAdoptionPage = false;
   
-  constructor(private router: Router) {}
+  constructor(private router: Router) { 
+    this.router.events
+      .pipe(filter(event => event instanceof NavigationEnd))
+      .subscribe((event: NavigationEnd) => {
+        this.isOnAdoptionPage = event.url.includes('/pets/adoption');
+      });
+  }
 
   toggleMobileMenu(): void {
     this.isMobileMenuOpen = !this.isMobileMenuOpen;
@@ -41,5 +51,25 @@ export class HeaderComponent {
     if (window.innerWidth > 768 && this.isMobileMenuOpen) {
       this.closeMobileMenu();
     }
+  }
+
+  toggleAdoptionDropdown(): void {
+    this.isAdoptionDropdownOpen = !this.isAdoptionDropdownOpen;
+  }
+
+  openAdoptionDropdown(): void {
+    this.isAdoptionDropdownOpen = true;
+  }
+
+  closeAdoptionDropdown(): void {
+    this.isAdoptionDropdownOpen = false;
+  }
+
+  toggleMobileAdoptionDropdown(): void {
+    this.isMobileAdoptionDropdownOpen = !this.isMobileAdoptionDropdownOpen;
+  }
+
+  closeMobileAdoptionDropdown(): void {
+    this.isMobileAdoptionDropdownOpen = false;
   }
 }

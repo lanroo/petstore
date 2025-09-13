@@ -21,10 +21,39 @@
       
       <a routerLink="/pets" 
          routerLinkActive="active" 
+         [routerLinkActiveOptions]="{exact: true}"
          class="nav-link">
         <mat-icon class="nav-icon">pets</mat-icon>
         <span class="nav-text">Pets</span>
       </a>
+      
+      <div class="nav-dropdown" 
+           [class.active]="isAdoptionDropdownOpen || isOnAdoptionPage"
+           (mouseenter)="openAdoptionDropdown()"
+           (mouseleave)="closeAdoptionDropdown()">
+        <a class="nav-link nav-adoption" 
+           [class.active]="isOnAdoptionPage"
+           (click)="toggleAdoptionDropdown()">
+          <mat-icon class="nav-icon">favorite</mat-icon>
+          <span class="nav-text">Quero Adotar</span>
+          <mat-icon class="dropdown-icon">keyboard_arrow_down</mat-icon>
+        </a>
+        
+        <div class="dropdown-menu" *ngIf="isAdoptionDropdownOpen">
+          <a routerLink="/pets/adoption" 
+             class="dropdown-item"
+             (click)="closeAdoptionDropdown()">
+            <mat-icon class="dropdown-item-icon">description</mat-icon>
+            <span>Formulário de Adoção</span>
+          </a>
+          <a routerLink="/pets/faq" 
+             class="dropdown-item"
+             (click)="closeAdoptionDropdown()">
+            <mat-icon class="dropdown-item-icon">contact_support</mat-icon>
+            <span>Dúvidas Frequentes</span>
+          </a>
+        </div>
+      </div>
       
       <a routerLink="/store"
          routerLinkActive="active"
@@ -33,11 +62,10 @@
         <span class="nav-text">Estoque</span>
       </a>
       
-      <a routerLink="/pets/new"
-         routerLinkActive="active"
+      <a routerLink="/auth/login"
          class="nav-link nav-cta">
-        <mat-icon class="nav-icon">add_circle</mat-icon>
-        <span class="nav-text">Cadastrar</span>
+        <mat-icon class="nav-icon">login</mat-icon>
+        <span class="nav-text">Login</span>
       </a>
     </nav>
 
@@ -62,11 +90,38 @@
     
     <a routerLink="/pets" 
        routerLinkActive="active" 
+       [routerLinkActiveOptions]="{exact: true}"
        class="mobile-nav-link"
        (click)="closeMobileMenu()">
       <mat-icon class="nav-icon">pets</mat-icon>
       <span class="nav-text">Pets</span>
     </a>
+    
+    <div class="mobile-dropdown" 
+         [class.active]="isMobileAdoptionDropdownOpen || isOnAdoptionPage">
+      <a class="mobile-nav-link mobile-nav-adoption"
+         [class.active]="isOnAdoptionPage"
+         (click)="toggleMobileAdoptionDropdown()">
+        <mat-icon class="nav-icon">favorite</mat-icon>
+        <span class="nav-text">Quero Adotar</span>
+        <mat-icon class="dropdown-icon">{{ isMobileAdoptionDropdownOpen ? 'keyboard_arrow_up' : 'keyboard_arrow_down' }}</mat-icon>
+      </a>
+      
+      <div class="mobile-dropdown-menu" *ngIf="isMobileAdoptionDropdownOpen">
+        <a routerLink="/pets/adoption" 
+           class="mobile-dropdown-item"
+           (click)="closeMobileMenu(); closeMobileAdoptionDropdown()">
+          <mat-icon class="dropdown-item-icon">description</mat-icon>
+          <span>Formulário de Adoção</span>
+        </a>
+        <a routerLink="/pets/faq" 
+           class="mobile-dropdown-item"
+           (click)="closeMobileMenu(); closeMobileAdoptionDropdown()">
+          <mat-icon class="dropdown-item-icon">contact_support</mat-icon>
+          <span>Dúvidas Frequentes</span>
+        </a>
+      </div>
+    </div>
     
     <a routerLink="/store"
        routerLinkActive="active"
@@ -76,12 +131,11 @@
       <span class="nav-text">Estoque</span>
     </a>
     
-    <a routerLink="/pets/new"
-       routerLinkActive="active"
+    <a routerLink="/auth/login"
        class="mobile-nav-link mobile-nav-cta"
        (click)="closeMobileMenu()">
-      <mat-icon class="nav-icon">add_circle</mat-icon>
-      <span class="nav-text">Cadastrar</span>
+      <mat-icon class="nav-icon">login</mat-icon>
+      <span class="nav-text">Login</span>
     </a>
   </nav>
 </header>
