@@ -1,0 +1,124 @@
+<div class="faq-container">
+  <div class="hero-section">
+    <div class="hero-content">
+      <div class="hero-text">
+        <h1 class="hero-title">
+          Dúvidas <span class="hero-highlight">Frequentes</span>
+        </h1>
+        <p class="hero-subtitle">
+          Encontre respostas para as principais perguntas sobre o processo de adoção de pets.
+          Se você não encontrar a resposta que procura, entre em contato conosco.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <div class="faq-content">
+    <div class="container">
+      <div class="faq-grid">
+        
+        <div class="faq-section">
+          <h2 class="section-title">
+            <mat-icon class="section-icon">pets</mat-icon>
+            Processo de Adoção
+          </h2>
+          
+          <div class="faq-item" *ngFor="let item of adoptionProcessFAQ; let i = index">
+            <button class="faq-question" 
+                    [class.active]="item.isOpen"
+                    (click)="toggleFAQ('adoptionProcess', i)">
+              <span class="question-text">{{ item.question }}</span>
+              <mat-icon class="expand-icon">{{ item.isOpen ? 'remove' : 'add' }}</mat-icon>
+            </button>
+            <div class="faq-answer" [class.open]="item.isOpen">
+              <div class="answer-content">
+                <p [innerHTML]="item.answer"></p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="faq-section">
+          <h2 class="section-title">
+            <mat-icon class="section-icon">description</mat-icon>
+            Requisitos e Documentação
+          </h2>
+          
+          <div class="faq-item" *ngFor="let item of requirementsFAQ; let i = index">
+            <button class="faq-question" 
+                    [class.active]="item.isOpen"
+                    (click)="toggleFAQ('requirements', i)">
+              <span class="question-text">{{ item.question }}</span>
+              <mat-icon class="expand-icon">{{ item.isOpen ? 'remove' : 'add' }}</mat-icon>
+            </button>
+            <div class="faq-answer" [class.open]="item.isOpen">
+              <div class="answer-content">
+                <p [innerHTML]="item.answer"></p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="faq-section">
+          <h2 class="section-title">
+            <mat-icon class="section-icon">favorite</mat-icon>
+            Cuidados e Responsabilidades
+          </h2>
+          
+          <div class="faq-item" *ngFor="let item of careFAQ; let i = index">
+            <button class="faq-question" 
+                    [class.active]="item.isOpen"
+                    (click)="toggleFAQ('care', i)">
+              <span class="question-text">{{ item.question }}</span>
+              <mat-icon class="expand-icon">{{ item.isOpen ? 'remove' : 'add' }}</mat-icon>
+            </button>
+            <div class="faq-answer" [class.open]="item.isOpen">
+              <div class="answer-content">
+                <p [innerHTML]="item.answer"></p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="faq-section">
+          <h2 class="section-title">
+            <mat-icon class="section-icon">attach_money</mat-icon>
+            Custos e Taxas
+          </h2>
+          
+          <div class="faq-item" *ngFor="let item of costsFAQ; let i = index">
+            <button class="faq-question" 
+                    [class.active]="item.isOpen"
+                    (click)="toggleFAQ('costs', i)">
+              <span class="question-text">{{ item.question }}</span>
+              <mat-icon class="expand-icon">{{ item.isOpen ? 'remove' : 'add' }}</mat-icon>
+            </button>
+            <div class="faq-answer" [class.open]="item.isOpen">
+              <div class="answer-content">
+                <p [innerHTML]="item.answer"></p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+      <div class="contact-section">
+        <div class="contact-card">
+          <mat-icon class="contact-icon">contact_support</mat-icon>
+          <h3>Ainda tem dúvidas?</h3>
+          <p>Nossa equipe está aqui para ajudar você com qualquer questão sobre adoção.</p>
+          <div class="contact-actions">
+            <a routerLink="/pets/adoption" class="btn-primary">
+              <mat-icon>favorite</mat-icon>
+              Fazer Adoção
+            </a>
+            <a href="mailto:contato@adoteumamigo.com" class="btn-secondary">
+              <mat-icon>email</mat-icon>
+              Entrar em Contato
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
