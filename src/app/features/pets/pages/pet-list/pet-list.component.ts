@@ -172,7 +172,6 @@ export class PetListComponent implements OnInit, OnDestroy {
   }
 
 
-
   clearFilters(): void {
     this.searchTerm = '';
     this.selectedStatus = '';
@@ -216,8 +215,6 @@ export class PetListComponent implements OnInit, OnDestroy {
     return petId ? this.favoritePets.has(petId) : false;
   }
 
-
-
   showFavorites(): void {
     if (this.favoritePets.size > 0) {
       this.filteredPets = this.pets.filter(pet => pet.id && this.favoritePets.has(pet.id));
@@ -257,8 +254,6 @@ export class PetListComponent implements OnInit, OnDestroy {
     return this.imageService.getPetImage(pet, 'small');
   }
   
-
-
 
   onPageChange(event: any): void {
     this.first = event.first;

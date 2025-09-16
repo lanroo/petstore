@@ -1,66 +1,139 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable, throwError } from 'rxjs';
+import { Observable } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
-import { Pet, PetStatus, PetResponse, PetStats } from '../models/pet.model';
+import { environment } from '../../../environments/environment';
 
-export interface PetFilters {
-  species?: 'dog' | 'cat';
-  city?: string;
-  status?: PetStatus;
-  gender?: 'male' | 'female';
-  min_age?: number;
-  max_age?: number;
-  page?: number;
-  limit?: number;
-  q?: string;
-}
+import { 
+  Pet, 
+  PetResponse, 
+  PetStats, 
+  PetFilters, 
+  PetUploadResponse, 
+  PetAdoptionRequest 
+} from '../models/pet.model';
+
+import { PET_API_ENDPOINTS, PET_DEFAULTS, PET_ERROR_MESSAGES } from '../constants/pet.constants';
+
+import { PetValidators } from '../validators/pet.validators';
+  
+import { ErrorHandlerUtil } from '../utils/error-handler.util';
 
 @Injectable({
   providedIn: 'root'
 })
 export class PetService {
-  private readonly apiUrl = 'https://projeto-jornadadados-pet-api-adoptt.zjnxkg.easypanel.host';
-  private readonly defaultLimit = 100;
+  private readonly apiUrl = environment.apiUrl;
 
-  constructor(private http: HttpClient) {}
+  constructor(private readonly http: HttpClient) {}
 
   getPets(filters?: PetFilters): Observable<PetResponse> {
+    if (filters) {
+      PetValidators.validatePetFilters(filters);
+    }
+    
     const params = this.buildQueryParams(filters);
     
-    return this.http.get<any>(`${this.apiUrl}/pets`, { params })
+    return this.http.get<any>(`${this.apiUrl}${PET_API_ENDPOINTS.PETS}`, { params })
       .pipe(
-        map(response => {
-          console.log('🔍 PetService - Raw API response:', response);
-          
-          if (Array.isArray(response)) {
-            console.log('✅ PetService - Processing array response with', response.length, 'pets');
-            return {
-              pets: response,
-              total: response.length,
-              page: 1,
-              limit: this.defaultLimit
-            };
-          } else if (response && response.pets && Array.isArray(response.pets)) {
-            console.log('✅ PetService - Processing object response with pets array');
-            return {
-              pets: response.pets,
-              total: response.total || response.pets.length,
-              page: response.page || 1,
-              limit: response.limit || this.defaultLimit
-            };
-          } else {
+        map(response => this.mapToPetResponse(response)),
+        catchError(error => ErrorHandlerUtil.handleGetUserError(error))
+      );
+  }
 
-            console.warn('⚠️ PetService - Unexpected response structure:', response);
-            return {
-              pets: [],
-              total: 0,
-              page: 1,
-              limit: this.defaultLimit
-            };
-          }
-        }),
-        catchError(this.handleError)
+  getPetById(id: number): Observable<Pet> {
+    PetValidators.validatePetId(id);
+    
+    return this.http.get<Pet>(`${this.apiUrl}${PET_API_ENDPOINTS.PET_BY_ID(id)}`)
+      .pipe(
+        catchError(error => ErrorHandlerUtil.handleGetUserError(error))
+      );
+  }
+
+  createPet(pet: Omit<Pet, 'id' | 'created_at' | 'updated_at'>): Observable<Pet> {
+    PetValidators.validatePetData(pet);
+    
+    return this.http.post<Pet>(`${this.apiUrl}${PET_API_ENDPOINTS.PETS}`, pet)
+      .pipe(
+        catchError(error => ErrorHandlerUtil.handleCreateUserError(error))
+      );
+  }
+
+  updatePet(id: number, pet: Partial<Pet>): Observable<Pet> {
+    PetValidators.validatePetId(id);
+    PetValidators.validatePetData(pet);
+    
+    return this.http.put<Pet>(`${this.apiUrl}${PET_API_ENDPOINTS.PET_BY_ID(id)}`, pet)
+      .pipe(
+        catchError(error => ErrorHandlerUtil.handleUpdateUserError(error))
+      );
+  }
+
+  deletePet(id: number): Observable<void> {
+    PetValidators.validatePetId(id);
+    
+    return this.http.delete<void>(`${this.apiUrl}${PET_API_ENDPOINTS.PET_BY_ID(id)}`)
+      .pipe(
+        catchError(error => ErrorHandlerUtil.handleDeleteUserError(error))
+      );
+  }
+
+  getPetsByStatus(status: string): Observable<Pet[]> {
+    return this.getPets({ status: status as any, limit: PET_DEFAULTS.LIMIT }).pipe(
+      map(response => response.pets)
+    );
+  }
+
+  getFilterOptions(): Observable<any> {
+    return this.http.get(`${this.apiUrl}${PET_API_ENDPOINTS.PET_FILTERS}`)
+      .pipe(
+        catchError(error => ErrorHandlerUtil.handleGetUserError(error))
+      );
+  }
+
+  searchPets(query: string): Observable<Pet[]> {
+    PetValidators.validateSearchQuery(query);
+    
+    const params = new HttpParams().set('q', query);
+    
+    return this.http.get<{ pets: Pet[], query: string }>(`${this.apiUrl}${PET_API_ENDPOINTS.PET_SEARCH}`, { params })
+      .pipe(
+        map(response => response.pets),
+        catchError(error => ErrorHandlerUtil.handleGetUserError(error))
+      );
+  }
+
+  uploadPetPhotos(petId: number, files: File[]): Observable<PetUploadResponse> {
+    PetValidators.validatePetId(petId);
+    PetValidators.validateFileUpload(files);
+    
+    const formData = new FormData();
+    files.forEach(file => {
+      formData.append('files', file);
+    });
+    
+    return this.http.post<PetUploadResponse>(`${this.apiUrl}${PET_API_ENDPOINTS.PET_PHOTOS(petId)}`, formData)
+      .pipe(
+        catchError(error => ErrorHandlerUtil.handleCreateUserError(error))
+      );
+  }
+
+  adoptPet(petId: number, userId: number): Observable<Pet> {
+    PetValidators.validatePetId(petId);
+    PetValidators.validateAdoptionRequest(userId);
+    
+    const adoptionRequest: PetAdoptionRequest = { user_id: userId };
+    
+    return this.http.post<Pet>(`${this.apiUrl}${PET_API_ENDPOINTS.PET_ADOPT(petId)}`, adoptionRequest)
+      .pipe(
+        catchError(error => ErrorHandlerUtil.handleCreateUserError(error))
+      );
+  }
+
+  getPetStats(): Observable<PetStats> {
+    return this.http.get<PetStats>(`${this.apiUrl}${PET_API_ENDPOINTS.PET_STATS}`)
+      .pipe(
+        catchError(error => ErrorHandlerUtil.handleGetUserError(error))
       );
   }
 
@@ -68,7 +141,7 @@ export class PetService {
     let params = new HttpParams();
     
     if (!filters) {
-      return params.set('limit', this.defaultLimit.toString());
+      return params.set('limit', PET_DEFAULTS.LIMIT.toString());
     }
     
     if (filters.species) {
@@ -96,125 +169,34 @@ export class PetService {
       params = params.set('q', filters.q);
     }
     
-    const limit = filters.limit || this.defaultLimit;
+    const limit = filters.limit || PET_DEFAULTS.LIMIT;
     params = params.set('limit', limit.toString());
     
     return params;
   }
 
-  getPetById(id: number): Observable<Pet> {
-    return this.http.get<Pet>(`${this.apiUrl}/pets/${id}`)
-      .pipe(
-        catchError(this.handleError)
-      );
-  }
-
-  createPet(pet: Omit<Pet, 'id' | 'created_at' | 'updated_at'>): Observable<Pet> {
-    return this.http.post<Pet>(`${this.apiUrl}/pets`, pet)
-      .pipe(
-        catchError(this.handleError)
-      );
-  }
-
-  updatePet(id: number, pet: Partial<Pet>): Observable<Pet> {
-    return this.http.put<Pet>(`${this.apiUrl}/pets/${id}`, pet)
-      .pipe(
-        catchError(this.handleError)
-      );
-  }
-
-  deletePet(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/pets/${id}`)
-      .pipe(
-        catchError(this.handleError)
-      );
-  }
-
-  getPetsByStatus(status: PetStatus): Observable<Pet[]> {
-    return this.getPets({ status, limit: 100 }).pipe(
-      map(response => response.pets)
-    );
-  }
-
-  getFilterOptions(): Observable<any> {
-    return this.http.get(`${this.apiUrl}/pets/filters/options`)
-      .pipe(
-        catchError(this.handleError)
-      );
-  }
-
-  searchPets(query: string): Observable<Pet[]> {
-    const params = new HttpParams().set('q', query);
-    
-    return this.http.get<{ pets: Pet[], query: string }>(`${this.apiUrl}/pets/search`, { params })
-      .pipe(
-        map(response => response.pets),
-        catchError(this.handleError)
-      );
-  }
-
-  uploadPetPhotos(petId: number, files: File[]): Observable<{
-    message: string;
-    pet_id: number;
-    uploaded_files: string[];
-    total_photos: number;
-  }> {
-    const formData = new FormData();
-    files.forEach(file => {
-      formData.append('files', file);
-    });
-    
-    return this.http.post<{
-      message: string;
-      pet_id: number;
-      uploaded_files: string[];
-      total_photos: number;
-    }>(`${this.apiUrl}/pets/${petId}/photos`, formData)
-      .pipe(
-        catchError(this.handleError)
-      );
-  }
-
-  adoptPet(petId: number, userId: number): Observable<Pet> {
-    return this.http.post<Pet>(`${this.apiUrl}/pets/${petId}/adopt`, { user_id: userId })
-      .pipe(
-        catchError(this.handleError)
-      );
-  }
-
-  getPetStats(): Observable<PetStats> {
-    return this.http.get<PetStats>(`${this.apiUrl}/pets/stats`)
-      .pipe(
-        catchError(this.handleError)
-      );
-  }
-
-  private handleError(error: any): Observable<never> {
-    let errorMessage = 'Algo deu errado. Tente novamente.';
-    
-    if (error.error instanceof ErrorEvent) {
-      errorMessage = `Erro: ${error.error.message}`;
+  private mapToPetResponse(response: any): PetResponse {
+    if (Array.isArray(response)) {
+      return {
+        pets: response,
+        total: response.length,
+        page: PET_DEFAULTS.PAGE,
+        limit: PET_DEFAULTS.LIMIT
+      };
+    } else if (response && response.pets && Array.isArray(response.pets)) {
+      return {
+        pets: response.pets,
+        total: response.total || response.pets.length,
+        page: response.page || PET_DEFAULTS.PAGE,
+        limit: response.limit || PET_DEFAULTS.LIMIT
+      };
     } else {
-      switch (error.status) {
-        case 400:
-          errorMessage = 'Dados inválidos. Verifique as informações.';
-          break;
-        case 404:
-          errorMessage = 'Pet não encontrado.';
-          break;
-        case 405:
-          errorMessage = 'Operação não permitida.';
-          break;
-        case 500:
-          errorMessage = 'Erro interno do servidor. Tente novamente mais tarde.';
-          break;
-        default:
-          errorMessage = `Erro ${error.status}: ${error.message}`;
-      }
+      return {
+        pets: [],
+        total: 0,
+        page: PET_DEFAULTS.PAGE,
+        limit: PET_DEFAULTS.LIMIT
+      };
     }
-    
-    console.error('PetService Error:', error);
-    return throwError(() => new Error(errorMessage));
   }
-
 }

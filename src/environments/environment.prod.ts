@@ -1,6 +1,6 @@
 export const environment = {
   production: true,
-  apiUrl: 'https://projeto-jornadadados-pet-api-adoptt.zjnxkg.easypanel.host',
+  apiUrl: 'https://api.petsz.shop',
   appName: 'Adote um Amigo',
   version: '1.0.0',
   features: {

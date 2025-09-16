@@ -101,20 +101,8 @@ export class LoginComponent implements OnInit {
       return;
     }
     
-    switch (currentUser.role) {
-      case 'admin':
-      case 'super_admin':
-        this.router.navigate(['/admin/dashboard']);
-        break;
-      case 'user':
-      default:
-        this.router.navigate(['/user/dashboard']);
-        break;
-    }
+    // Sempre redireciona para dashboard admin (apenas admins podem fazer login)
+    this.router.navigate(['/admin/dashboard']);
   }
 
-  goToRegister(event: Event): void {
-    event.preventDefault();
-    this.router.navigate(['/auth/register']);
-  }
 }
