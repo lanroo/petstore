@@ -12,11 +12,11 @@ const routes: Routes = [
   {
     path: 'dashboard',
     component: DashboardComponent,
-    canActivate: [AdminGuard]
+    canActivate: [AdminGuard] // Only admins can access
   },
   {
     path: '',
-    redirectTo: 'dashboard',
+    redirectTo: 'login',
     pathMatch: 'full'
   }
 ];

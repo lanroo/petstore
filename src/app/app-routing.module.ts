@@ -2,16 +2,16 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { AuthLayoutComponent } from './layouts/auth-layout/auth-layout.component';
 import { MainLayoutComponent } from './layouts/main-layout/main-layout.component';
+import { AdminGuard } from './core/guards/admin.guard';
 
 const routes: Routes = [
-
   {
     path: '',
     component: MainLayoutComponent,
     children: [
       {
         path: '',
-        loadChildren: () => import('./features/home/home.module').then(m => m.HomeModule)
+        loadChildren: () => import('./pages/home/home.module').then(m => m.HomeModule)
       },
       {
         path: 'pets',
@@ -23,24 +23,26 @@ const routes: Routes = [
       },
       {
         path: 'errors',
-        loadChildren: () => import('./features/errors/errors.module').then(m => m.ErrorsModule)
+        loadChildren: () => import('./pages/error/error.module').then(m => m.ErrorModule)
       },
       {
         path: 'auth',
-        loadChildren: () => import('./features/auth/auth.module').then(m => m.AuthModule)
+        loadChildren: () => import('./pages/auth/auth.module').then(m => m.AuthModule)
       }
     ]
   },
   
+
   {
     path: 'admin',
     component: AuthLayoutComponent,
     loadChildren: () => import('./features/admin/admin.module').then(m => m.AdminModule)
   },
+  
   {
-    path: 'user',
-    component: AuthLayoutComponent,
-    loadChildren: () => import('./features/user/user/user.module').then(m => m.UserModule)
+    path: 'login',
+    redirectTo: 'admin/login',
+    pathMatch: 'full'
   },
   
   {
