@@ -59,7 +59,6 @@ export class PetDetailComponent implements OnInit, OnDestroy {
         this.checkIfFavorite();
       },
       error: (error) => {
-        console.error('Erro ao carregar detalhes do pet:', error);
         this.error = error.message || 'Erro ao carregar detalhes do pet';
         this.loading = false;
       }
@@ -162,8 +161,7 @@ export class PetDetailComponent implements OnInit, OnDestroy {
         url: url
       }).then(() => {
         this.notificationService.showSuccess('Perfil compartilhado com sucesso!', 'Sucesso');
-      }).catch((error) => {
-        console.error('Erro ao compartilhar:', error);
+      }).catch(() => {
         this.copyToClipboard(url, title, text);
       });
     } else {
@@ -211,7 +209,6 @@ export class PetDetailComponent implements OnInit, OnDestroy {
       document.execCommand('copy');
       this.notificationService.showSuccess('Link e informações copiados para a área de transferência!', 'Sucesso');
     } catch (err) {
-      console.error('Erro ao copiar para área de transferência:', err);
       this.notificationService.showError('Não foi possível copiar o link. Tente novamente.', 'Erro');
     } finally {
       document.body.removeChild(textArea);
@@ -301,14 +298,11 @@ export class PetDetailComponent implements OnInit, OnDestroy {
   }
 
   navigateToAdoption(): void {
-    console.log('🚀 navigateToAdoption called');
-    console.log('🐾 Current pet:', this.pet);
     if (this.pet && this.pet.id) {
-      console.log('✅ Navigating to adoption with pet ID:', this.pet.id);
       this.router.navigate(['/pets/adoption', this.pet.id]);
     } else {
-      console.log('⚠️ No pet ID, navigating to general adoption form');
       this.router.navigate(['/pets/adoption']);
     }
   }
+
 }
