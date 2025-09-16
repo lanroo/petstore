@@ -173,16 +173,20 @@ export class PetFormComponent implements OnInit, OnDestroy {
 
   private mapFormToPet(formData: PetFormData): Pet {
     return {
-      id: this.petId,
+      id: this.petId || 0,
       name: formData.name,
       species: formData.species,
       breed: formData.breed,
       age: formData.age,
       gender: formData.gender,
+      size: 'medium', // Default value
+      color: 'Mixed', // Default value
       city: formData.city,
+      state: 'Unknown', // Default value
       description: formData.description,
       status: formData.status,
-      photos: this.imagePreview ? [this.imagePreview] : []
+      photos: this.imagePreview ? [this.imagePreview] : [],
+      created_at: new Date().toISOString()
     };
   }
 
