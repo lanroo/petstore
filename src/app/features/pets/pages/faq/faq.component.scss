@@ -30,6 +30,10 @@
     margin: 0 auto;
     padding: 0 var(--space-6);
     
+    .hero-text {
+      margin-top: 2rem;
+    }
+    
     .hero-title {
       font-size: var(--font-size-5xl);
       font-weight: var(--font-weight-extrabold);
@@ -65,6 +69,11 @@
       }
     }
   }
+}
+
+// Seletor mais específico para sobrescrever
+.hero-section .hero-content .hero-text .hero-subtitle {
+  margin-top: 1rem;
 }
 
 .faq-content {
@@ -286,68 +295,290 @@
 
 
 @media (max-width: 768px) {
+  .faq-container {
+    padding-top: 80px; 
+  }
+
   .hero-section {
-    padding: var(--space-16) 0 var(--space-12);
+    padding: var(--space-12) 0 var(--space-8);
+    margin-top: -80px; 
+    padding-top: calc(var(--space-12) + 80px);
+    
+    .hero-content {
+      padding: 0 var(--space-4);
+      
+      .hero-text {
+        margin-top: 1rem;
+      }
+      
+      .hero-title {
+        font-size: var(--font-size-3xl);
+        margin-bottom: var(--space-4);
+        line-height: 1.2;
+      }
+      
+      .hero-subtitle {
+        font-size: var(--font-size-base);
+        line-height: 1.6;
+        margin-bottom: 0;
+      }
+    }
   }
 
   .faq-content {
-    padding: var(--space-8) 0;
-  }
-
-  .container {
-    padding: 0 var(--space-4);
-  }
-
-  .faq-grid {
-    gap: var(--space-6);
-  }
-
-  .section-title {
-    font-size: var(--font-size-lg);
-    padding: var(--space-4) var(--space-4) var(--space-3);
-  }
-
-  .faq-question {
-    padding: var(--space-3) var(--space-4);
-
-    .question-text {
-      font-size: var(--font-size-sm);
+    padding: var(--space-6) 0;
+    
+    .container {
+      padding: 0 var(--space-4);
     }
-  }
 
-  .faq-answer .answer-content {
-    padding: 0 var(--space-4) var(--space-4);
-
-    p {
-      font-size: var(--font-size-xs);
+    .faq-grid {
+      gap: var(--space-8);
     }
-  }
 
-  .contact-card {
-    padding: var(--space-6);
+    .faq-section {
+      .section-title {
+        font-size: var(--font-size-xl);
+        padding: var(--space-5) var(--space-4) var(--space-4);
+        margin-bottom: var(--space-4);
+        border-radius: var(--radius-lg);
+        background: linear-gradient(135deg, var(--primary-50) 0%, var(--primary-100) 100%);
+        border: 1px solid var(--primary-200);
+        
+        .section-icon {
+          font-size: 24px;
+          width: 24px;
+          height: 24px;
+          margin-right: var(--space-3);
+        }
+      }
 
-    .contact-actions {
-      flex-direction: column;
-      align-items: center;
+      .faq-item {
+        margin-bottom: var(--space-3);
+        border-radius: var(--radius-lg);
+        overflow: hidden;
+        box-shadow: var(--shadow-sm);
+        border: 1px solid var(--neutral-200);
+        background: var(--neutral-0);
+        
+        .faq-question {
+          padding: var(--space-4) var(--space-4);
+          width: 100%;
+          text-align: left;
+          border: none;
+          background: var(--neutral-0);
+          border-radius: var(--radius-lg);
+          transition: all var(--transition-base);
+          
+          &:hover {
+            background: var(--primary-25);
+          }
+          
+          &.active {
+            background: var(--primary-50);
+            border-bottom-left-radius: 0;
+            border-bottom-right-radius: 0;
+          }
 
-      .btn-primary,
-      .btn-secondary {
-        width: 100%;
-        max-width: 280px;
-        justify-content: center;
+          .question-text {
+            font-size: var(--font-size-base);
+            font-weight: var(--font-weight-semibold);
+            color: var(--neutral-800);
+            line-height: 1.4;
+            flex: 1;
+            text-align: left;
+          }
+          
+          .expand-icon {
+            font-size: 20px;
+            width: 20px;
+            height: 20px;
+            color: var(--primary-600);
+            transition: transform var(--transition-base);
+          }
+          
+          &.active .expand-icon {
+            transform: rotate(45deg);
+          }
+        }
+
+        .faq-answer {
+          background: var(--neutral-25);
+          border-top: 1px solid var(--primary-200);
+          
+          .answer-content {
+            padding: var(--space-4) var(--space-4) var(--space-5);
+
+            p {
+              font-size: var(--font-size-sm);
+              line-height: 1.6;
+              color: var(--neutral-700);
+              margin: 0;
+            }
+          }
+        }
+      }
+    }
+
+    .contact-section {
+      margin-top: var(--space-8);
+      
+      .contact-card {
+        padding: var(--space-6) var(--space-4);
+        border-radius: var(--radius-xl);
+        text-align: center;
+        
+        .contact-icon {
+          font-size: 48px;
+          width: 48px;
+          height: 48px;
+          margin-bottom: var(--space-4);
+        }
+        
+        h3 {
+          font-size: var(--font-size-xl);
+          margin-bottom: var(--space-3);
+        }
+        
+        p {
+          font-size: var(--font-size-base);
+          margin-bottom: var(--space-6);
+          line-height: 1.6;
+        }
+
+        .contact-actions {
+          flex-direction: column;
+          gap: var(--space-3);
+          align-items: center;
+
+          .btn-primary,
+          .btn-secondary {
+            width: 100%;
+            max-width: 300px;
+            justify-content: center;
+            padding: var(--space-3) var(--space-4);
+            font-size: var(--font-size-base);
+            border-radius: var(--radius-lg);
+            
+            mat-icon {
+              font-size: 20px;
+              width: 20px;
+              height: 20px;
+              margin-right: var(--space-2);
+            }
+          }
+        }
       }
     }
   }
 }
 
 @media (max-width: 480px) {
-  .hero-section .hero-content .hero-title {
-    font-size: var(--font-size-2xl);
+  .faq-container {
+    padding-top: 70px; 
   }
 
-  .section-title {
-    flex-direction: column;
-    text-align: center;
-    gap: var(--space-2);
+  .hero-section {
+    padding-top: calc(var(--space-10) + 70px);
+    
+    .hero-content {
+      padding: 0 var(--space-3);
+      
+      .hero-title {
+        font-size: var(--font-size-2xl);
+        margin-bottom: var(--space-3);
+      }
+      
+      .hero-subtitle {
+        font-size: var(--font-size-sm);
+      }
+    }
+  }
+
+  .faq-content {
+    padding: var(--space-4) 0;
+    
+    .container {
+      padding: 0 var(--space-3);
+    }
+
+    .faq-section {
+      .section-title {
+        font-size: var(--font-size-lg);
+        padding: var(--space-4) var(--space-3) var(--space-3);
+        flex-direction: column;
+        text-align: center;
+        gap: var(--space-2);
+        
+        .section-icon {
+          font-size: 20px;
+          width: 20px;
+          height: 20px;
+          margin-right: 0;
+          margin-bottom: var(--space-1);
+        }
+      }
+
+      .faq-item {
+        .faq-question {
+          padding: var(--space-3) var(--space-3);
+          
+          .question-text {
+            font-size: var(--font-size-sm);
+            line-height: 1.3;
+          }
+          
+          .expand-icon {
+            font-size: 18px;
+            width: 18px;
+            height: 18px;
+          }
+        }
+
+        .faq-answer .answer-content {
+          padding: var(--space-3) var(--space-3) var(--space-4);
+
+          p {
+            font-size: var(--font-size-xs);
+            line-height: 1.5;
+          }
+        }
+      }
+    }
+
+    .contact-section {
+      .contact-card {
+        padding: var(--space-5) var(--space-3);
+        
+        .contact-icon {
+          font-size: 40px;
+          width: 40px;
+          height: 40px;
+        }
+        
+        h3 {
+          font-size: var(--font-size-lg);
+        }
+        
+        p {
+          font-size: var(--font-size-sm);
+        }
+
+        .contact-actions {
+          .btn-primary,
+          .btn-secondary {
+            max-width: 100%;
+            padding: var(--space-3) var(--space-3);
+            font-size: var(--font-size-sm);
+            
+            mat-icon {
+              font-size: 18px;
+              width: 18px;
+              height: 18px;
+            }
+          }
+        }
+      }
+    }
   }
 }
