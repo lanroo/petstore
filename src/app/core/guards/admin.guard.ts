@@ -21,13 +21,10 @@ export class AdminGuard implements CanActivate {
     return this.authService.isAuthenticated$.pipe(
       take(1),
       map(isAuthenticated => {
-        if (isAuthenticated && this.authService.isAdmin()) {
+        if (isAuthenticated) {
           return true;
-        } else if (isAuthenticated && !this.authService.isAdmin()) {
-          this.router.navigate(['/']);
-          return false;
         } else {
-          this.router.navigate(['/auth/login'], {
+          this.router.navigate(['/admin/login'], {
             queryParams: { returnUrl: state.url }
           });
           return false;

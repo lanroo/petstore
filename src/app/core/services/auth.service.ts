@@ -1,89 +1,67 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, of } from 'rxjs';
-import { tap, delay, map, catchError, switchMap } from 'rxjs/operators';
-import { HttpClient, HttpParams } from '@angular/common/http';
-import { environment } from '../../../environments/environment';
-import { UserService, User as ApiUser } from './user.service';
+import { map, catchError, switchMap } from 'rxjs/operators';
+import { UserService } from './user.service';
 
 export interface AuthUser {
-  id: number;
-  username: string;
-  email: string;
-  name: string;
-  role: 'user' | 'admin' | 'super_admin';
-  avatar?: string;
-  isActive?: boolean;
-  createdAt?: Date;
+  readonly id: number;
+  readonly username: string;
+  readonly email: string;
+  readonly name: string;
+  readonly role: 'admin';
+  readonly avatar?: string;
+  readonly isActive: boolean;
+  readonly createdAt: Date;
 }
 
 export interface LoginCredentials {
-  username: string;
-  password: string;
+  readonly username: string;
+  readonly password: string;
+}
+
+export interface LoginResult {
+  readonly success: boolean;
+  readonly user?: AuthUser;
+  readonly message?: string;
 }
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
-  private currentUserSubject = new BehaviorSubject<AuthUser | null>(null);
-  private isAuthenticatedSubject = new BehaviorSubject<boolean>(false);
+  private readonly currentUserSubject = new BehaviorSubject<AuthUser | null>(null);
+  private readonly isAuthenticatedSubject = new BehaviorSubject<boolean>(false);
   
-  public currentUser$ = this.currentUserSubject.asObservable();
-  public isAuthenticated$ = this.isAuthenticatedSubject.asObservable();
+  public readonly currentUser$ = this.currentUserSubject.asObservable();
+  public readonly isAuthenticated$ = this.isAuthenticatedSubject.asObservable();
 
+  private static readonly STORAGE_KEYS = {
+    ADMIN_USER: 'admin_user',
+    ACCESS_TOKEN: 'access_token'
+  } as const;
 
-  constructor(
-    private http: HttpClient,
-    private userService: UserService
-  ) {
-    this.checkStoredAuth();
+  constructor(private readonly userService: UserService) {
+    this.initializeAuth();
   }
 
-  login(credentials: LoginCredentials): Observable<{ success: boolean; user?: AuthUser; message?: string }> {
+  login(credentials: LoginCredentials): Observable<LoginResult> {
+    if (!this.isValidCredentials(credentials)) {
+      return of({ 
+        success: false, 
+        message: 'Credenciais inválidas' 
+      });
+    }
+
     const { username, password } = credentials;
     
     return this.userService.loginUser(username, password).pipe(
-      switchMap(loginResponse => {
-        console.log('🔐 Login response from backend:', loginResponse);
-        
-        if (loginResponse.access_token) {
-          localStorage.setItem('access_token', loginResponse.access_token);
-          
-          return this.userService.getCurrentUserProfile().pipe(
-            map(userData => {
-              const user: AuthUser = {
-                id: userData.id || Math.floor(Math.random() * 1000),
-                username: username,
-                email: userData.email || '',
-                name: userData.full_name || username,
-                role: this.determineUserRole(username),
-                isActive: true,
-                createdAt: new Date()
-              };
-              
-              this.setCurrentUser(user);
-              this.storeAuth(user);
-              
-              return { success: true, user, message: 'Login realizado com sucesso!' };
-            })
-          );
-        } else {
-          return of({ success: false, message: loginResponse.message || 'Erro no login' });
-        }
-      }),
-      catchError(error => {
-        console.error('❌ Login failed:', error);
-        return of({ 
-          success: false, 
-          message: 'Erro de conexão. Verifique suas credenciais e tente novamente.' 
-        });
-      })
+      switchMap(loginResponse => this.handleLoginResponse(loginResponse, username)),
+      catchError(() => this.handleLoginError())
     );
   }
 
   logout(): void {
-    this.currentUserSubject.next(null);
-    this.isAuthenticatedSubject.next(false);
+    this.clearUserState();
     this.clearStoredAuth();
   }
 
@@ -97,46 +75,106 @@ export class AuthService {
 
   isAdmin(): boolean {
     const user = this.getCurrentUser();
-    return user?.role === 'admin' || user?.role === 'super_admin';
+    return user?.role === 'admin';
   }
 
-  isSuperAdmin(): boolean {
-    const user = this.getCurrentUser();
-    return user?.role === 'super_admin';
+  updateCurrentUser(user: AuthUser): void {
+    this.setCurrentUser(user);
+    this.storeAuth(user);
   }
 
+  needsProfileSetup(): boolean {
+    return false;
+  }
+
+
+  private initializeAuth(): void {
+    this.loadStoredUser();
+  }
+
+  private isValidCredentials(credentials: LoginCredentials): boolean {
+    return !!(credentials.username?.trim() && credentials.password?.trim());
+  }
+
+  private handleLoginResponse(loginResponse: any, username: string): Observable<LoginResult> {
+    if (!loginResponse.access_token) {
+      return of({ 
+        success: false, 
+        message: loginResponse.message || 'Erro no login' 
+      });
+    }
+
+    this.storeAccessToken(loginResponse.access_token);
+    
+    return this.userService.getCurrentUserProfile().pipe(
+      map(userData => this.createUserFromApiData(userData, username)),
+      map(user => {
+        this.setCurrentUser(user);
+        this.storeAuth(user);
+        return { 
+          success: true, 
+          user, 
+          message: 'Login realizado com sucesso!' 
+        };
+      })
+    );
+  }
+
+  private handleLoginError(): Observable<LoginResult> {
+    return of({ 
+      success: false, 
+      message: 'Erro de conexão. Verifique suas credenciais e tente novamente.' 
+    });
+  }
+
+  private createUserFromApiData(userData: any, username: string): AuthUser {
+    return {
+      id: userData.id || this.generateUserId(),
+      username,
+      email: userData.email || '',
+      name: userData.full_name || username,
+      role: 'admin',
+      isActive: true,
+      createdAt: new Date()
+    };
+  }
+
+  private generateUserId(): number {
+    return Math.floor(Math.random() * 1000000) + 1000;
+  }
 
   private setCurrentUser(user: AuthUser): void {
     this.currentUserSubject.next(user);
     this.isAuthenticatedSubject.next(true);
   }
 
-  private checkStoredAuth(): void {
-    const storedUser = localStorage.getItem('admin_user');
+  private clearUserState(): void {
+    this.currentUserSubject.next(null);
+    this.isAuthenticatedSubject.next(false);
+  }
+
+  private loadStoredUser(): void {
+    const storedUser = localStorage.getItem(AuthService.STORAGE_KEYS.ADMIN_USER);
     if (storedUser) {
       try {
         const user = JSON.parse(storedUser);
         this.setCurrentUser(user);
-      } catch (error) {
+      } catch {
         this.clearStoredAuth();
       }
     }
   }
 
   private storeAuth(user: AuthUser): void {
-    localStorage.setItem('admin_user', JSON.stringify(user));
+    localStorage.setItem(AuthService.STORAGE_KEYS.ADMIN_USER, JSON.stringify(user));
+  }
+
+  private storeAccessToken(token: string): void {
+    localStorage.setItem(AuthService.STORAGE_KEYS.ACCESS_TOKEN, token);
   }
 
   private clearStoredAuth(): void {
-    localStorage.removeItem('admin_user');
-  }
-
-
-  private determineUserRole(username: string): 'user' | 'admin' | 'super_admin' {
-    
-    if (username.toLowerCase().includes('admin')) {
-      return 'admin';
-    }
-    return 'user';
+    localStorage.removeItem(AuthService.STORAGE_KEYS.ADMIN_USER);
+    localStorage.removeItem(AuthService.STORAGE_KEYS.ACCESS_TOKEN);
   }
 }
