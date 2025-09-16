@@ -1,27 +1,5 @@
 <div class="pet-detail-container">
 
-  <div class="pet-detail-header">
-    <div class="container">
-      <button 
-        mat-stroked-button 
-        class="back-button" 
-        (click)="goBack()"
-        matTooltip="Voltar à página anterior">
-        <mat-icon>arrow_back</mat-icon>
-        <span>Voltar</span>
-      </button>
-      <div class="header-actions">
-        <button 
-          mat-stroked-button 
-          (click)="shareProfile()" 
-          matTooltip="Compartilhar perfil do pet"
-          class="share-button">
-          <mat-icon>share</mat-icon>
-          <span>Compartilhar</span>
-        </button>
-      </div>
-    </div>
-  </div>
 
   <div *ngIf="loading" class="loading-container">
     <div class="container">
@@ -41,10 +19,6 @@
         <h2>Oops! Algo deu errado</h2>
         <p class="error-message">{{ error }}</p>
         <div class="error-actions">
-          <button mat-raised-button color="primary" (click)="goBack()">
-            <mat-icon>arrow_back</mat-icon>
-            Voltar para Lista
-          </button>
           <button mat-button (click)="loadPetDetails()">
             <mat-icon>refresh</mat-icon>
             Tentar Novamente
@@ -413,43 +387,6 @@
   </div>
 </div>
 
-<div *ngIf="showShareModal" class="modal-backdrop" (click)="closeShareModal()">
-  <div class="share-modal" (click)="$event.stopPropagation()">
-    <div class="modal-header">
-      <h3>Como deseja compartilhar?</h3>
-      <button mat-icon-button (click)="closeShareModal()" class="close-button">
-        <mat-icon>close</mat-icon>
-      </button>
-    </div>
-    <div class="modal-content">
-      <div class="share-options">
-        <button 
-          mat-raised-button 
-          color="primary" 
-          (click)="shareWithFullInfoModal()"
-          class="share-option-button">
-          <mat-icon>share</mat-icon>
-          <div class="option-text">
-            <span class="option-title">Compartilhar informações completas</span>
-            <span class="option-desc">Inclui nome, descrição e link do pet</span>
-          </div>
-        </button>
-        
-        <button 
-          mat-stroked-button 
-          color="primary" 
-          (click)="copyLinkOnlyModal()"
-          class="share-option-button">
-          <mat-icon>link</mat-icon>
-          <div class="option-text">
-            <span class="option-title">Copiar apenas o link</span>
-            <span class="option-desc">Copia somente a URL da página</span>
-          </div>
-        </button>
-      </div>
-    </div>
-  </div>
-</div>
 
 
 <div *ngIf="showFullscreenModal" class="fullscreen-modal" (click)="closeFullscreenModal()">

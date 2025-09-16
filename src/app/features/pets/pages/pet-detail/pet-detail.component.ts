@@ -1,6 +1,5 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Location } from '@angular/common';
 import { PetService } from '../../../../core/services/pet.service';
 import { ImageService } from '../../../../core/services/image.service';
 import { Pet } from '../../../../core/models/pet.model';
@@ -22,14 +21,12 @@ export class PetDetailComponent implements OnInit, OnDestroy {
   showFullscreenModal = false;
   fullscreenImageIndex = 0;
   isPetFavorite = false;
-  showShareModal = false;
   
   activeTab: 'info' | 'characteristics' | 'health' | 'adoption' | 'care' = 'info';
 
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private location: Location,
     private petService: PetService,
     private imageService: ImageService,
     private notificationService: NotificationService,
@@ -74,13 +71,6 @@ export class PetDetailComponent implements OnInit, OnDestroy {
   getPetDescription = PetUtils.getPetDescription;
   isAvailable = PetUtils.isAvailable;
 
-  goBack(): void {
-    if (window.history.length > 1) {
-      this.location.back();
-    } else {
-      this.router.navigate(['/pets']);
-    }
-  }
 
   getPetImage(index: number = 0): string {
     if (!this.pet || !this.pet.photos || this.pet.photos.length === 0) {
@@ -122,98 +112,7 @@ export class PetDetailComponent implements OnInit, OnDestroy {
     window.open(whatsappUrl, '_blank');
   }
 
-  shareProfile(): void {
-    if (!this.pet) return;
 
-    const shareUrl = window.location.href;
-    const shareTitle = `Conheça ${this.pet.name} - ${this.getPetType(this.pet)} para adoção`;
-    const shareText = `${this.pet.name} é um ${this.getPetType(this.pet).toLowerCase()} ${this.getPetGender(this.pet).toLowerCase()} de ${this.getPetAge(this.pet)} disponível para adoção em ${this.getPetLocation(this.pet)}. ${this.getPetDescription(this.pet)}`;
-
-    this.showShareOptions(shareUrl, shareTitle, shareText);
-  }
-
-  private showShareOptions(url: string, title: string, text: string): void {
-    this.showShareModal = true;
-    (window as any).shareData = { url, title, text };
-  }
-
-  closeShareModal(): void {
-    this.showShareModal = false;
-  }
-
-  shareWithFullInfoModal(): void {
-    const data = (window as any).shareData;
-    this.shareWithFullInfo(data.url, data.title, data.text);
-    this.closeShareModal();
-  }
-
-  copyLinkOnlyModal(): void {
-    const data = (window as any).shareData;
-    this.copyLinkOnly(data.url);
-    this.closeShareModal();
-  }
-
-  private shareWithFullInfo(url: string, title: string, text: string): void {
-    if (navigator.share) {
-      navigator.share({
-        title: title,
-        text: text,
-        url: url
-      }).then(() => {
-        this.notificationService.showSuccess('Perfil compartilhado com sucesso!', 'Sucesso');
-      }).catch(() => {
-        this.copyToClipboard(url, title, text);
-      });
-    } else {
-      this.copyToClipboard(url, title, text);
-    }
-  }
-
-  private copyLinkOnly(url: string): void {
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(url).then(() => {
-        this.notificationService.showSuccess('Link copiado para a área de transferência!', 'Sucesso');
-      }).catch(() => {
-        this.fallbackCopyToClipboard(url);
-      });
-    } else {
-      this.fallbackCopyToClipboard(url);
-    }
-  }
-
-  private copyToClipboard(url: string, title: string, text: string): void {
-    const shareContent = `${title}\n\n${text}\n\n🔗 ${url}`;
-    
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(shareContent).then(() => {
-        this.notificationService.showSuccess('Link e informações copiados para a área de transferência!', 'Sucesso');
-      }).catch(() => {
-        this.fallbackCopyToClipboard(shareContent);
-      });
-    } else {
-      this.fallbackCopyToClipboard(shareContent);
-    }
-  }
-
-  private fallbackCopyToClipboard(text: string): void {
-    const textArea = document.createElement('textarea');
-    textArea.value = text;
-    textArea.style.position = 'fixed';
-    textArea.style.left = '-999999px';
-    textArea.style.top = '-999999px';
-    document.body.appendChild(textArea);
-    textArea.focus();
-    textArea.select();
-    
-    try {
-      document.execCommand('copy');
-      this.notificationService.showSuccess('Link e informações copiados para a área de transferência!', 'Sucesso');
-    } catch (err) {
-      this.notificationService.showError('Não foi possível copiar o link. Tente novamente.', 'Erro');
-    } finally {
-      document.body.removeChild(textArea);
-    }
-  }
 
   viewRelatedPets(): void {
     this.router.navigate(['/pets'], {
