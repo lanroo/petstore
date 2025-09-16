@@ -1,0 +1,41 @@
+<div class="error-container">
+  <div class="error-content">
+    <div class="error-icon">
+      <mat-icon>pets</mat-icon>
+    </div>
+
+    <div class="error-code">404</div>
+
+    <div class="error-message">
+      <h1>Ops! Pet não encontrado</h1>
+      <p>A página que você está procurando não existe ou foi movida.</p>
+    </div>
+
+    <div class="error-actions">
+      <button mat-raised-button color="primary" (click)="goHome()">
+        <mat-icon>home</mat-icon>
+        Voltar ao Início
+      </button>
+      
+      <button mat-stroked-button color="primary" (click)="searchPets()">
+        <mat-icon>search</mat-icon>
+        Buscar Pets
+      </button>
+      
+      <button mat-button color="primary" (click)="goBack()">
+        <mat-icon>arrow_back</mat-icon>
+        Voltar
+      </button>
+    </div>
+
+    <div class="error-help">
+      <p>Que tal dar uma olhada nos nossos pets disponíveis para adoção?</p>
+    </div>
+  </div>
+
+  <div class="error-decoration">
+    <div class="paw-print paw-1"></div>
+    <div class="paw-print paw-2"></div>
+    <div class="paw-print paw-3"></div>
+  </div>
+</div>
