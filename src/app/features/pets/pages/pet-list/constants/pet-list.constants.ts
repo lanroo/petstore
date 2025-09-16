@@ -3,7 +3,7 @@
 export const PET_LIST_CONFIG = {
   PAGINATION: {
     DEFAULT_PAGE_SIZE: 30,
-    PAGE_SIZE_OPTIONS: [12, 24, 30, 48, 60, 100],
+    PAGE_SIZE_OPTIONS: [30],
     DEFAULT_FIRST: 0
   },
   SORTING: {
