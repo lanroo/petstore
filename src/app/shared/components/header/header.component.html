@@ -1,3 +1,4 @@
+
 <header class="app-header" [class.scrolled]="isScrolled">
   <div class="header-content">
     <div class="logo" routerLink="/">
@@ -55,18 +56,6 @@
         </div>
       </div>
       
-      <a routerLink="/store"
-         routerLinkActive="active"
-         class="nav-link">
-        <mat-icon class="nav-icon">inventory</mat-icon>
-        <span class="nav-text">Estoque</span>
-      </a>
-      
-      <a routerLink="/auth/login"
-         class="nav-link nav-cta">
-        <mat-icon class="nav-icon">login</mat-icon>
-        <span class="nav-text">Login</span>
-      </a>
     </nav>
 
     <button mat-icon-button 
@@ -123,19 +112,5 @@
       </div>
     </div>
     
-    <a routerLink="/store"
-       routerLinkActive="active"
-       class="mobile-nav-link"
-       (click)="closeMobileMenu()">
-      <mat-icon class="nav-icon">inventory</mat-icon>
-      <span class="nav-text">Estoque</span>
-    </a>
-    
-    <a routerLink="/auth/login"
-       class="mobile-nav-link mobile-nav-cta"
-       (click)="closeMobileMenu()">
-      <mat-icon class="nav-icon">login</mat-icon>
-      <span class="nav-text">Login</span>
-    </a>
   </nav>
 </header>

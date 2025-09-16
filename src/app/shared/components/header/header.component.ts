@@ -1,6 +1,7 @@
-import { Component, HostListener } from '@angular/core';
+import { Component, HostListener, OnInit, OnDestroy } from '@angular/core';
 import { Router, NavigationEnd } from '@angular/router';
 import { filter } from 'rxjs/operators';
+import { Subject } from 'rxjs';
 
 @Component({
   selector: 'app-header',
@@ -8,19 +9,31 @@ import { filter } from 'rxjs/operators';
   templateUrl: './header.component.html',
   styleUrl: './header.component.scss'
 })
-export class HeaderComponent {
+export class HeaderComponent implements OnInit, OnDestroy {
+  private readonly destroy$ = new Subject<void>();
+  
   isMobileMenuOpen = false;
   isScrolled = false;
   isAdoptionDropdownOpen = false;
   isMobileAdoptionDropdownOpen = false;
   isOnAdoptionPage = false;
   
-  constructor(private router: Router) { 
+  constructor(
+    private router: Router
+  ) { 
     this.router.events
       .pipe(filter(event => event instanceof NavigationEnd))
       .subscribe((event: NavigationEnd) => {
         this.isOnAdoptionPage = event.url.includes('/pets/adoption');
       });
+  }
+
+  ngOnInit(): void {
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   toggleMobileMenu(): void {
@@ -72,4 +85,5 @@ export class HeaderComponent {
   closeMobileAdoptionDropdown(): void {
     this.isMobileAdoptionDropdownOpen = false;
   }
+
 }

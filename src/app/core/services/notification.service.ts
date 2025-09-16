@@ -2,21 +2,16 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { filter } from 'rxjs/operators';
 
-export interface Notification {
-  id: string;
-  type: 'success' | 'error' | 'warning' | 'info';
-  title: string;
-  message: string;
-  duration?: number;
-  persistent?: boolean;
-  timestamp: Date;
-}
+
+import { Notification, NotificationType, NotificationConfig } from '../models/notification.model';
+
+import { NOTIFICATION_DEFAULTS, NOTIFICATION_MESSAGES } from '../constants/notification.constants';
 
 @Injectable({
   providedIn: 'root'
 })
 export class NotificationService {
-  private notifications$ = new BehaviorSubject<Notification[]>([]);
+  private readonly notifications$ = new BehaviorSubject<Notification[]>([]);
   
   constructor() {}
 
@@ -24,46 +19,49 @@ export class NotificationService {
     return this.notifications$.asObservable();
   }
 
-  getNotificationsByType(type: Notification['type']): Observable<Notification[]> {
+  getNotificationsByType(type: NotificationType): Observable<Notification[]> {
     return this.notifications$.pipe(
       filter(notifications => notifications.some(n => n.type === type))
     );
   }
 
-  showSuccess(title: string, message: string, duration: number = 5000): void {
+  showSuccess(title: string, message: string, config?: NotificationConfig): void {
     this.addNotification({
-      type: 'success',
+      type: NotificationType.SUCCESS,
       title,
       message,
-      duration
+      duration: config?.duration || NOTIFICATION_DEFAULTS.SUCCESS_DURATION,
+      persistent: config?.persistent || false
     });
   }
 
-  showError(title: string, message: string, persistent: boolean = false): void {
+  showError(title: string, message: string, config?: NotificationConfig): void {
     this.addNotification({
-      type: 'error',
+      type: NotificationType.ERROR,
       title,
       message,
-      persistent,
-      duration: persistent ? undefined : 8000
+      duration: config?.persistent ? NOTIFICATION_DEFAULTS.PERSISTENT_ERROR_DURATION : (config?.duration || NOTIFICATION_DEFAULTS.ERROR_DURATION),
+      persistent: config?.persistent || false
     });
   }
 
-  showWarning(title: string, message: string, duration: number = 6000): void {
+  showWarning(title: string, message: string, config?: NotificationConfig): void {
     this.addNotification({
-      type: 'warning',
+      type: NotificationType.WARNING,
       title,
       message,
-      duration
+      duration: config?.duration || NOTIFICATION_DEFAULTS.WARNING_DURATION,
+      persistent: config?.persistent || false
     });
   }
 
-  showInfo(title: string, message: string, duration: number = 4000): void {
+  showInfo(title: string, message: string, config?: NotificationConfig): void {
     this.addNotification({
-      type: 'info',
+      type: NotificationType.INFO,
       title,
       message,
-      duration
+      duration: config?.duration || NOTIFICATION_DEFAULTS.INFO_DURATION,
+      persistent: config?.persistent || false
     });
   }
 
@@ -77,10 +75,50 @@ export class NotificationService {
     this.notifications$.next([]);
   }
 
-  clearByType(type: Notification['type']): void {
+  clearByType(type: NotificationType): void {
     const current = this.notifications$.value;
     const filtered = current.filter(notification => notification.type !== type);
     this.notifications$.next(filtered);
+  }
+  
+  petCreated(petName: string): void {
+    const message = NOTIFICATION_MESSAGES.PET_CREATED(petName);
+    this.showSuccess(message.title, message.message);
+  }
+
+  petUpdated(petName: string): void {
+    const message = NOTIFICATION_MESSAGES.PET_UPDATED(petName);
+    this.showSuccess(message.title, message.message);
+  }
+
+  petDeleted(petName: string): void {
+    const message = NOTIFICATION_MESSAGES.PET_DELETED(petName);
+    this.showWarning(message.title, message.message);
+  }
+
+  petAdopted(petName: string): void {
+    const message = NOTIFICATION_MESSAGES.PET_ADOPTED(petName);
+    this.showSuccess(message.title, message.message, { duration: 8000 });
+  }
+  
+  networkError(): void {
+    const message = NOTIFICATION_MESSAGES.NETWORK_ERROR;
+    this.showError(message.title, message.message, { persistent: true });
+  }
+
+  validationError(field: string): void {
+    const message = NOTIFICATION_MESSAGES.VALIDATION_ERROR(field);
+    this.showWarning(message.title, message.message);
+  }
+
+  unauthorizedError(): void {
+    const message = NOTIFICATION_MESSAGES.UNAUTHORIZED_ERROR;
+    this.showError(message.title, message.message);
+  }
+
+  serverError(): void {
+    const message = NOTIFICATION_MESSAGES.SERVER_ERROR;
+    this.showError(message.title, message.message, { persistent: true });
   }
 
   private addNotification(notification: Omit<Notification, 'id' | 'timestamp'>): void {
@@ -102,64 +140,5 @@ export class NotificationService {
 
   private generateId(): string {
     return `notification_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-  }
-
-  petCreated(petName: string): void {
-    this.showSuccess(
-      'Pet Cadastrado!', 
-      `${petName} foi cadastrado com sucesso e está aguardando adoção.`
-    );
-  }
-
-  petUpdated(petName: string): void {
-    this.showSuccess(
-      'Pet Atualizado!', 
-      `As informações de ${petName} foram atualizadas.`
-    );
-  }
-
-  petDeleted(petName: string): void {
-    this.showWarning(
-      'Pet Removido', 
-      `${petName} foi removido da lista de adoção.`
-    );
-  }
-
-  petAdopted(petName: string): void {
-    this.showSuccess(
-      'Pet Adotado! 🎉', 
-      `${petName} encontrou uma família! Parabéns!`,
-      8000
-    );
-  }
-  
-  networkError(): void {
-    this.showError(
-      'Erro de Conexão',
-      'Verifique sua conexão com a internet e tente novamente.',
-      true
-    );
-  }
-
-  validationError(field: string): void {
-    this.showWarning(
-      'Dados Inválidos',
-      `Por favor, verifique o campo: ${field}`
-    );
-  }
-
-  unauthorizedError(): void {
-    this.showError(
-      'Acesso Negado',
-      'Você não tem permissão para realizar esta ação.'
-    );
-  }
-
-  serverError(): void {
-    this.showError(
-      'Erro no Servidor',
-      'Ocorreu um erro interno. Nossa equipe foi notificada.',
-      true
-    );
   }
 }

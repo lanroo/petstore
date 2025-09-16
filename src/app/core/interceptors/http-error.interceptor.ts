@@ -11,6 +11,7 @@ import { catchError, finalize } from 'rxjs/operators';
 import { LoadingService } from '../services/loading.service';
 import { NotificationService } from '../services/notification.service';
 import { ErrorService } from '../services/error.service';
+import { ErrorContext } from '../models/error.model';
 
 @Injectable()
 export class HttpErrorInterceptor implements HttpInterceptor {
@@ -48,15 +49,16 @@ export class HttpErrorInterceptor implements HttpInterceptor {
   }
 
   private handleHttpError(error: HttpErrorResponse): void {
-    console.error('HTTP Error:', {
-      status: error.status,
-      message: error.message,
-      url: error.url,
-      error: error.error
-    });
-
     if (this.shouldRedirectToErrorPage(error.status)) {
-      this.errorService.handleHttpError(error, 'HTTP Request');
+      const context: ErrorContext = {
+        component: 'HttpErrorInterceptor',
+        action: 'HTTP Request',
+        additionalData: {
+          url: error.url,
+          method: error.url ? 'GET' : 'UNKNOWN'
+        }
+      };
+      this.errorService.handleHttpError(error, context);
       return;
     }
 

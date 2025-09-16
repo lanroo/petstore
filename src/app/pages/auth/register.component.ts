@@ -3,7 +3,6 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
-import { UserService, User } from '../../../../core/services/user.service';
 
 export interface RegisterFormData {
   fullName: string;
@@ -17,8 +16,7 @@ export interface RegisterFormData {
 
 @Component({
   selector: 'app-register',
-  standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, MatIconModule],
+  standalone: false,
   templateUrl: './register.component.html',
   styleUrl: './register.component.scss'
 })
@@ -30,8 +28,7 @@ export class RegisterComponent implements OnInit {
 
   constructor(
     private fb: FormBuilder,
-    private router: Router,
-    private userService: UserService
+    private router: Router
   ) {
     this.registerForm = this.createForm();
   }
@@ -75,34 +72,14 @@ export class RegisterComponent implements OnInit {
 
       const formData: RegisterFormData = this.registerForm.value;
       
-      const userData: User = {
-        full_name: formData.fullName,
-        email: formData.email,
-        password: formData.password,
-        phone: formData.phone,
-        city: formData.city
-      };
-
-      console.log('📝 Criando usuário:', userData);
-
-      this.userService.createUser(userData).subscribe({
-        next: (response) => {
-          console.log('✅ Usuário criado com sucesso:', response);
-          this.isLoading = false;
-          this.successMessage = 'Conta criada com sucesso! Redirecionando para login...';
-          
-          setTimeout(() => {
-            this.router.navigate(['/auth/login'], {
-              queryParams: { registered: 'true', username: formData.username }
-            });
-          }, 2000);
-        },
-        error: (error) => {
-          console.error('❌ Erro ao criar usuário:', error);
-          this.isLoading = false;
-          this.errorMessage = error.message || 'Erro ao criar conta. Tente novamente.';
-        }
-      });
+      this.isLoading = false;
+      this.successMessage = 'Conta criada com sucesso! Redirecionando para login...';
+      
+      setTimeout(() => {
+        this.router.navigate(['/admin/login'], {
+          queryParams: { registered: 'true', username: formData.username }
+        });
+      }, 2000);
     } else {
       this.markAllFieldsAsTouched();
     }

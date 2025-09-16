@@ -2,23 +2,21 @@
   <header class="dashboard-header">
     <div class="header-content">
       <div class="header-left">
-        <mat-icon class="logo-icon">pets</mat-icon>
-        <h1>Dashboard Admin</h1>
+        <mat-icon class="header-logo">admin_panel_settings</mat-icon>
+        <h1>Admin Dashboard</h1>
       </div>
       <div class="header-right">
         <div class="user-info">
-          <mat-icon>account_circle</mat-icon>
-          <span>{{ currentUser?.name }}</span>
-          <span class="user-role">{{ currentUser?.role }}</span>
+          <mat-icon class="user-icon">person</mat-icon>
+          <span class="user-name">{{ currentUser?.name || 'Admin' }}</span>
         </div>
-        <button class="logout-btn" (click)="logout()">
+        <button class="logout-btn" (click)="logout()" title="Sair">
           <mat-icon>logout</mat-icon>
-          <span>Sair</span>
         </button>
       </div>
     </div>
   </header>
-
+  
   <main class="dashboard-main">
     <section class="stats-section">
       <div class="stats-grid">
@@ -70,10 +68,6 @@
           <mat-icon>history</mat-icon>
           Adoções Recentes
         </h2>
-        <button class="view-all-btn">
-          <mat-icon>arrow_forward</mat-icon>
-          Ver Todas
-        </button>
       </div>
 
       <div class="adoptions-table" *ngIf="!isLoading; else loadingTemplate">
@@ -86,7 +80,7 @@
         </div>
 
         <div class="table-body">
-          <div class="table-row" *ngFor="let adoption of recentAdoptions">
+          <div class="table-row" *ngFor="let adoption of recentAdoptions" (click)="showAdoptionDetails(adoption)" style="cursor: pointer;">
             <div class="col-pet">
               <mat-icon class="pet-icon">pets</mat-icon>
               <span>{{ getPetName(adoption) }}</span>
@@ -130,7 +124,7 @@
           <mat-icon>add</mat-icon>
           <span>Cadastrar Pet</span>
         </button>
-        <button class="action-card">
+        <button class="action-card" (click)="goToUserManagement()">
           <mat-icon>people</mat-icon>
           <span>Gerenciar Usuários</span>
         </button>
@@ -145,4 +139,130 @@
       </div>
     </section>
   </main>
+
+  <!-- Modal de Detalhes da Adoção -->
+  <div class="modal-overlay" *ngIf="showAdoptionModal" (click)="closeAdoptionModal()">
+    <div class="adoption-modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>
+          <mat-icon>pets</mat-icon>
+          Detalhes da Adoção
+        </h2>
+        <button class="close-btn" (click)="closeAdoptionModal()">
+          <mat-icon>close</mat-icon>
+        </button>
+      </div>
+
+      <div class="modal-content" *ngIf="selectedAdoption">
+        <!-- Informações do Pet -->
+        <div class="pet-section">
+          <h3>
+            <mat-icon>pets</mat-icon>
+            Informações do Pet
+          </h3>
+          <div class="pet-details">
+            <div class="pet-photo">
+              <img [src]="getPetImage(selectedAdoption.pet)" [alt]="selectedAdoption.pet?.name" 
+                   (error)="onImageError($event)" class="pet-image">
+            </div>
+            <div class="pet-info">
+              <div class="info-row">
+                <span class="label">Nome:</span>
+                <span class="value">{{ selectedAdoption.pet?.name || 'Não informado' }}</span>
+              </div>
+              <div class="info-row">
+                <span class="label">ID:</span>
+                <span class="value">#{{ selectedAdoption.pet?.id || selectedAdoption.pet_id }}</span>
+              </div>
+              <div class="info-row">
+                <span class="label">Espécie:</span>
+                <span class="value">{{ selectedAdoption.pet?.species === 'dog' ? 'Cachorro' : 'Gato' }}</span>
+              </div>
+              <div class="info-row">
+                <span class="label">Raça:</span>
+                <span class="value">{{ getBreedDisplay(selectedAdoption.pet?.breed, selectedAdoption.pet?.species) }}</span>
+              </div>
+              <div class="info-row">
+                <span class="label">Idade:</span>
+                <span class="value">{{ selectedAdoption.pet?.age || 'Não informado' }} meses</span>
+              </div>
+              <div class="info-row">
+                <span class="label">Sexo:</span>
+                <span class="value">{{ selectedAdoption.pet?.gender === 'male' ? 'Macho' : 'Fêmea' }}</span>
+              </div>
+              <div class="info-row">
+                <span class="label">Tamanho:</span>
+                <span class="value">{{ selectedAdoption.pet?.size || 'Não informado' }}</span>
+              </div>
+              <div class="info-row" *ngIf="selectedAdoption.pet?.description">
+                <span class="label">Descrição:</span>
+                <span class="value">{{ selectedAdoption.pet.description }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Informações do Solicitante -->
+        <div class="applicant-section">
+          <h3>
+            <mat-icon>person</mat-icon>
+            Informações do Solicitante
+          </h3>
+          <div class="applicant-info">
+            <div class="info-row">
+              <span class="label">Nome:</span>
+              <span class="value">{{ selectedAdoption.full_name }}</span>
+            </div>
+            <div class="info-row">
+              <span class="label">E-mail:</span>
+              <span class="value">{{ selectedAdoption.email }}</span>
+            </div>
+            <div class="info-row">
+            <span class="label">WhatsApp:</span>
+              <span class="value">{{ selectedAdoption.whatsapp || 'Não informado' }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Informações da Solicitação -->
+        <div class="request-section">
+          <h3>
+            <mat-icon>assignment</mat-icon>
+            Informações da Solicitação
+          </h3>
+          <div class="request-info">
+            <div class="info-row">
+              <span class="label">ID da Solicitação:</span>
+              <span class="value">#{{ selectedAdoption.id }}</span>
+            </div>
+            <div class="info-row">
+              <span class="label">Status:</span>
+              <span class="status-badge" [class]="getStatusBadgeClass(selectedAdoption.status)">
+                {{ getStatusText(selectedAdoption.status) }}
+              </span>
+            </div>
+            <div class="info-row">
+              <span class="label">Data da Solicitação:</span>
+              <span class="value">{{ formatDate(selectedAdoption.created_at) }}</span>
+            </div>
+            <div class="info-row" *ngIf="selectedAdoption.updated_at">
+              <span class="label">Última Atualização:</span>
+              <span class="value">{{ formatDate(selectedAdoption.updated_at) }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn-secondary" (click)="closeAdoptionModal()">
+          <mat-icon>close</mat-icon>
+          Fechar
+        </button>
+        <button class="btn-primary" *ngIf="selectedAdoption?.status === 'pending'" (click)="approveAdoption()">
+          <mat-icon>check</mat-icon>
+          Aprovar
+        </button>
+      </div>
+    </div>
+  </div>
 </div>

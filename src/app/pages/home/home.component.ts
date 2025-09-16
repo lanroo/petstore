@@ -3,10 +3,9 @@ import { Router } from '@angular/router';
 import { PetService } from '../../core/services/pet.service';
 import { ImageService } from '../../core/services/image.service';
 import { StoreService } from '../../core/services/store.service';
+import { AuthService } from '../../core/services/auth.service';
 import { Pet, PetStatus } from '../../core/models/pet.model';
 import { PetUtils } from '../../core/utils/pet.utils';
-import { PetListStorageService } from '../pets/pages/pet-list/services/pet-list-storage.service';
-import { createShareData } from '../pets/pages/pet-list/utils/pet-list.utils';
 
 @Component({
   selector: 'app-home',
@@ -45,11 +44,16 @@ export class HomeComponent implements OnInit {
     private imageService: ImageService,
     private storeService: StoreService,
     private router: Router,
-    private storageService: PetListStorageService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private authService: AuthService,
   ) {}
 
   ngOnInit(): void {
+    if (this.authService.isAuthenticated()) {
+      this.router.navigate(['/admin/dashboard']);
+      return;
+    }
+
     this.loadPetStats();
     this.loadFavorites();
     this.updateCarouselDimensions();
@@ -65,7 +69,6 @@ export class HomeComponent implements OnInit {
         this.cdr.markForCheck();
       },
       error: (error) => {
-        console.error('Erro ao carregar pets adotados:', error);
         this.todayAdoptions = 12; 
       }
     });
@@ -77,12 +80,10 @@ export class HomeComponent implements OnInit {
     
     this.petService.getPets(filters).subscribe({
       next: (response) => {
-        console.log('🏠 Home - API Response:', response);
         if (response && response.pets && Array.isArray(response.pets)) {
           this.availablePets = response.pets; 
           this.totalPetsAvailable = response.total || response.pets.length;
         } else {
-          console.warn('⚠️ Home - Invalid response structure:', response);
           this.availablePets = [];
           this.totalPetsAvailable = 0;
         }
@@ -90,7 +91,6 @@ export class HomeComponent implements OnInit {
         this.cdr.markForCheck();
       },
       error: (error) => {
-        console.error('❌ Home - Erro ao carregar pets disponíveis:', error);
         this.availablePets = [];
         this.totalPetsAvailable = 0;
         this.cdr.markForCheck();
@@ -121,7 +121,9 @@ export class HomeComponent implements OnInit {
   getPetBreed = PetUtils.getPetBreed;
   
   private loadFavorites(): void {
-    this.favoritePets = this.storageService.loadFavorites();
+    // Simple favorites loading from localStorage
+    const stored = localStorage.getItem('favoritePets');
+    this.favoritePets = stored ? new Set(JSON.parse(stored)) : new Set();
   }
   
   private updateCarouselDimensions(): void {
@@ -134,15 +136,12 @@ export class HomeComponent implements OnInit {
       this.cardsPerView = 1;
       this.cardWidth = Math.min(350, width - 48);
     } else if (width < 1024) {
-      // Tablet
       this.cardsPerView = 2;
       this.cardWidth = (width - 96) / 2; 
     } else if (width < 1440) {
-      // Desktop small
       this.cardsPerView = 3;
       this.cardWidth = 320;
     } else {
-      // Desktop large
       this.cardsPerView = 4;
       this.cardWidth = 320;
     }
@@ -269,7 +268,7 @@ export class HomeComponent implements OnInit {
     }
     
     this.favoritePets = newFavorites;
-    this.storageService.saveFavorites(newFavorites);
+    localStorage.setItem('favoritePets', JSON.stringify([...newFavorites]));
     this.cdr.markForCheck();
   }
   
@@ -286,15 +285,19 @@ export class HomeComponent implements OnInit {
   sharePet(pet: Pet, event: Event): void {
     event.stopPropagation();
     
-    const shareData = createShareData(pet, window.location.origin);
+    const shareData = {
+      title: `${pet.name} - Pet Store`,
+      text: `Conheça ${pet.name}, um ${pet.species} ${pet.breed || 'mestiço'} disponível para adoção!`,
+      url: `${window.location.origin}/pets/${pet.id}`
+    };
 
     if (navigator.share) {
-      navigator.share(shareData).catch(console.error);
+      navigator.share(shareData).catch(() => {});
     } else {
       const shareText = `${shareData.title}\n\n${shareData.text}\n\n${shareData.url}`;
       navigator.clipboard.writeText(shareText)
-        .then(() => console.log('Link copiado para a área de transferência!'))
-        .catch(console.error);
+        .then(() => {})
+        .catch(() => {});
     }
   }
   
