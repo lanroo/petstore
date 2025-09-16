@@ -26,7 +26,6 @@
       
       <div class="hero-actions">
         <button mat-raised-button class="hero-btn hero-btn-primary" routerLink="/pets">
-          <mat-icon class="btn-icon">search</mat-icon>
           <span>Encontrar Pet</span>
           <mat-icon class="btn-arrow">arrow_forward</mat-icon>
         </button>
@@ -152,113 +151,91 @@
       <p class="section-subtitle">Encontre seu novo melhor amigo entre nossos pets disponíveis</p>
     </div>
 
-    <div class="pets-carousel-container">
-      <div class="carousel-controls">
+    <div class="perfect-carousel">
+      <div class="carousel-container">
         <button 
-          mat-icon-button 
-          class="carousel-btn carousel-prev"
+          mat-fab 
+          class="nav-button prev"
           (click)="previousSlide()"
           [disabled]="currentSlide === 0">
           <mat-icon>chevron_left</mat-icon>
         </button>
+        
         <button 
-          mat-icon-button 
-          class="carousel-btn carousel-next"
+          mat-fab 
+          class="nav-button next"
           (click)="nextSlide()"
           [disabled]="currentSlide >= maxSlide">
           <mat-icon>chevron_right</mat-icon>
         </button>
-      </div>
-      
-      <div 
-        class="pets-carousel" 
-        #petsCarousel
-        (touchstart)="onTouchStart($event)"
-        (touchmove)="onTouchMove($event)"
-        (touchend)="onTouchEnd()"
-        (mousedown)="onMouseDown($event)"
-        (mousemove)="onMouseMove($event)"
-        (mouseup)="onMouseUp()"
-        (mouseleave)="onMouseUp()">
+
         <div 
-          class="carousel-track" 
-          [style.transform]="'translateX(' + translateX + 'px)'"
-          [class.dragging]="isDragging">
+          class="carousel-scroll"
+          #petsCarousel
+          (touchstart)="onTouchStart($event)"
+          (touchmove)="onTouchMove($event)"
+          (touchend)="onTouchEnd()"
+          (mousedown)="onMouseDown($event)"
+          (mousemove)="onMouseMove($event)"
+          (mouseup)="onMouseUp()"
+          (mouseleave)="onMouseUp()">
+          
           <div 
-            *ngFor="let pet of availablePets; let i = index; trackBy: trackByPetId" 
-            class="pet-card"
-            [routerLink]="['/pets', pet.id]">
+            class="cards-track"
+            [style.transform]="'translateX(' + translateX + 'px)'"
+            [class.dragging]="isDragging">
             
-            <div class="pet-image-container">
-              <img 
-                [src]="getPetImage(pet)" 
-                [alt]="pet.name || 'Pet disponível'"
-                (error)="onImageError($event)"
-                class="pet-image"
-                loading="lazy">
+            <div 
+              *ngFor="let pet of availablePets; let i = index; trackBy: trackByPetId" 
+              class="pet-card"
+              [routerLink]="['/pets', pet.id]">
               
-              <div class="pet-status">
-                <mat-chip class="status-chip available">Disponível</mat-chip>
-              </div>
-              
-              <button 
-                mat-icon-button 
-                class="favorite-btn"
-                (click)="toggleFavorite(pet.id, $event)"
-                [class.active]="isFavorite(pet.id)"
-                [attr.aria-label]="isFavorite(pet.id) ? 'Remover dos favoritos' : 'Adicionar aos favoritos'">
-                <mat-icon>{{ isFavorite(pet.id) ? 'favorite' : 'favorite_border' }}</mat-icon>
-              </button>
-            </div>
-            
-            <div class="pet-info">
-              <div class="pet-header">
-                <h3 class="pet-name">{{ pet.name || 'Pet ' + (i + 1) }}</h3>
-                <div class="pet-gender">
-                  <mat-icon class="gender-icon">{{ pet.gender === 'male' ? 'male' : 'female' }}</mat-icon>
+              <div class="card-image">
+                <img 
+                  [src]="getPetImage(pet)" 
+                  [alt]="pet.name || 'Pet disponível'"
+                  (error)="onImageError($event)"
+                  loading="lazy">
+                
+                <div class="status-badge">
+                  <mat-icon>check_circle</mat-icon>
+                  <span>Disponível</span>
                 </div>
+                
               </div>
               
-              <div class="pet-info-list">
-                <div class="info-item">
-                  <mat-icon class="info-icon">pets</mat-icon>
-                  <div class="info-details">
-                    <span class="info-label">TIPO</span>
-                    <span class="info-value">{{ getPetType(pet) }}</span>
+              <div class="card-body">
+                <div class="pet-header">
+                  <h3 class="pet-name">{{ pet.name || 'Pet ' + (i + 1) }}</h3>
+                  <div class="gender-icon">
+                    <mat-icon>{{ pet.gender === 'male' ? 'male' : 'female' }}</mat-icon>
                   </div>
                 </div>
                 
-                <div class="info-item">
-                  <mat-icon class="info-icon">schedule</mat-icon>
-                  <div class="info-details">
-                    <span class="info-label">Idade</span>
-                    <span class="info-value">{{ getPetAge(pet) }}</span>
+                <div class="pet-info">
+                  <div class="info-item">
+                    <mat-icon>pets</mat-icon>
+                    <span>{{ getPetType(pet) }}</span>
+                  </div>
+                  <div class="info-item">
+                    <mat-icon>schedule</mat-icon>
+                    <span>{{ getPetAge(pet) }}</span>
+                  </div>
+                  <div class="info-item">
+                    <mat-icon>location_on</mat-icon>
+                    <span>{{ getPetLocation(pet) }}</span>
                   </div>
                 </div>
                 
-                <div class="info-item location-info">
-                  <mat-icon class="info-icon">location_on</mat-icon>
-                  <div class="info-details">
-                    <span class="info-value">{{ getPetLocation(pet) }}</span>
-                  </div>
-                </div>
-              </div>
-              
-              <div class="pet-actions">
-                <button 
-                  mat-raised-button 
-                  color="primary"
-                  class="details-btn"
-                  (click)="viewPet(pet.id, $event)">
-                  Ver Detalhes
-                </button>
-                <button 
-                  mat-icon-button 
-                  class="share-btn"
-                  (click)="sharePet(pet, $event)"
-                  [attr.aria-label]="'Compartilhar ' + pet.name">
-                  <mat-icon>share</mat-icon>
-                </button>
+                   <div class="card-actions">
+                     <button 
+                       mat-raised-button 
+                       class="adopt-button"
+                       (click)="viewPet(pet.id, $event)">
+                       <mat-icon>pets</mat-icon>
+                       <span>Conhecer</span>
+                     </button>
+                   </div>
               </div>
             </div>
           </div>
@@ -268,10 +245,9 @@
       <div class="carousel-indicators">
         <button 
           *ngFor="let dot of dots; let i = index"
-          class="indicator-dot"
+          class="indicator"
           [class.active]="i === currentSlide"
-          (click)="goToSlide(i)"
-          [attr.aria-label]="'Ir para slide ' + (i + 1)">
+          (click)="goToSlide(i)">
         </button>
       </div>
     </div>
@@ -281,7 +257,6 @@
         <button mat-flat-button 
                 class="view-all-button"
                 routerLink="/pets">
-          <mat-icon class="btn-icon">search</mat-icon>
           <span>Ver Todos os Pets</span>
           <mat-icon class="btn-arrow">arrow_forward</mat-icon>
         </button>
