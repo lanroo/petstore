@@ -1,9 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { AuthService, AuthUser } from '../../../../core/services/auth.service';
-import { DashboardService, DashboardStats, AdoptionRequest } from '../../../../core/services/dashboard.service';
+import { DashboardService, AdoptionRequest } from '../../../../core/services/dashboard.service';
 import { AdoptionService } from '../../../../core/services/adoption.service';
 import { ImageService } from '../../../../core/services/image.service';
 import { PetService } from '../../../../core/services/pet.service';
@@ -18,14 +18,9 @@ import { Pet } from '../../../../core/models/pet.model';
 })
 export class DashboardComponent implements OnInit {
   currentUser: AuthUser | null = null;
-  stats: DashboardStats = {
-    totalUsers: 0,
-    totalPets: 0,
-    totalAdoptions: 0,
-    pendingAdoptions: 0
-  };
   recentAdoptions: AdoptionRequest[] = [];
   isLoading = true;
+  showUserMenu = false;
 
   constructor(
     private authService: AuthService,
@@ -45,36 +40,20 @@ export class DashboardComponent implements OnInit {
     }
 
     this.loadDashboardData();
-    
-    // Escutar novas adoções para atualizar a lista automaticamente
+
     this.adoptionService.adoptionCreated.subscribe(() => {
-      console.log('🔄 Dashboard - Nova adoção detectada, recarregando lista...');
       this.loadRecentAdoptions();
     });
   }
 
   loadDashboardData(): void {
-    this.loadStats();
-    
     this.loadRecentAdoptions();
   }
 
-  loadStats(): void {
-    this.dashboardService.getDashboardStats().subscribe({
-      next: (stats) => {
-        this.stats = stats;
-      },
-      error: (error) => {
-        console.error('Error loading stats:', error);
-        this.stats = {
-          totalUsers: 0,
-          totalPets: 0,
-          totalAdoptions: 0,
-          pendingAdoptions: 0
-        };
-      }
-    });
+  refreshDashboard(): void {
+    this.loadDashboardData();
   }
+
 
   loadRecentAdoptions(): void {
     this.dashboardService.getRecentAdoptions(10).subscribe({
@@ -83,7 +62,6 @@ export class DashboardComponent implements OnInit {
         this.isLoading = false;
       },
       error: (error) => {
-        console.error('Error loading recent adoptions:', error);  
         this.recentAdoptions = [];
         this.isLoading = false;
       }
@@ -94,10 +72,13 @@ export class DashboardComponent implements OnInit {
   getStatusBadgeClass(status: string): string {
     switch (status) {
       case 'pending':
+      case 'PENDENTE':
         return 'status-pending';
       case 'approved':
+      case 'APROVADA':
         return 'status-approved';
       case 'rejected':
+      case 'REJEITADA':
         return 'status-rejected';
       default:
         return 'status-default';
@@ -107,10 +88,13 @@ export class DashboardComponent implements OnInit {
   getStatusText(status: string): string {
     switch (status) {
       case 'pending':
+      case 'PENDENTE':
         return 'Pendente';
       case 'approved':
+      case 'APROVADA':
         return 'Aprovada';
       case 'rejected':
+      case 'REJEITADA':
         return 'Rejeitada';
       default:
         return 'Desconhecido';
@@ -140,29 +124,33 @@ export class DashboardComponent implements OnInit {
     this.router.navigate(['/admin/users']);
   }
 
+  toggleUserMenu(): void {
+    this.showUserMenu = !this.showUserMenu;
+  }
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: Event): void {
+    const target = event.target as HTMLElement;
+    const userDropdown = target.closest('.user-dropdown');
+    
+    if (!userDropdown) {
+      this.showUserMenu = false;
+    }
+  }
+
   logout(): void {
+    this.showUserMenu = false;
     this.authService.logout();
     this.router.navigate(['/admin/login']);
   }
 
 
-  // Método para exportar dados em JSON
-  // Propriedades para o modal de detalhes
   showAdoptionModal = false;
   selectedAdoption: any = null;
 
-  // Método para mostrar detalhes da adoção
   showAdoptionDetails(adoption: any): void {
-    console.log('🔍 Mostrando detalhes da adoção:', adoption);
-    console.log('🔍 WhatsApp no objeto adoption:', adoption.whatsapp);
-    console.log('🔍 Phone no objeto adoption:', adoption.phone);
-    console.log('🔍 Pet photos no objeto adoption:', adoption.pet?.photos);
-    console.log('🔍 Pet needsFullData:', adoption.pet?.needsFullData);
-    console.log('🔍 Todos os campos do adoption:', Object.keys(adoption));
-    
     // Se o pet não tem fotos, buscar dados completos
     if (adoption.pet?.needsFullData) {
-      console.log('🔍 Buscando dados completos do pet...');
       this.loadPetDetails(adoption.pet_id, adoption);
     } else {
       this.selectedAdoption = adoption;
@@ -170,40 +158,33 @@ export class DashboardComponent implements OnInit {
     }
   }
 
-  // Método para carregar detalhes completos do pet
   private loadPetDetails(petId: number, adoption: any): void {
     this.petService.getPetById(petId).subscribe({
       next: (pet) => {
-        console.log('🔍 Pet completo carregado:', pet);
-        console.log('🔍 Pet photos:', pet.photos);
-        
-        // Atualizar o objeto adoption com os dados completos do pet
+
         adoption.pet = pet;
         this.selectedAdoption = adoption;
         this.showAdoptionModal = true;
       },
       error: (error) => {
-        console.error('❌ Erro ao carregar pet:', error);
-        // Mesmo com erro, mostrar o modal com os dados que temos
         this.selectedAdoption = adoption;
         this.showAdoptionModal = true;
       }
     });
   }
 
-  // Método para fechar o modal
+
   closeAdoptionModal(): void {
     this.showAdoptionModal = false;
     this.selectedAdoption = null;
   }
 
-  // Método para tratamento de erro de imagem
+
   onImageError(event: any): void {
-    console.log('❌ Erro ao carregar imagem do pet');
     event.target.src = '/assets/default-pet.png';
   }
 
-  // Método para exibir raça
+
   getBreedDisplay(breed: string, species: string): string {
     if (breed === 'Vira-lata' && species === 'dog') {
       return 'SRD';
@@ -216,15 +197,14 @@ export class DashboardComponent implements OnInit {
     }
   }
 
-  // Método para obter imagem do pet (igual aos cards dos pets)
+
   getPetImage(pet: any): string {
     return this.imageService.getPetImage(pet, 'large');
   }
 
-  // Método para aprovar adoção
+
   approveAdoption(): void {
     if (this.selectedAdoption) {
-      console.log('✅ Aprovando adoção:', this.selectedAdoption.id);
       // Aqui você pode implementar a lógica para aprovar a adoção
       alert(`Adoção #${this.selectedAdoption.id} aprovada com sucesso!`);
       this.closeAdoptionModal();
@@ -241,24 +221,22 @@ export class DashboardComponent implements OnInit {
         return;
       }
       
-      // Criar arquivo JSON
+
       const dataStr = JSON.stringify(adoptions, null, 2);
       const dataBlob = new Blob([dataStr], { type: 'application/json' });
       
-      // Criar link para download
+
       const url = URL.createObjectURL(dataBlob);
       const link = document.createElement('a');
       link.href = url;
       link.download = `adoption-requests-${new Date().toISOString().split('T')[0]}.json`;
       link.click();
       
-      // Limpar URL
+
       URL.revokeObjectURL(url);
       
-      console.log('📊 Dados exportados:', adoptions);
       alert(`📊 Dados exportados com sucesso! (${adoptions.length} pedidos)`);
     } catch (error) {
-      console.error('❌ Erro ao exportar dados:', error);
       alert('❌ Erro ao exportar dados de adoção.');
     }
   }

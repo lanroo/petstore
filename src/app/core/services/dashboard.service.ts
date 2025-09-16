@@ -39,7 +39,7 @@ export interface AdoptionRequest {
   readonly email: string;
   readonly phone: string;
   readonly whatsapp?: string;
-  readonly status: 'pending' | 'approved' | 'rejected' | 'completed';
+  readonly status: 'pending' | 'approved' | 'rejected' | 'completed' | 'PENDENTE' | 'APROVADA' | 'REJEITADA';
   readonly created_at: string;
   readonly updated_at?: string;
   readonly pet?: PetInfo;
@@ -51,10 +51,6 @@ export interface AdoptionRequest {
 })
 export class DashboardService {
   private readonly apiUrl = environment.apiUrl;
-  private static readonly STORAGE_KEYS = {
-    ADMIN_USERS: 'admin_created_users',
-    LOCAL_ADOPTIONS: 'local_adoptions'
-  } as const;
 
   private static readonly DEFAULT_STATS: DashboardStats = {
     totalUsers: 0,
@@ -83,24 +79,22 @@ export class DashboardService {
   }
 
   getUserAdoptions(userId: number): Observable<AdoptionRequest[]> {
-    const localAdoptions = this.adoptionService.getLocalAdoptions(userId);
-    const adoptions: AdoptionRequest[] = localAdoptions.map(adoption => 
-      this.mapToAdoptionRequest(adoption)
-    );
-
-    return of(adoptions).pipe(
+    return this.http.get<any>(`${this.apiUrl}/adoption-requests/user/${userId}`).pipe(
+      map(response => this.processApiAdoptions(response, 50)),
       catchError(() => of([]))
     );
   }
 
   updateAdoptionStatus(adoptionId: number, status: string): Observable<{ success: boolean; message: string }> {
-    return of({ success: false, message: 'Endpoint not available' });
+    return this.http.put<any>(`${this.apiUrl}/adoption-requests/${adoptionId}/status`, { status }).pipe(
+      map(() => ({ success: true, message: 'Status updated successfully' })),
+      catchError(() => of({ success: false, message: 'Failed to update status' }))
+    );
   }
 
   private mapApiStatsToDashboardStats(stats: any): DashboardStats {
-    const localUsers = this.getLocalUsersCount();
     return {
-      totalUsers: 2 + localUsers,
+      totalUsers: stats.total_users || 0,
       totalPets: stats.total_pets || 0,
       totalAdoptions: stats.adopted_pets || 0,
       pendingAdoptions: stats.pending_adoptions || 0
@@ -108,33 +102,7 @@ export class DashboardService {
   }
 
   private getFallbackStats(): Observable<DashboardStats> {
-    const localUsers = this.getLocalUsersCount();
-    return of({
-      totalUsers: 2 + localUsers,
-      totalPets: 0,
-      totalAdoptions: 0,
-      pendingAdoptions: 0
-    });
-  }
-
-  private getLocalUsersCount(): number {
-    try {
-      const users = localStorage.getItem(DashboardService.STORAGE_KEYS.ADMIN_USERS);
-      return users ? JSON.parse(users).length : 0;
-    } catch {
-      return 0;
-    }
-  }
-
-  private getLocalAdoptions(): AdoptionRequest[] {
-    try {
-      const stored = localStorage.getItem(DashboardService.STORAGE_KEYS.LOCAL_ADOPTIONS);
-      const localAdoptions = stored ? JSON.parse(stored) : [];
-      
-      return localAdoptions.map((adoption: any) => this.mapToAdoptionRequest(adoption));
-    } catch {
-      return [];
-    }
+    return of(DashboardService.DEFAULT_STATS);
   }
 
   private processApiAdoptions(response: any, limit: number): AdoptionRequest[] {
@@ -146,8 +114,7 @@ export class DashboardService {
   }
 
   private getFallbackAdoptions(limit: number): Observable<AdoptionRequest[]> {
-    const localAdoptions = this.getLocalAdoptions();
-    return of(this.sortAndLimitAdoptions(localAdoptions, limit));
+    return of([]);
   }
 
   private sortAndLimitAdoptions(adoptions: AdoptionRequest[], limit: number): AdoptionRequest[] {
