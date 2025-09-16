@@ -7,7 +7,6 @@ import { DashboardService, AdoptionRequest } from '../../../../core/services/das
 import { AdoptionService } from '../../../../core/services/adoption.service';
 import { ImageService } from '../../../../core/services/image.service';
 import { PetService } from '../../../../core/services/pet.service';
-import { Pet } from '../../../../core/models/pet.model';
 
 @Component({
   selector: 'app-dashboard',
@@ -120,9 +119,6 @@ export class DashboardComponent implements OnInit {
     return adoption.user?.full_name || adoption.full_name || 'Usuário não encontrado';
   }
 
-  goToUserManagement(): void {
-    this.router.navigate(['/admin/users']);
-  }
 
   toggleUserMenu(): void {
     this.showUserMenu = !this.showUserMenu;
@@ -149,7 +145,7 @@ export class DashboardComponent implements OnInit {
   selectedAdoption: any = null;
 
   showAdoptionDetails(adoption: any): void {
-    // Se o pet não tem fotos, buscar dados completos
+  
     if (adoption.pet?.needsFullData) {
       this.loadPetDetails(adoption.pet_id, adoption);
     } else {
@@ -205,39 +201,10 @@ export class DashboardComponent implements OnInit {
 
   approveAdoption(): void {
     if (this.selectedAdoption) {
-      // Aqui você pode implementar a lógica para aprovar a adoção
+  
       alert(`Adoção #${this.selectedAdoption.id} aprovada com sucesso!`);
       this.closeAdoptionModal();
     }
   }
 
-  exportAdoptionData(): void {
-    try {
-      const stored = localStorage.getItem('local_adoptions');
-      const adoptions = stored ? JSON.parse(stored) : [];
-      
-      if (adoptions.length === 0) {
-        alert('📊 Nenhum pedido de adoção para exportar.');
-        return;
-      }
-      
-
-      const dataStr = JSON.stringify(adoptions, null, 2);
-      const dataBlob = new Blob([dataStr], { type: 'application/json' });
-      
-
-      const url = URL.createObjectURL(dataBlob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = `adoption-requests-${new Date().toISOString().split('T')[0]}.json`;
-      link.click();
-      
-
-      URL.revokeObjectURL(url);
-      
-      alert(`📊 Dados exportados com sucesso! (${adoptions.length} pedidos)`);
-    } catch (error) {
-      alert('❌ Erro ao exportar dados de adoção.');
-    }
-  }
 }
