@@ -1,6 +1,4 @@
 <div class="pet-detail-container">
-
-
   <div *ngIf="loading" class="loading-container">
     <div class="container">
       <div class="loading-content">
@@ -51,13 +49,6 @@
                 {{ currentImageIndex + 1 }} / {{ pet.photos.length }}
               </div>
 
-              <button mat-icon-button class="fullscreen-btn" (click)="openImageFullscreen(currentImageIndex)" matTooltip="Ver em tela cheia">
-                <mat-icon>fullscreen</mat-icon>
-              </button>
-
-              <button mat-icon-button class="favorite-btn" (click)="togglePetFavorite()" [class.favorited]="isPetFavorite">
-                <mat-icon>{{ isPetFavorite ? 'favorite' : 'favorite_border' }}</mat-icon>
-              </button>
             </div>
             
             <div *ngIf="pet.photos && pet.photos.length > 1" class="image-navigation">
