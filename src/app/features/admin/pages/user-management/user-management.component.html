@@ -1,0 +1,382 @@
+<div class="user-management">
+  <div class="page-header">
+    <div class="breadcrumb">
+      <a routerLink="/admin/dashboard" class="breadcrumb-link">
+        <mat-icon>dashboard</mat-icon>
+        Dashboard
+      </a>
+      <mat-icon class="breadcrumb-separator">chevron_right</mat-icon>
+      <span class="breadcrumb-current">
+        <mat-icon>people</mat-icon>
+        Gerenciar Usuários
+      </span>
+    </div>
+    
+    <div class="header-content">
+      <div class="header-left">
+        <div class="page-title">
+          <mat-icon class="page-icon">people</mat-icon>
+          <div>
+            <h1>Gerenciar Usuários</h1>
+            <p>Gerencie usuários e permissões do sistema</p>
+          </div>
+        </div>
+      </div>
+      <div class="header-right">
+        <button 
+          class="btn btn-primary"
+          (click)="toggleCreateForm()"
+          [class.active]="showCreateForm">
+          <mat-icon>{{ showCreateForm ? 'close' : 'person_add' }}</mat-icon>
+          {{ showCreateForm ? 'Criar Usuário' : 'Novo Usuário' }}
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="create-form" *ngIf="showCreateForm" [@slideInOut]>
+    <div class="form-card">
+      <div class="form-header">
+        <div class="form-title">
+          <mat-icon>person_add</mat-icon>
+          <h2>Criar Novo Usuário</h2>
+        </div>
+        <button type="button" class="close-btn" (click)="toggleCreateForm()">
+          <mat-icon>close</mat-icon>
+        </button>
+      </div>
+      
+      <form [formGroup]="createUserForm" (ngSubmit)="onSubmitCreateUser()">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="name">Nome Completo *</label>
+            <input 
+              type="text" 
+              id="name"
+              formControlName="full_name"
+              placeholder="Digite o nome completo"
+              [class.error]="createUserForm.get('full_name')?.invalid && createUserForm.get('full_name')?.touched">
+            <div class="error-message" *ngIf="createUserForm.get('full_name')?.invalid && createUserForm.get('full_name')?.touched">
+              Nome é obrigatório (mínimo 2 caracteres)
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label for="email">Email *</label>
+            <input 
+              type="email" 
+              id="email"
+              formControlName="email"
+              placeholder="Digite o email"
+              [class.error]="createUserForm.get('email')?.invalid && createUserForm.get('email')?.touched">
+            <div class="error-message" *ngIf="createUserForm.get('email')?.invalid && createUserForm.get('email')?.touched">
+              Email é obrigatório e deve ser válido
+            </div>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="password">Senha *</label>
+            <input 
+              type="password" 
+              id="password"
+              formControlName="password"
+              placeholder="Digite a senha (mínimo 6 caracteres)"
+              [class.error]="createUserForm.get('password')?.invalid && createUserForm.get('password')?.touched">
+            <div class="error-message" *ngIf="createUserForm.get('password')?.invalid && createUserForm.get('password')?.touched">
+              Senha é obrigatória (mínimo 6 caracteres)
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label for="role">Tipo de Usuário *</label>
+            <select 
+              id="role"
+              formControlName="role"
+              [class.error]="createUserForm.get('role')?.invalid && createUserForm.get('role')?.touched">
+              <option value="user">Usuário</option>
+              <option value="admin">Admin</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="phone">Telefone</label>
+            <input 
+              type="tel" 
+              id="phone"
+              formControlName="phone"
+              placeholder="(11) 99999-9999">
+          </div>
+          
+          <div class="form-group">
+            <label for="bio">Bio</label>
+            <textarea 
+              id="bio"
+              formControlName="bio"
+              placeholder="Breve descrição sobre o usuário"
+              rows="3"></textarea>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button type="button" class="btn btn-secondary" (click)="toggleCreateForm()">
+            Cancelar
+          </button>
+          <button 
+            type="submit" 
+            class="btn btn-primary"
+            [disabled]="createUserForm.invalid">
+            <mat-icon>person_add</mat-icon>
+            Criar Usuário
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="stats-section">
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon total">
+          <mat-icon>people</mat-icon>
+        </div>
+        <div class="stat-content">
+          <h3>{{ users.length }}</h3>
+          <p>Total de Usuários</p>
+        </div>
+      </div>
+      
+      <div class="stat-card">
+        <div class="stat-icon admins">
+          <mat-icon>admin_panel_settings</mat-icon>
+        </div>
+        <div class="stat-content">
+          <h3>{{ getUsersByRole('admin').length + getUsersByRole('super_admin').length }}</h3>
+          <p>Administradores</p>
+        </div>
+      </div>
+      
+      <div class="stat-card">
+        <div class="stat-icon users">
+          <mat-icon>person</mat-icon>
+        </div>
+        <div class="stat-content">
+          <h3>{{ getUsersByRole('user').length }}</h3>
+          <p>Usuários Comuns</p>
+        </div>
+      </div>
+      
+      <div class="stat-card">
+        <div class="stat-icon active">
+          <mat-icon>check_circle</mat-icon>
+        </div>
+        <div class="stat-content">
+          <h3>{{ getActiveUsers().length }}</h3>
+          <p>Usuários Ativos</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="users-section">
+    <div class="section-header">
+      <div class="section-title">
+        <h2>Usuários Cadastrados</h2>
+        <div class="user-count">
+          <mat-icon>people</mat-icon>
+          <span>{{ filteredUsers.length }} de {{ users.length }} usuário(s)</span>
+        </div>
+      </div>
+      
+      <div class="filters-section">
+        <div class="search-box">
+          <mat-icon class="search-icon">search</mat-icon>
+          <input 
+            type="text" 
+            placeholder="Buscar usuários..."
+            [(ngModel)]="searchTerm"
+            (input)="filterUsers()">
+        </div>
+        
+        <div class="filter-buttons">
+          <button 
+            class="filter-btn"
+            [class.active]="selectedFilter === 'all'"
+            (click)="setFilter('all')">
+            <mat-icon>people</mat-icon>
+            Todos
+          </button>
+          <button 
+            class="filter-btn"
+            [class.active]="selectedFilter === 'admin'"
+            (click)="setFilter('admin')">
+            <mat-icon>admin_panel_settings</mat-icon>
+            Admins
+          </button>
+          <button 
+            class="filter-btn"
+            [class.active]="selectedFilter === 'user'"
+            (click)="setFilter('user')">
+            <mat-icon>person</mat-icon>
+            Usuários
+          </button>
+          <button 
+            class="filter-btn"
+            [class.active]="selectedFilter === 'inactive'"
+            (click)="setFilter('inactive')">
+            <mat-icon>block</mat-icon>
+            Inativos
+          </button>
+        </div>
+              
+        <div class="bulk-actions" *ngIf="selectedUsers.length > 0">
+          <span class="bulk-count">{{ selectedUsers.length }} selecionado(s)</span>
+          <div class="bulk-buttons">
+            <button class="bulk-btn bulk-promote" (click)="bulkPromoteToAdmin()">
+              <mat-icon>arrow_upward</mat-icon>
+              Promover a Admin
+            </button>
+            <button class="bulk-btn bulk-demote" (click)="bulkDemoteToUser()">
+              <mat-icon>arrow_downward</mat-icon>
+              Rebaixar a User
+            </button>
+            <button class="bulk-btn bulk-deactivate" (click)="bulkDeactivate()">
+              <mat-icon>block</mat-icon>
+              Desativar
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="loading" *ngIf="isLoading">
+      <mat-icon class="loading-icon">refresh</mat-icon>
+      <span>Carregando usuários...</span>
+    </div>
+
+    <div class="users-grid" *ngIf="!isLoading">
+      <div class="user-card" *ngFor="let user of filteredUsers" [@fadeIn] [class.selected]="isUserSelected(user.id)">
+        <div class="user-card-header">
+          <div class="user-select">
+            <input 
+              type="checkbox" 
+              [id]="'user-' + user.id"
+              [checked]="isUserSelected(user.id)"
+              (change)="toggleUserSelection(user.id)"
+              [disabled]="user.role === 'super_admin'">
+            <label [for]="'user-' + user.id"></label>
+          </div>
+          
+          <div class="user-actions-quick">
+            <button 
+              class="quick-action-btn"
+              (click)="toggleUserDetails(user.id)"
+              [title]="isUserDetailsOpen(user.id) ? 'Ocultar detalhes' : 'Ver detalhes'">
+              <mat-icon>{{ isUserDetailsOpen(user.id) ? 'expand_less' : 'expand_more' }}</mat-icon>
+            </button>
+          </div>
+        </div>
+        
+        <div class="user-header">
+          <div class="user-avatar" [ngClass]="getRoleBadgeClass(user.role)">
+            <mat-icon>account_circle</mat-icon>
+          </div>
+          <div class="user-info">
+            <h3>{{ user.name }}</h3>
+            <p>{{ user.email }}</p>
+            <div class="user-meta">
+              <span class="created-date">
+                <mat-icon>schedule</mat-icon>
+                {{ user.created_at | date:'dd/MM/yyyy' }}
+              </span>
+            </div>
+          </div>
+          <div class="user-role">
+            <span class="badge" [ngClass]="getRoleBadgeClass(user.role)">
+              <mat-icon>{{ getRoleIcon(user.role) }}</mat-icon>
+              {{ getRoleDisplayName(user.role) }}
+            </span>
+          </div>
+        </div>
+
+        <div class="user-details-expanded" *ngIf="isUserDetailsOpen(user.id)" [@slideInOut]>
+          <div class="details-grid">
+            <div class="detail-section">
+              <h4>Informações Pessoais</h4>
+              <div class="detail-item" *ngIf="user.phone">
+                <mat-icon>phone</mat-icon>
+                <span>{{ user.phone }}</span>
+              </div>
+              <div class="detail-item" *ngIf="user.bio">
+                <mat-icon>info</mat-icon>
+                <span>{{ user.bio }}</span>
+              </div>
+              <div class="detail-item">
+                <mat-icon>email</mat-icon>
+                <span>{{ user.email }}</span>
+              </div>
+            </div>
+            
+            <div class="detail-section">
+              <h4>Informações da Conta</h4>
+              <div class="detail-item">
+                <mat-icon>schedule</mat-icon>
+                <span>Criado em: {{ user.created_at | date:'dd/MM/yyyy HH:mm' }}</span>
+              </div>
+              <div class="detail-item" *ngIf="user.updated_at">
+                <mat-icon>update</mat-icon>
+                <span>Atualizado em: {{ user.updated_at | date:'dd/MM/yyyy HH:mm' }}</span>
+              </div>
+              <div class="detail-item">
+                <mat-icon>{{ user.is_active ? 'check_circle' : 'cancel' }}</mat-icon>
+                <span>Status: {{ user.is_active ? 'Ativo' : 'Inativo' }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="user-actions" *ngIf="user.role !== 'super_admin'">
+          <div class="role-selector">
+            <label>Alterar Role:</label>
+            <select 
+              [value]="user.role"
+              (change)="onRoleChange(user, $event)"
+              [disabled]="isSuperAdmin(user.role)">
+              <option value="user">Usuário</option>
+              <option value="admin">Admin</option>
+            </select>
+          </div>
+          
+          <div class="action-buttons">
+            <button 
+              class="btn btn-danger btn-sm"
+              (click)="deactivateUser(user)"
+              [disabled]="!user.is_active">
+              <mat-icon>block</mat-icon>
+              {{ user.is_active ? 'Desativar' : 'Desativado' }}
+            </button>
+          </div>
+        </div>
+
+        <div class="user-status">
+          <span class="status" [ngClass]="user.is_active ? 'active' : 'inactive'">
+            <mat-icon>{{ user.is_active ? 'check_circle' : 'cancel' }}</mat-icon>
+            {{ user.is_active ? 'Ativo' : 'Inativo' }}
+          </span>
+          <span class="created-date">
+            Criado em: {{ user.created_at | date:'dd/MM/yyyy' }}
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <div class="empty-state" *ngIf="!isLoading && users.length === 0">
+      <mat-icon>people_outline</mat-icon>
+      <h3>Nenhum usuário encontrado</h3>
+      <p>Comece criando o primeiro usuário usando o botão acima.</p>
+    </div>
+  </div>
+</div>
