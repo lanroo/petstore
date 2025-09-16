@@ -1922,8 +1922,8 @@
 .cards-track {
   display: flex;
   transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-  gap: 24px;
-  padding: 24px;
+  gap: 16px;
+  padding: 20px;
 
   &.dragging {
     transition: none;
@@ -1931,7 +1931,7 @@
 }
 
 .pet-card {
-  flex: 0 0 320px;
+  flex: 0 0 280px;
   background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
   border-radius: 20px;
   overflow: hidden;

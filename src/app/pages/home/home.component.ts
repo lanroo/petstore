@@ -28,7 +28,7 @@ export class HomeComponent implements OnInit {
   currentSlide = 0;
   translateX = 0;
   cardWidth = 320; 
-  cardsPerView = 4;
+  cardsPerView = 6;
   maxSlide = 0;
   dots: number[] = [];
   
@@ -75,7 +75,7 @@ export class HomeComponent implements OnInit {
 
     const filters: any = {
       status: 'available',
-      limit: 12
+      limit: 30
     };
     
     this.petService.getPets(filters).subscribe({
@@ -133,16 +133,16 @@ export class HomeComponent implements OnInit {
       this.cardsPerView = 1;
       this.cardWidth = Math.min(300, width - 48); 
     } else if (width < 768) {
-      this.cardsPerView = 1;
+      this.cardsPerView = 2;
       this.cardWidth = Math.min(350, width - 48);
     } else if (width < 1024) {
-      this.cardsPerView = 2;
-      this.cardWidth = (width - 96) / 2; 
-    } else if (width < 1440) {
       this.cardsPerView = 3;
+      this.cardWidth = (width - 96) / 3; 
+    } else if (width < 1440) {
+      this.cardsPerView = 4;
       this.cardWidth = 320;
     } else {
-      this.cardsPerView = 4;
+      this.cardsPerView = 6;
       this.cardWidth = 320;
     }
     

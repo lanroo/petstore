@@ -37,7 +37,7 @@ export class PetListComponent implements OnInit, OnDestroy {
   
   totalPets = 0;
   pageSize: number = PET_LIST_CONFIG.PAGINATION.DEFAULT_PAGE_SIZE;
-  currentPage = 0;
+  currentPage = 1;
   first: number = PET_LIST_CONFIG.PAGINATION.DEFAULT_FIRST;
   rows: number = PET_LIST_CONFIG.PAGINATION.DEFAULT_PAGE_SIZE;
   
@@ -73,6 +73,7 @@ export class PetListComponent implements OnInit, OnDestroy {
 
   private initializeComponent(): void {
     this.loadPersistedData();
+    this.first = (this.currentPage - 1) * this.rows; 
     this.loadPets();
   }
 
@@ -84,23 +85,19 @@ export class PetListComponent implements OnInit, OnDestroy {
     const currentTime = Date.now();
     this.lastRequestTime = currentTime;
     
-    console.log('🔄 Pet List - Loading pets...');
     this.setLoadingState(true);
 
     const filters = this.buildApiFilters();
-    console.log('🔍 Pet List - Filters:', filters);
     
     this.petService.getPets(filters)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (response) => {
-          console.log('✅ Pet List - API Response received:', response);
           if (this.lastRequestTime === currentTime) {
             this.handlePetsLoaded(response.pets, response.total);
           }
         },
         error: (error) => {
-          console.error('❌ Pet List - API Error:', error);
           if (this.lastRequestTime === currentTime) {
             this.handlePetsLoadError(error);
           }
@@ -109,13 +106,11 @@ export class PetListComponent implements OnInit, OnDestroy {
   }
 
   private handlePetsLoaded(pets: Pet[], total?: number): void {
-    console.log('🐾 Pet List - Pets loaded:', pets);
     if (pets && Array.isArray(pets)) {
       this.pets = pets;
       this.totalPets = total || pets.length; 
       this.filteredPets = pets;
     } else {
-      console.warn('⚠️ Pet List - Invalid pets data:', pets);
       this.pets = [];
       this.totalPets = 0;
       this.filteredPets = [];
@@ -124,7 +119,6 @@ export class PetListComponent implements OnInit, OnDestroy {
   }
 
   private handlePetsLoadError(error: any): void {
-    console.error('Error loading pets:', error);
     this.setLoadingState(false);
   }
 
@@ -135,13 +129,13 @@ export class PetListComponent implements OnInit, OnDestroy {
 
   onFilterChange(): void {
     this.first = 0; 
-    this.currentPage = 0;
+    this.currentPage = 1;
     this.filterSubject$.next();
   }
 
   onSelectChange(): void {
     this.first = 0; 
-    this.currentPage = 0;
+    this.currentPage = 1;
     this.loadPets();
   }
 
@@ -179,7 +173,7 @@ export class PetListComponent implements OnInit, OnDestroy {
     this.selectedCity = '';
     this.selectedGender = '';
     this.first = 0;
-    this.currentPage = 0;
+    this.currentPage = 1;
     this.loadPets();
   }
 
@@ -232,12 +226,12 @@ export class PetListComponent implements OnInit, OnDestroy {
     const shareData = createShareData(pet, window.location.origin);
 
     if (navigator.share) {
-      navigator.share(shareData).catch(console.error);
+      navigator.share(shareData).catch(() => {});
     } else {
       const shareText = `${shareData.title}\n\n${shareData.text}\n\n${shareData.url}`;
       navigator.clipboard.writeText(shareText)
-        .then(() => console.log('Link copiado para a área de transferência!'))
-        .catch(console.error);
+        .then(() => {})
+        .catch(() => {});
     }
   }
 
@@ -258,7 +252,7 @@ export class PetListComponent implements OnInit, OnDestroy {
   onPageChange(event: any): void {
     this.first = event.first;
     this.rows = event.rows;
-    this.currentPage = event.page;
+    this.currentPage = event.page; // Já vem 1-based do custom-pagination
     this.pageSize = event.rows;
     this.loadPets(); 
   }
