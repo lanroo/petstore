@@ -26,7 +26,6 @@ export class PetListComponent implements OnInit, OnDestroy {
   
   pets: readonly Pet[] = [];
   filteredPets: readonly Pet[] = [];
-  favoritePets: ReadonlySet<number> = new Set();
   
   searchTerm = '';
   selectedStatus: FilterState['selectedStatus'] = '';
@@ -72,14 +71,10 @@ export class PetListComponent implements OnInit, OnDestroy {
 
 
   private initializeComponent(): void {
-    this.loadPersistedData();
     this.first = (this.currentPage - 1) * this.rows; 
     this.loadPets();
   }
 
-  private loadPersistedData(): void {
-    this.favoritePets = this.storageService.loadFavorites();
-  }
 
   private loadPets(): void {
     const currentTime = Date.now();
@@ -189,36 +184,6 @@ export class PetListComponent implements OnInit, OnDestroy {
     return [...this.config.PAGINATION.PAGE_SIZE_OPTIONS];
   }
 
-  toggleFavorite(petId: number | undefined, event: Event): void {
-    event.stopPropagation();
-    if (!petId) return;
-
-    const newFavorites = new Set(this.favoritePets);
-    if (newFavorites.has(petId)) {
-      newFavorites.delete(petId);
-    } else {
-      newFavorites.add(petId);
-    }
-    
-    this.favoritePets = newFavorites;
-    this.storageService.saveFavorites(newFavorites);
-    this.cdr.markForCheck();
-  }
-
-  isFavorite(petId: number | undefined): boolean {
-    return petId ? this.favoritePets.has(petId) : false;
-  }
-
-  showFavorites(): void {
-    if (this.favoritePets.size > 0) {
-      this.filteredPets = this.pets.filter(pet => pet.id && this.favoritePets.has(pet.id));
-      this.totalPets = this.filteredPets.length;
-    } else {
-      this.filteredPets = this.pets;
-      this.totalPets = this.pets.length;
-    }
-    this.cdr.markForCheck();
-  }
 
   sharePet(pet: Pet, event: Event): void {
     event.stopPropagation();

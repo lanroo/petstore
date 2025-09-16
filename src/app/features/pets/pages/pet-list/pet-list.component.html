@@ -92,9 +92,6 @@
           
           <div class="pet-image">
             <img [src]="getPetImage(pet)" [alt]="pet.name" (error)="onImageError($event)">
-            <button class="favorite-btn" (click)="toggleFavorite(pet.id, $event)" [class.favorited]="isFavorite(pet.id)">
-              <mat-icon>{{ isFavorite(pet.id) ? 'favorite' : 'favorite_border' }}</mat-icon>
-            </button>
             <div class="status-badge" [ngClass]="'status-' + (pet.status || 'available')">
               {{ getStatusText(pet.status) }}
             </div>
