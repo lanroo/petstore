@@ -3,7 +3,7 @@
     <div class="header-content">
       <div class="header-left">
         <div class="logo-container">
-          <mat-icon class="header-logo">admin_panel_settings</mat-icon>
+          <mat-icon class="header-logo">pets</mat-icon>
           <div class="logo-text">
             <h1>Admin Dashboard</h1>
             <span class="subtitle">Painel de Controle</span>
@@ -215,11 +215,29 @@
             </div>
             <div class="info-row">
               <span class="label">E-mail:</span>
-              <span class="value">{{ selectedAdoption.email }}</span>
+              <span class="value">
+                <a *ngIf="selectedAdoption.email" 
+                   [href]="'mailto:' + selectedAdoption.email" 
+                   target="_blank" 
+                   class="email-link">
+                  <mat-icon>email</mat-icon>
+                  {{ selectedAdoption.email }}
+                </a>
+                <span *ngIf="!selectedAdoption.email" class="no-info">Não informado</span>
+              </span>
             </div>
             <div class="info-row">
-            <span class="label">WhatsApp:</span>
-              <span class="value">{{ selectedAdoption.whatsapp || 'Não informado' }}</span>
+              <span class="label">WhatsApp:</span>
+              <span class="value">
+                <a *ngIf="selectedAdoption.whatsapp" 
+                   [href]="getWhatsAppUrl(selectedAdoption.whatsapp)" 
+                   target="_blank" 
+                   class="whatsapp-link">
+                  <mat-icon>chat</mat-icon>
+                  {{ selectedAdoption.whatsapp }}
+                </a>
+                <span *ngIf="!selectedAdoption.whatsapp" class="no-info">Não informado</span>
+              </span>
             </div>
           </div>
         </div>
@@ -259,6 +277,47 @@
         <button class="btn-primary" *ngIf="selectedAdoption?.status === 'pending'" (click)="approveAdoption()">
           <mat-icon>check</mat-icon>
           Aprovar
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" *ngIf="showApprovalModal" (click)="closeApprovalModal()">
+    <div class="approval-modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <div class="header-icon">
+          <mat-icon>check_circle</mat-icon>
+        </div>
+        <h2>Confirmar Aprovação</h2>
+      </div>
+
+      <div class="modal-content">
+        <p>Tem certeza que deseja aprovar esta adoção?</p>
+        <div class="adoption-info" *ngIf="selectedAdoption">
+          <div class="info-item">
+            <span class="label">Pet:</span>
+            <span class="value">{{ getPetName(selectedAdoption) }}</span>
+          </div>
+          <div class="info-item">
+            <span class="label">Solicitante:</span>
+            <span class="value">{{ getUserName(selectedAdoption) }}</span>
+          </div>
+          <div class="info-item">
+            <span class="label">ID da Solicitação:</span>
+            <span class="value">#{{ selectedAdoption.id }}</span>
+          </div>
+        </div>
+        <p class="warning-text">Esta ação não pode ser desfeita.</p>
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn-secondary" (click)="closeApprovalModal()">
+          <mat-icon>close</mat-icon>
+          Cancelar
+        </button>
+        <button class="btn-primary" (click)="confirmApproval()">
+          <mat-icon>check</mat-icon>
+          Confirmar Aprovação
         </button>
       </div>
     </div>

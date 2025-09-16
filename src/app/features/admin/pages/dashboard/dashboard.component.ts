@@ -143,6 +143,7 @@ export class DashboardComponent implements OnInit {
 
   showAdoptionModal = false;
   selectedAdoption: any = null;
+  showApprovalModal = false;
 
   showAdoptionDetails(adoption: any): void {
   
@@ -200,11 +201,70 @@ export class DashboardComponent implements OnInit {
 
 
   approveAdoption(): void {
+    this.showApprovalModal = true;
+  }
+
+  confirmApproval(): void {
     if (this.selectedAdoption) {
-  
-      alert(`Adoção #${this.selectedAdoption.id} aprovada com sucesso!`);
+    
+      const adoptionIndex = this.recentAdoptions.findIndex(adoption => adoption.id === this.selectedAdoption.id);
+      if (adoptionIndex !== -1) {
+        this.recentAdoptions[adoptionIndex] = {
+          ...this.recentAdoptions[adoptionIndex],
+          status: 'APROVADA'
+        };
+      }
+      
+      this.selectedAdoption = {
+        ...this.selectedAdoption,
+        status: 'APROVADA'
+      };
+
+      this.saveAdoptionToLocalStorage(this.selectedAdoption);
+      
+      this.closeApprovalModal();
       this.closeAdoptionModal();
     }
+  }
+
+  private saveAdoptionToLocalStorage(adoption: any): void {
+    try {
+
+      const stored = localStorage.getItem('local_adoptions');
+      const adoptions = stored ? JSON.parse(stored) : [];
+      
+
+      const adoptionIndex = adoptions.findIndex((ad: any) => ad.id === adoption.id);
+      if (adoptionIndex !== -1) {
+        adoptions[adoptionIndex] = {
+          ...adoptions[adoptionIndex],
+          status: 'APROVADA',
+          updated_at: new Date().toISOString()
+        };
+      } else {
+
+        adoptions.push({
+          ...adoption,
+          status: 'APROVADA',
+          updated_at: new Date().toISOString()
+        });
+      }
+      
+      
+      localStorage.setItem('local_adoptions', JSON.stringify(adoptions));
+    } catch (error) {
+      console.error('Erro ao salvar adoção no localStorage:', error);
+    }
+  }
+
+  closeApprovalModal(): void {
+    this.showApprovalModal = false;
+  }
+
+  getWhatsAppUrl(whatsapp: string): string {
+    if (!whatsapp) return '';
+    const cleanNumber = whatsapp.replace(/\D/g, '');
+    return `https://wa.me/${cleanNumber}`;
   }
 
 }
