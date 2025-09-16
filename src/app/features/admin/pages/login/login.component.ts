@@ -101,7 +101,6 @@ export class LoginComponent implements OnInit {
       return;
     }
     
-    // Sempre redireciona para dashboard admin (apenas admins podem fazer login)
     this.router.navigate(['/admin/dashboard']);
   }
 
