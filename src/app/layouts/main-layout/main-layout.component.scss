@@ -13,8 +13,21 @@
   width: 100%;
 }
 
-
+@media (min-width: 1025px) {
+  .main-layout {
+    min-height: 100vh !important;
+    display: flex !important;
+    flex-direction: column !important;
+  }
   
+  .main-content {
+    flex: 1 !important;
+    padding: 0 !important;
+    padding-top: 80px !important;
+    width: 100% !important;
+  }
+}
+
 @media (max-width: 768px) {
   .header-content {
     flex-direction: column;

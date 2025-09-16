@@ -19,6 +19,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
   ) { }
 
   ngOnInit(): void {
+    // Componente inicializado
   }
 
   ngOnDestroy(): void {
@@ -55,6 +56,4 @@ export class HeaderComponent implements OnInit, OnDestroy {
       this.closeMobileMenu();
     }
   }
-
-
 }

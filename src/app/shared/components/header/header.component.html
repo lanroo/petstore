@@ -1,77 +1,54 @@
-
-<header class="app-header" [class.scrolled]="isScrolled">
-  <div class="header-content">
-    <div class="logo" routerLink="/">
-      <div class="logo-icon-wrapper">
-        <mat-icon class="logo-icon">pets</mat-icon>
+<header class="app-header">
+  <div class="header-container">
+    
+    <div class="logo-section">
+      <div class="logo-icon">
+        <mat-icon>pets</mat-icon>
       </div>
       <div class="logo-text">
         <h1>Adote um Amigo</h1>
-        <span class="tagline">Conectando famílias e pets</span>
+        <span class="logo-subtitle">Conectando famílias e pets</span>
       </div>
     </div>
-
-    <nav class="navigation">
-      <a routerLink="/" 
-         routerLinkActive="active" 
-         [routerLinkActiveOptions]="{exact: true}"
-         class="nav-link">
+    
+    <nav class="desktop-nav">
+      <a routerLink="/" class="nav-link" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
         <mat-icon class="nav-icon">home</mat-icon>
         <span class="nav-text">Início</span>
       </a>
-      
-      <a routerLink="/pets" 
-         routerLinkActive="active" 
-         [routerLinkActiveOptions]="{exact: true}"
-         class="nav-link">
+      <a routerLink="/pets" class="nav-link" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
         <mat-icon class="nav-icon">pets</mat-icon>
         <span class="nav-text">Pets</span>
       </a>
-      
-      <a routerLink="/pets/faq" 
-         routerLinkActive="active" 
-         class="nav-link">
+      <a routerLink="/pets/faq" class="nav-link" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
         <mat-icon class="nav-icon">help_outline</mat-icon>
         <span class="nav-text">Ajuda</span>
       </a>
-      
     </nav>
-
-    <button mat-icon-button 
-            class="mobile-menu-toggle" 
-            (click)="toggleMobileMenu()"
-            [attr.aria-expanded]="isMobileMenuOpen"
-            aria-label="Menu">
-      <mat-icon>{{ isMobileMenuOpen ? 'close' : 'menu' }}</mat-icon>
+    
+    <button class="mobile-menu-btn" (click)="toggleMobileMenu()" [class.active]="isMobileMenuOpen">
+      <span class="hamburger-line"></span>
+      <span class="hamburger-line"></span>
+      <span class="hamburger-line"></span>
     </button>
+    
   </div>
-
-  <nav class="mobile-navigation" [class.open]="isMobileMenuOpen">
-    <a routerLink="/" 
-       routerLinkActive="active" 
-       [routerLinkActiveOptions]="{exact: true}"
-       class="mobile-nav-link"
-       (click)="closeMobileMenu()">
-      <mat-icon class="nav-icon">home</mat-icon>
-      <span class="nav-text">Início</span>
-    </a>
-    
-    <a routerLink="/pets" 
-       routerLinkActive="active" 
-       [routerLinkActiveOptions]="{exact: true}"
-       class="mobile-nav-link"
-       (click)="closeMobileMenu()">
-      <mat-icon class="nav-icon">pets</mat-icon>
-      <span class="nav-text">Pets</span>
-    </a>
-    
-    <a routerLink="/pets/faq" 
-       routerLinkActive="active" 
-       class="mobile-nav-link"
-       (click)="closeMobileMenu()">
-      <mat-icon class="nav-icon">help_outline</mat-icon>
-      <span class="nav-text">Ajuda</span>
-    </a>
-    
-  </nav>
+  
+  <div class="mobile-menu" [class.open]="isMobileMenuOpen">
+    <div class="mobile-menu-content">
+      <a routerLink="/" class="mobile-nav-link" (click)="closeMobileMenu()" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
+        <mat-icon class="nav-icon">home</mat-icon>
+        <span class="nav-text">Início</span>
+      </a>
+      <a routerLink="/pets" class="mobile-nav-link" (click)="closeMobileMenu()" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
+        <mat-icon class="nav-icon">pets</mat-icon>
+        <span class="nav-text">Pets</span>
+      </a>
+      <a routerLink="/pets/faq" class="mobile-nav-link" (click)="closeMobileMenu()" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
+        <mat-icon class="nav-icon">help_outline</mat-icon>
+        <span class="nav-text">Ajuda</span>
+      </a>
+    </div>
+  </div>
+  
 </header>
