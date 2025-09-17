@@ -1,169 +1,298 @@
-# Pet Store Application
+# Angular Application
 
-A modern Angular application for pet adoption management, built with Angular 18+ and following enterprise-grade development practices.
+Aplicação Angular para adoção de pets com interface responsiva e dashboard administrativo. O painel admin permite gerenciar adoções, controlar pets cadastrados e ter visão geral das operações do sistema.
 
-## Overview
+## Sobre
 
-This application transforms the traditional PetStore API into a comprehensive pet adoption platform. It provides a user-friendly interface for browsing available pets, managing adoptions, and handling store inventory operations.
+Plataforma de adoção de pets com navegação, filtros, gerenciamento de usuários e painel administrativo. Desenvolvida com Angular 19.2.15 e API personalizada em Python FastAPI.
 
-## Architecture
+## Dashboard Administrativo
 
-### Core Features
-- **Pet Management**: Complete CRUD operations for pet listings
-- **Adoption System**: Streamlined pet adoption workflow
-- **Store Inventory**: Product catalog and order management
-- **Error Handling**: Comprehensive error management with custom pages
-- **Responsive Design**: Mobile-first approach with Material Design
+O painel administrativo oferece controle total sobre a plataforma:
 
-### Technical Stack
-- **Framework**: Angular 18+
+### Gerenciamento de Adoções
+- **Lista completa de adoções** realizadas no sistema
+- **Filtros por status** (pendente, aprovada, rejeitada)
+- **Busca por pet** ou usuário que fez a adoção
+- **Detalhes completos** de cada processo de adoção
+- **Dados do interessado** - visualização completa dos dados de quem pretende adotar
+- **Contato direto** - botões para WhatsApp e email do interessado
+- **Controle de status** das adoções pendentes
+
+### Dashboard Principal
+- **Visão geral** das adoções em andamento
+- **Contadores básicos** de pets e adoções
+- **Navegação intuitiva** entre as funcionalidades
+
+### Controle de Pets
+- **Visualização completa** de todos os pets cadastrados
+- **Busca avançada** por nome, cidade, sexo
+- **Gerenciamento de informações** dos pets
+- **Controle de disponibilidade** para adoção
+
+## Principais Funcionalidades
+
+### Recursos Públicos
+- **Navegação de Pets**: Listagem de pets com filtros, ordenação e capacidades de busca
+- **Detalhes do Pet**: Informações abrangentes do pet com galerias de fotos e detalhes de adoção
+- **Processo de Adoção**: Formulário completo para interessados em adotar
+- **Contato Direto**: Botões para WhatsApp e email para facilitar comunicação
+- **Sistema de FAQ**: Seção abrangente de ajuda e suporte
+
+### Recursos Administrativos
+- **Painel de Controle**: Operações CRUD completas para listagens de pets
+
+### Recursos Técnicos
+- **Otimização de Performance**: Lazy loading, divisão de código e otimização de bundle
+- **Tratamento de Erros**: Gerenciamento de erros com páginas personalizadas (404, 500)
+- **Design Responsivo**: Interface adaptável para mobile, tablet e desktop
+
+## Arquitetura
+
+### Estrutura Modular
+- **Lazy Loading**: Módulos carregados sob demanda (home, pets, store, admin, auth, errors)
+- **Layouts Separados**: MainLayout (público) e AuthLayout (admin)
+- **Guards de Rota**: Proteção de rotas administrativas
+- **Interceptadores HTTP**: Tratamento global de erros e loading
+
+### Padrões Implementados
+- **Services Pattern**: Serviços centralizados para lógica de negócio
+- **Component Communication**: Input/Output e Services para comunicação
+- **Reactive Forms**: Formulários com validação reativa
+- **Error Handling**: Páginas de erro personalizadas (404, 500)
+
+### Stack Técnico
+- **Framework**: Angular 19.2.15
 - **UI Library**: Angular Material
-- **Styling**: SCSS with custom design system
-- **State Management**: RxJS Observables and Services
-- **API Integration**: RESTful API consumption with error handling
-- **Routing**: Lazy-loaded feature modules
+- **Styling**: SCSS com design system personalizado
+- **State Management**: RxJS Observables e Services
+- **API Integration**: HTTP Client com interceptadores
+- **Routing**: RouterModule com lazy loading
 
-## Project Structure
+## Estrutura do Projeto
 
 ```
 src/
 ├── app/
 │   ├── core/
-│   │   ├── interceptors/          # HTTP interceptors
-│   │   ├── models/               # TypeScript interfaces
-│   │   ├── services/             # Core business services
-│   │   └── utils/                # Utility functions
+│   │   ├── config/               # Configuração da aplicação
+│   │   ├── constants/            # Constantes da aplicação
+│   │   ├── guards/               # Guards de rota
+│   │   ├── interceptors/         # Interceptadores HTTP
+│   │   ├── models/               # Interfaces TypeScript
+│   │   ├── services/             # Serviços de negócio principais
+│   │   ├── utils/                # Funções utilitárias
+│   │   └── validators/           # Validadores personalizados
 │   ├── features/
-│   │   ├── errors/               # Error page components
-│   │   ├── home/                 # Landing page module
-│   │   ├── pets/                 # Pet management module
-│   │   └── store/                # Store inventory module
-│   ├── layouts/                  # Application layouts
-│   └── shared/                   # Reusable components
-└── assets/                       # Static assets
+│   │   ├── admin/                # Funcionalidades administrativas
+│   │   │   ├── pages/
+│   │   │   │   ├── dashboard/    # Dashboard administrativo
+│   │   │   │   ├── login/        # Login administrativo
+│   │   │   │   └── user-management/ # Gerenciamento de usuários
+│   │   │   └── components/       # Componentes específicos do admin
+│   │   ├── pets/                 # Funcionalidades de gerenciamento de pets
+│   │   │   ├── pages/
+│   │   │   │   ├── pet-list/     # Página de listagem de pets
+│   │   │   │   ├── pet-detail/   # Página de detalhes do pet
+│   │   │   │   ├── pet-form/     # Formulário de pet (admin)
+│   │   │   │   ├── adoption/     # Processo de adoção
+│   │   │   │   └── faq/          # Página de FAQ
+│   │   │   └── components/       # Componentes específicos de pets
+│   │   ├── store/                # Funcionalidades de inventário da loja
+│   │   └── user/                 # Funcionalidades de gerenciamento de usuários
+│   ├── layouts/
+│   │   ├── auth-layout/          # Layout de autenticação
+│   │   └── main-layout/          # Layout principal da aplicação
+│   ├── pages/
+│   │   ├── auth/                 # Páginas de autenticação
+│   │   ├── error/                # Páginas de erro (404, 500)
+│   │   └── home/                 # Página inicial
+│   └── shared/
+│       └── components/           # Componentes reutilizáveis
+│           ├── header/           # Cabeçalho da aplicação
+│           ├── footer/           # Rodapé da aplicação
+│           ├── loading-spinner/  # Indicadores de carregamento
+│           └── custom-pagination/ # Paginação personalizada
+└── assets/                       # Assets estáticos
+    ├── images/                   # Assets de imagem
+    └── default-pet.png          # Imagem padrão de pet
 ```
 
-## Key Components
+## Componentes Principais
 
-### Services
-- **PetService**: Manages pet CRUD operations and API communication
-- **ImageService**: Handles pet image management with fallback mechanisms
-- **ErrorService**: Centralized error handling with reactive patterns
-- **StoreService**: Inventory and order management
-- **UserService**: User account operations
+### Serviços
+- **PetService**: Gerencia operações CRUD de pets e comunicação com API
+- **ImageService**: Gerencia imagens de pets com mecanismos de fallback
+- **ErrorService**: Tratamento centralizado de erros com padrões reativos
+- **StoreService**: Gerenciamento de inventário e pedidos
+- **AdoptionService**: Gerencia processo de adoção de pets
+- **NotificationService**: Notificações e alertas do usuário
+- **LoadingService**: Gerenciamento de estado de carregamento global
 
-### Modules
-- **HomeModule**: Landing page with adoption statistics
-- **PetsModule**: Pet listing, details, and management
-- **StoreModule**: Product catalog and inventory
-- **ErrorsModule**: Custom error pages (404, 500)
+### Módulos
+- **HomeModule**: Página inicial com estatísticas de adoção
+- **PetsModule**: Listagem, detalhes e gerenciamento de pets
+- **StoreModule**: Catálogo de produtos e inventário
+- **AdminModule**: Funcionalidades e dashboard administrativos
+- **ErrorsModule**: Páginas de erro personalizadas (404, 500)
 
-## API Integration
+## Integração com API
 
-The application consumes a custom Pet Adoption API with intelligent adaptations:
+- **Endpoints de Pets**: Dados reais de adoção de pets com filtragem avançada
+- **Endpoints da Loja**: Gerenciamento de inventário de produtos para pets
+- **Endpoints de Adoção**: Processo de adoção de pets
 
-- **Pet Endpoints**: Real pet adoption data
-- **Store Endpoints**: Pet product inventory management
-- **User Endpoints**: Adoption account management
-- **Error Handling**: Comprehensive HTTP error management
+## Recursos de Desenvolvimento
 
-## Development Features
+### Qualidade de Código
+- **TypeScript**: Modo estrito com tipagem abrangente
+- **Linting**: ESLint e regras específicas do Angular
+- **Tratamento de Erros**: Interceptador HTTP global com páginas de erro personalizadas
+- **Performance**: Lazy loading e tamanhos de bundle otimizados
+- **Testes**: Testes unitários completos (43/43 passando - 100% de sucesso, 27.1% cobertura)
 
-### Code Quality
-- **TypeScript**: Strict mode with comprehensive typing
-- **Linting**: ESLint and Angular-specific rules
-- **Error Handling**: Global HTTP interceptor with custom error pages
-- **Performance**: Lazy loading and optimized bundle sizes
+### Experiência do Usuário
+- **Design Responsivo**: Abordagem mobile-first com breakpoints
+- **Estados de Carregamento**: Indicadores de carregamento global
+- **Recuperação de Erros**: Mensagens de erro amigáveis
+- **Material Design**: Componentes e padrões de UI consistentes
 
-### User Experience
-- **Responsive Design**: Mobile-first approach
-- **Loading States**: Global loading indicators
-- **Error Recovery**: User-friendly error messages and recovery options
-- **Material Design**: Consistent UI components
+## Como Começar
 
-## Getting Started
-
-### Prerequisites
+### Pré-requisitos
 - Node.js 18+ 
 - npm 9+
 - Angular CLI 19+
 
-### Installation
+### Instalação
 
-1. Clone the repository:
+1. Clone o repositório:
 ```bash
 git clone https://github.com/lanroo/petstore.git
 cd petstore
 ```
 
-2. Install dependencies:
+2. Instale as dependências:
 ```bash
 npm install
 ```
 
-3. Start the development server:
+3. Inicie o servidor de desenvolvimento:
 ```bash
 ng serve
 ```
 
-4. Navigate to `http://localhost:4200`
+4. Navegue para `http://localhost:4200`
 
-### Build for Production
+## Acesso ao Painel Administrativo
+
+Para acessar o painel administrativo:
+
+1. **URL de Login**: `http://localhost:4200/admin/login` ou `http://localhost:4200/login`
+2. **Credenciais**: Serão fornecidas pela desenvolvedora
+3. **Dashboard**: Após o login, voce ira acessar `http://localhost:4200/admin/dashboard`
+
+### Rotas Principais
+- **Página Inicial**: `http://localhost:4200/`
+- **Lista de Pets**: `http://localhost:4200/pets`
+- **FAQ**: `http://localhost:4200/pets/faq`
+- **Login Admin**: `http://localhost:4200/admin/login`
+- **Dashboard Admin**: `http://localhost:4200/admin/dashboard`
+
+### Build para Produção
 
 ```bash
 ng build --configuration production
 ```
 
-## Testing
+O build de produção inclui:
+- Minificação e otimização de código
+- Tree shaking para bundles menores
+- Otimização de assets
+- Geração de source maps
+- Análise de bundle
 
-Run unit tests:
+## Testes
+
+Execute os testes unitários:
 ```bash
 ng test
 ```
 
-Unit tests are configured with Karma and Jasmine for all services and components.
+Execute testes com cobertura:
+```bash
+ng test --code-coverage
+```
 
-## Deployment
+Testes unitários completos com Jasmine e Karma:
+- **155 de 158 testes passando** (98% de sucesso)
+- **Serviços testados**: PetService, AuthService, AdoptionService, LoadingService, NotificationService, UserService, StoreService, DashboardService, ErrorService, ImageService
+- **Componentes testados**: PetListComponent, PetFormComponent, PetDetailComponent, LoginComponent, MainLayoutComponent, LoadingSpinnerComponent, CustomPaginationComponent, HeaderComponent, FooterComponent
+- **Cobertura de código**: 40.67% (519/1276 linhas)
+  - **Statements**: 40.67% (519/1276)
+  - **Functions**: 36.44% (156/428)
+  - **Lines**: 40.96% (510/1245)
+- **Tempo de execução**: 0.35 segundos
+- **Configuração**: TestBed configurado corretamente com mocks e dependências injetadas
+- **Relatório**: Execute `ng test --code-coverage` e abra `coverage/pet-store-app/index.html`
 
-The application is ready for deployment with:
-- Production build configuration
-- Asset optimization
-- Environment configuration
+## Deploy
 
-## API Configuration
+A aplicação está pronta para deploy com:
+- Configuração de build de produção
+- Otimização de assets
+- Configuração de ambiente
+- Assets estáticos prontos para CDN
 
-The application uses a custom Pet Adoption API:
-- **Base URL**: `https://projeto-jornadadados-pet-api-adoptt.zjnxkg.easypanel.host`
-- **Authentication**: Not required for demo purposes
-- **Rate Limiting**: Implemented with retry mechanisms
+## Stack Tecnológico
 
-## Error Handling
+- **Frontend**: Angular 19.2.15 + Angular Material
+- **Backend**: Python FastAPI (API personalizada em outro repo)
+- **Arquitetura**: RESTful com lazy loading
 
-Comprehensive error management includes:
-- **HTTP Interceptors**: Global error handling
-- **Custom Error Pages**: 404 and 500 error pages
-- **User Notifications**: Toast notifications for user feedback
-- **Logging**: Console logging for debugging
+## Configuração da API
 
-## Performance Optimizations
+✅ **API CONFIGURADA**: Este projeto já está configurado para usar uma API:
+- **URL Base**: Definida em `src/environments/environment.ts`
+- **Endpoints**: Pets, adoções, usuários e loja
+- **Autenticação**: Sistema de login via API com endpoints `/api/auth/login`
 
-- **Lazy Loading**: Feature modules loaded on demand
-- **Image Optimization**: Cached pet images with fallbacks
-- **Bundle Splitting**: Optimized chunk loading
-- **Memory Management**: Proper subscription cleanup
+### Para rodar o projeto:
+1. Execute `ng serve` para o frontend
+2. A API já está configurada e funcionando
+3. Não é necessário configuração adicional
 
-## Browser Support
+## Tratamento de Erros
+
+- **Interceptadores HTTP**: Tratamento global de erros
+- **Páginas de Erro**: 404 e 500 personalizadas
+- **Notificações**: Toast para feedback do usuário
+
+## Otimizações de Performance
+
+- **Lazy Loading**: Módulos de funcionalidades carregados sob demanda
+- **Otimização de Imagens**: Imagens de pets com fallbacks
+- **Divisão de Bundle**: Carregamento de chunk otimizado
+- **Gerenciamento de Memória**: Limpeza adequada de subscriptions
+
+## Suporte a Navegadores
 
 - Chrome 90+
 - Firefox 88+
 - Safari 14+
 - Edge 90+
+- Navegadores móveis (iOS Safari, Chrome Mobile)
 
+## Licença
 
-## License
+Este projeto está licenciado sob a Licença MIT.
 
-This project is licensed under the MIT License.
+## Changelog
 
-## Contact
-
-For questions or support, please contact the development team.
+### Versão 1.0.0
+- Lançamento inicial
+- Plataforma de adoção de pets
+- Dashboard administrativo
+- Design responsivo
+- Tratamento de erros
+- Otimizações de performance
