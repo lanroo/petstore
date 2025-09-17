@@ -24,6 +24,7 @@ export class PetDetailComponent implements OnInit, OnDestroy {
   isPetFavorite = false;
   
   activeTab: 'info' | 'characteristics' | 'health' | 'adoption' | 'care' = 'info';
+  
 
   constructor(
     private route: ActivatedRoute,
@@ -37,6 +38,12 @@ export class PetDetailComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.loadPetDetails();
+    
+    window.addEventListener('resize', () => {
+      setTimeout(() => {
+        this.checkTabsScroll();
+      }, 100);
+    });
   }
 
   loadPetDetails(): void {
@@ -57,6 +64,10 @@ export class PetDetailComponent implements OnInit, OnDestroy {
         this.loading = false;
         this.checkIfFavorite();
         this.cdr.markForCheck();
+        
+        setTimeout(() => {
+          this.checkTabsScroll();
+        }, 100);
       },
       error: (error) => {
         this.error = error.message || 'Erro ao carregar detalhes do pet';
@@ -209,6 +220,39 @@ export class PetDetailComponent implements OnInit, OnDestroy {
     this.activeTab = tab;
     this.cdr.markForCheck();
   }
+
+  // Verifica se há conteúdo para scroll no carrossel de tabs
+  private checkTabsScroll(): void {
+    const carousel = document.querySelector('.tabs-carousel') as HTMLElement;
+    if (carousel) {
+      const hasScroll = carousel.scrollWidth > carousel.clientWidth;
+      
+      if (hasScroll) {
+        carousel.classList.add('has-scroll');
+        carousel.classList.remove('scrolled');
+        
+        this.addScrollListener(carousel);
+      } else {
+        carousel.classList.remove('has-scroll');
+        carousel.classList.remove('scrolled');
+      }
+    }
+  }
+
+  private addScrollListener(carousel: HTMLElement): void {
+    const handleScroll = () => {
+      if (carousel.scrollLeft > 0) {
+        carousel.classList.add('scrolled');
+      } else {
+        carousel.classList.remove('scrolled');
+      }
+    };
+    
+    carousel.removeEventListener('scroll', handleScroll);
+    
+    carousel.addEventListener('scroll', handleScroll);
+  }
+
 
   navigateToAdoption(): void {
     if (this.pet && this.pet.id) {

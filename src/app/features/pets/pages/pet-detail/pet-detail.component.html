@@ -45,6 +45,10 @@
                 <span class="status-text">{{ getStatusText(pet.status) }}</span>
               </div>
 
+              <div class="verification-badge" matTooltip="Perfil verificado">
+                <mat-icon>verified</mat-icon>
+              </div>
+
               <div *ngIf="pet.photos && pet.photos.length > 1" class="image-counter">
                 {{ currentImageIndex + 1 }} / {{ pet.photos.length }}
               </div>
@@ -79,9 +83,6 @@
           <div class="pet-header">
             <div class="name-badge-container">
               <h1 class="pet-name">{{ pet.name }}</h1>
-              <div class="verification-badge" matTooltip="Perfil verificado">
-                <mat-icon>verified</mat-icon>
-              </div>
             </div>
             <div class="pet-breed-info">
               <div class="breed-details">
@@ -136,41 +137,45 @@
 
           <div class="pet-info-card">
             <div class="tab-navigation">
-              <button 
-                class="tab-button" 
-                [class.active]="activeTab === 'info'"
-                (click)="switchTab('info')">
-                <mat-icon>info</mat-icon>
-                <span>Sobre</span>
-              </button>
-              <button 
-                class="tab-button" 
-                [class.active]="activeTab === 'characteristics'"
-                (click)="switchTab('characteristics')">
-                <mat-icon>star</mat-icon>
-                <span>Características</span>
-              </button>
-              <button 
-                class="tab-button" 
-                [class.active]="activeTab === 'health'"
-                (click)="switchTab('health')">
-                <mat-icon>medical_services</mat-icon>
-                <span>Saúde</span>
-              </button>
-              <button 
-                class="tab-button" 
-                [class.active]="activeTab === 'adoption'"
-                (click)="switchTab('adoption')">
-                <mat-icon>timeline</mat-icon>
-                <span>Adoção</span>
-              </button>
-              <button 
-                class="tab-button" 
-                [class.active]="activeTab === 'care'"
-                (click)="switchTab('care')">
-                <mat-icon>checklist</mat-icon>
-                <span>Cuidados</span>
-              </button>
+              <div class="tabs-carousel" #tabsCarousel>
+                <div class="tabs-track">
+                  <button 
+                    class="tab-button" 
+                    [class.active]="activeTab === 'info'"
+                    (click)="switchTab('info')">
+                    <mat-icon>info</mat-icon>
+                    <span>Sobre</span>
+                  </button>
+                  <button 
+                    class="tab-button" 
+                    [class.active]="activeTab === 'characteristics'"
+                    (click)="switchTab('characteristics')">
+                    <mat-icon>star</mat-icon>
+                    <span>Características</span>
+                  </button>
+                  <button 
+                    class="tab-button" 
+                    [class.active]="activeTab === 'health'"
+                    (click)="switchTab('health')">
+                    <mat-icon>medical_services</mat-icon>
+                    <span>Saúde</span>
+                  </button>
+                  <button 
+                    class="tab-button" 
+                    [class.active]="activeTab === 'adoption'"
+                    (click)="switchTab('adoption')">
+                    <mat-icon>timeline</mat-icon>
+                    <span>Adoção</span>
+                  </button>
+                  <button 
+                    class="tab-button" 
+                    [class.active]="activeTab === 'care'"
+                    (click)="switchTab('care')">
+                    <mat-icon>checklist</mat-icon>
+                    <span>Cuidados</span>
+                  </button>
+                </div>
+              </div>
             </div>
 
             <div class="tab-content">
