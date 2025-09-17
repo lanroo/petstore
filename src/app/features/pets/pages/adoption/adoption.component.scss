@@ -29,6 +29,10 @@
     margin: 0 auto;
     padding: 0 var(--space-6);
     
+    .hero-text {
+      margin-top: 2rem;
+    }
+    
     .hero-title {
       font-size: var(--font-size-5xl);
       font-weight: var(--font-weight-extrabold);
@@ -56,51 +60,12 @@
       color: var(--neutral-0);
       opacity: 1;
       max-width: 600px;
-      margin: 0 auto var(--space-8);
+      margin: var(--space-6) auto var(--space-8);
       text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
       
       @media (max-width: 768px) {
         font-size: var(--font-size-lg);
-      }
-    }
-    
-    .hero-stats {
-      .stat-chips {
-        display: flex;
-        flex-wrap: wrap;
-        gap: var(--space-4);
-        justify-content: center;
-        
-        .stat-chip {
-          background: rgba(255, 255, 255, 0.2);
-          backdrop-filter: blur(10px);
-          border: 1px solid rgba(255, 255, 255, 0.3);
-          padding: var(--space-4) var(--space-6);
-          border-radius: var(--radius-full);
-          font-weight: var(--font-weight-medium);
-          font-size: var(--font-size-sm);
-          box-shadow: var(--shadow-sm);
-          transition: all var(--transition-base);
-          color: var(--neutral-0);
-          display: flex;
-          align-items: center;
-          gap: var(--space-2);
-          white-space: nowrap;
-          
-          mat-icon {
-            font-size: 18px;
-            width: 18px;
-            height: 18px;
-            line-height: 18px;
-            color: var(--neutral-0);
-          }
-          
-          &:hover {
-            background: rgba(255, 255, 255, 0.3);
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-md);
-          }
-        }
+        margin-top: var(--space-4);
       }
     }
   }
@@ -154,32 +119,97 @@
     text-align: left;
     box-shadow: var(--shadow-sm);
     
-    h3 {
-      font-size: var(--font-size-xl);
-      font-weight: var(--font-weight-bold);
-      color: var(--primary-700);
-      margin-bottom: var(--space-4);
+    @media (max-width: 768px) {
+      padding: var(--space-4);
+      border-radius: var(--radius-md);
+      margin-top: var(--space-3);
+    }
+    
+    .pet-header {
       display: flex;
       align-items: center;
       gap: var(--space-2);
+      margin-bottom: var(--space-4);
       
-      mat-icon {
+      @media (max-width: 768px) {
+        gap: var(--space-2);
+        margin-bottom: var(--space-3);
+      }
+      
+      .pet-icon {
         font-size: 24px;
         width: 24px;
         height: 24px;
         color: var(--primary-600);
+        flex-shrink: 0;
+        
+        @media (max-width: 768px) {
+          font-size: 20px;
+          width: 20px;
+          height: 20px;
+        }
+      }
+      
+      h3 {
+        font-size: var(--font-size-lg);
+        font-weight: var(--font-weight-semibold);
+        color: var(--neutral-700);
+        margin: 0;
+        
+        @media (max-width: 768px) {
+          font-size: var(--font-size-base);
+        }
       }
     }
     
-    p {
-      font-size: var(--font-size-base);
-      color: var(--neutral-700);
-      margin-bottom: var(--space-2);
-      text-align: left;
+    .pet-details {
+      display: grid;
+      gap: var(--space-2);
       
-      strong {
-        color: var(--neutral-900);
-        font-weight: var(--font-weight-semibold);
+      @media (max-width: 768px) {
+        gap: var(--space-1);
+      }
+      
+      .detail-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: var(--space-2) 0;
+        border-bottom: 1px solid var(--neutral-100);
+        
+        @media (max-width: 768px) {
+          padding: var(--space-1) 0;
+        }
+        
+        &:last-child {
+          border-bottom: none;
+        }
+        
+        .detail-label {
+          font-size: var(--font-size-sm);
+          font-weight: var(--font-weight-medium);
+          color: var(--neutral-600);
+          
+          @media (max-width: 768px) {
+            font-size: var(--font-size-xs);
+          }
+        }
+        
+        .detail-value {
+          font-size: var(--font-size-base);
+          font-weight: var(--font-weight-semibold);
+          color: var(--neutral-800);
+          text-align: right;
+          
+          @media (max-width: 768px) {
+            font-size: var(--font-size-sm);
+          }
+        }
+        
+        &:first-child .detail-value {
+          color: var(--primary-600);
+          font-weight: var(--font-weight-bold);
+        }
       }
     }
   }
