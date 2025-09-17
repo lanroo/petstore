@@ -2006,6 +2006,13 @@
 .carousel-scroll {
   overflow: hidden;
   position: relative;
+  
+  @media (max-width: 768px) {
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+  }
 }
 
 .cards-track {
@@ -2016,6 +2023,12 @@
 
   &.dragging {
     transition: none;
+  }
+  
+  @media (max-width: 768px) {
+    transition: none; // Desabilita transição JS no mobile
+    padding: 12px;
+    gap: 12px;
   }
 }
 
@@ -2531,6 +2544,8 @@
     box-shadow: 
       0 6px 24px rgba(0, 0, 0, 0.1),
       0 3px 12px rgba(0, 0, 0, 0.06);
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
   }
 
   .card-image {

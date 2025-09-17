@@ -131,27 +131,32 @@ export class HomeComponent implements OnInit {
     
     if (width < 480) {
       this.cardsPerView = 1;
-      this.cardWidth = Math.min(300, width - 48); 
+      this.cardWidth = 200; 
     } else if (width < 768) {
-      this.cardsPerView = 2;
-      this.cardWidth = Math.min(350, width - 48);
+      this.cardsPerView = 1.5; 
+      this.cardWidth = 240;
     } else if (width < 1024) {
-      this.cardsPerView = 3;
-      this.cardWidth = (width - 96) / 3; 
+      this.cardsPerView = 2;
+      this.cardWidth = 280;
     } else if (width < 1440) {
-      this.cardsPerView = 4;
-      this.cardWidth = 320;
+      this.cardsPerView = 3;
+      this.cardWidth = 280;
     } else {
-      this.cardsPerView = 6;
-      this.cardWidth = 320;
+      this.cardsPerView = 4;
+      this.cardWidth = 280;
     }
     
     this.updateCarouselSettings();
   }
   
   private updateCarouselSettings(): void {
-    if (this.availablePets.length > 0) {
-      this.maxSlide = Math.max(0, Math.ceil(this.availablePets.length / this.cardsPerView) - 1);
+    if (this.availablePets.length > 0) {  
+      if (window.innerWidth < 768) {
+        this.maxSlide = Math.max(0, this.availablePets.length - 1);
+      } else {
+        this.maxSlide = Math.max(0, Math.ceil(this.availablePets.length / this.cardsPerView) - 1);
+      }
+      
       this.dots = Array(this.maxSlide + 1).fill(0).map((_, i) => i);
       this.currentSlide = Math.min(this.currentSlide, this.maxSlide);
       this.updateTranslateX();
@@ -162,7 +167,19 @@ export class HomeComponent implements OnInit {
     if (this.isAnimating) return;
     
     this.isAnimating = true;
-    this.translateX = -this.currentSlide * this.cardWidth * this.cardsPerView;
+
+    const width = window.innerWidth;
+    let gap = 16; 
+    
+    if (width < 480) {
+      gap = 12; 
+    } else if (width < 768) {
+      gap = 16; 
+    }
+    
+    const totalCardWidth = this.cardWidth + gap;
+    this.translateX = -this.currentSlide * totalCardWidth;
+    
     this.cdr.markForCheck();
     
     setTimeout(() => {
@@ -192,38 +209,43 @@ export class HomeComponent implements OnInit {
   }
     
   onTouchStart(event: TouchEvent): void {
-    this.touchStartX = event.touches[0].clientX;
-    this.isDragging = true;
+    
+    if (window.innerWidth >= 768) {
+      this.touchStartX = event.touches[0].clientX;
+      this.isDragging = true;
+    }
   }
   
   onTouchMove(event: TouchEvent): void {
-    if (!this.isDragging) return;
     
-    this.touchEndX = event.touches[0].clientX;
-    
-    const deltaX = Math.abs(this.touchEndX - this.touchStartX);
-    if (deltaX > 10) {
-      event.preventDefault();
+    if (window.innerWidth >= 768 && this.isDragging) {
+      this.touchEndX = event.touches[0].clientX;
+      
+      const deltaX = Math.abs(this.touchEndX - this.touchStartX);
+      if (deltaX > 10) {
+        event.preventDefault();
+      }
     }
   }
   
   onTouchEnd(): void {
-    if (!this.isDragging) return;
-    
-    this.isDragging = false;
-    const deltaX = this.touchStartX - this.touchEndX;
-    const minSwipeDistance = 50;
-    
-    if (Math.abs(deltaX) > minSwipeDistance) {
-      if (deltaX > 0) {
-        this.nextSlide();
-      } else {
-        this.previousSlide();
+      
+    if (window.innerWidth >= 768 && this.isDragging) {
+      this.isDragging = false;
+      const deltaX = this.touchStartX - this.touchEndX;
+      const minSwipeDistance = 50;
+      
+      if (Math.abs(deltaX) > minSwipeDistance) {
+        if (deltaX > 0) {
+          this.nextSlide();
+        } else {
+          this.previousSlide();
+        }
       }
+      
+      this.touchStartX = 0;
+      this.touchEndX = 0;
     }
-    
-    this.touchStartX = 0;
-    this.touchEndX = 0;
   }
   
   onMouseDown(event: MouseEvent): void {
