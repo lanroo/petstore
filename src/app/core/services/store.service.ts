@@ -4,21 +4,16 @@ import { Observable } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 
-// Models
 import { Order, InventoryStats, OrderRequest } from '../models/store.model';
 
-// Export Inventory interface for external use
 export interface Inventory {
   readonly [status: string]: number;
 }
 
-// Constants
 import { STORE_API_ENDPOINTS, STORE_ERROR_MESSAGES, INVENTORY_STATUSES } from '../constants/store.constants';
 
-// Validators
 import { StoreValidators } from '../validators/store.validators';
 
-// Utils
 import { ErrorHandlerUtil } from '../utils/error-handler.util';
 
 @Injectable({
@@ -71,7 +66,6 @@ export class StoreService {
   }
 
   private mapToInventoryStats(inventory: Inventory): InventoryStats {
-    // Create mutable object first
     const mutableStats = {
       available: inventory[INVENTORY_STATUSES.AVAILABLE] || 0,
       pending: inventory[INVENTORY_STATUSES.PENDING] || 0,
@@ -88,7 +82,6 @@ export class StoreService {
       }
     });
 
-    // Return as readonly object
     return mutableStats as InventoryStats;
   }
 }

@@ -105,8 +105,6 @@ export class LoadingService {
     return Object.fromEntries(this.loadingStates);
   }
 
-
-  // Pet operations
   loadingPets(): void {
     this.showForOperation('loading-pets');
   }

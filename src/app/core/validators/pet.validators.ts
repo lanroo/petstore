@@ -69,7 +69,7 @@ export class PetValidators {
       throw new Error('Máximo de 10 arquivos por upload');
     }
     
-    const maxSize = 5 * 1024 * 1024; // 5MB
+    const maxSize = 5 * 1024 * 1024; 
     const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
     
     files.forEach((file, index) => {

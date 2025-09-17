@@ -120,8 +120,5 @@ export class ErrorService {
       url: error.url,
       context: context
     };
-
-    // Em produção, isso seria enviado para um serviço de logging
-    console.error('Error logged:', logData);
   }
 }
