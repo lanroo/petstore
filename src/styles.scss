@@ -1,17 +1,8 @@
 
-// ===========================================
-// 🎨 DESIGN SYSTEM IMPORT
-// ===========================================
 @use 'styles/design-system.scss';
 
-// ===========================================
-// 🔧 EXTERNAL LIBRARIES
-// ===========================================
 @import 'primeicons/primeicons.css';
 
-// ===========================================
-// 🌐 GLOBAL RESET
-// ===========================================
 * {
   box-sizing: border-box;
 }
@@ -50,9 +41,7 @@ a:hover {
   color: var(--primary-700);
 }
 
-// ===========================================
-// 🎨 MATERIAL DESIGN OVERRIDES
-// ===========================================
+
 .mat-mdc-raised-button,
 .mat-mdc-outlined-button,
 .mat-mdc-button {
@@ -87,9 +76,6 @@ a:hover {
   border-radius: var(--radius-lg) !important;
 }
 
-// ===========================================
-// 🎨 CUSTOM SCROLLBAR
-// ===========================================
 ::-webkit-scrollbar {
   width: var(--space-2);
   height: var(--space-2);
@@ -109,9 +95,7 @@ a:hover {
   background: var(--neutral-400);
 }
 
-// ===========================================
-// 🎯 SELECTION & FOCUS
-// ===========================================
+
 ::selection {
   background: var(--primary-100);
   color: var(--primary-900);
@@ -122,18 +106,14 @@ a:hover {
   outline-offset: 2px;
 }
 
-// ===========================================
-// 📱 RESPONSIVE DESIGN
-// ===========================================
+
 @media (max-width: 768px) {
   .container {
     padding: 0 var(--space-5);
   }
 }
 
-// ===========================================
-// ♿ ACCESSIBILITY
-// ===========================================
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -164,9 +144,7 @@ a:hover {
   }
 }
 
-// ===========================================
-// 🖨️ PRINT STYLES
-// ===========================================
+    
 @media print {
   * {
     background: var(--neutral-0) !important;
