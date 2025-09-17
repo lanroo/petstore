@@ -112,6 +112,10 @@
   background: linear-gradient(135deg, var(--neutral-50), var(--neutral-100));
   border-bottom: 2px solid var(--primary-100);
 
+  @media (max-width: 768px) {
+    padding: var(--space-4) var(--space-6) var(--space-4) !important; 
+  }
+
   .section-icon {
     font-size: var(--font-size-lg);
     color: var(--primary-600);
