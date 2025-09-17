@@ -2,13 +2,7 @@
   <header class="dashboard-header">
     <div class="header-content">
       <div class="header-left">
-        <div class="logo-container">
-          <mat-icon class="header-logo">pets</mat-icon>
-          <div class="logo-text">
-            <h1>Admin Dashboard</h1>
-            <span class="subtitle">Painel de Controle</span>
-          </div>
-        </div>
+        <mat-icon class="header-logo">pets</mat-icon>
       </div>
       <div class="header-right">
         <div class="user-dropdown" (click)="toggleUserMenu()" [class.active]="showUserMenu">
@@ -36,7 +30,7 @@
       <div class="section-header">
         <div class="section-title">
           <mat-icon>history</mat-icon>
-          <h2>Adoções Recentes</h2>
+          <h2>Adoções</h2>
         </div>
         <div class="section-actions">
           <button class="refresh-btn" (click)="refreshDashboard()" title="Atualizar">

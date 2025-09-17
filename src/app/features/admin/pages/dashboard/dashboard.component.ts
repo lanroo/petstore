@@ -50,6 +50,7 @@ export class DashboardComponent implements OnInit {
   }
 
   refreshDashboard(): void {
+    this.isLoading = true;
     this.loadDashboardData();
   }
 
