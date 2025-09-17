@@ -182,22 +182,35 @@ npm install
 ng serve
 ```
 
-4. Navegue para `http://localhost:4200`
+4. Navegue para `http://localhost:4200` ou `https://adoteumamigo-nu.vercel.app/` (produção)
 
 ## Acesso ao Painel Administrativo
 
 Para acessar o painel administrativo:
 
-1. **URL de Login**: `http://localhost:4200/admin/login` ou `http://localhost:4200/login`
+1. **URL de Login**: 
+   - Desenvolvimento: `http://localhost:4200/admin/login` ou `http://localhost:4200/login`
+   - Produção: `https://adoteumamigo-nu.vercel.app/admin/login`
 2. **Credenciais**: Serão fornecidas pela desenvolvedora
-3. **Dashboard**: Após o login, voce ira acessar `http://localhost:4200/admin/dashboard`
+3. **Dashboard**: Após o login, voce ira acessar:
+   - Desenvolvimento: `http://localhost:4200/admin/dashboard`
+   - Produção: `https://adoteumamigo-nu.vercel.app/admin/dashboard`
 
 ### Rotas Principais
+
+#### Desenvolvimento (Local)
 - **Página Inicial**: `http://localhost:4200/`
 - **Lista de Pets**: `http://localhost:4200/pets`
 - **FAQ**: `http://localhost:4200/pets/faq`
 - **Login Admin**: `http://localhost:4200/admin/login`
 - **Dashboard Admin**: `http://localhost:4200/admin/dashboard`
+
+#### Produção (Vercel)
+- **Página Inicial**: `https://adoteumamigo-nu.vercel.app/`
+- **Lista de Pets**: `https://adoteumamigo-nu.vercel.app/pets`
+- **FAQ**: `https://adoteumamigo-nu.vercel.app/pets/faq`
+- **Login Admin**: `https://adoteumamigo-nu.vercel.app/admin/login`
+- **Dashboard Admin**: `https://adoteumamigo-nu.vercel.app/admin/dashboard`
 
 ### Build para Produção
 
