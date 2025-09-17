@@ -190,9 +190,6 @@
   }
 }
 
-// ===========================================
-// 📝 FORM SECTION
-// ===========================================
 .form-section {
   padding: var(--space-6);
   display: flex;
@@ -225,9 +222,6 @@
   }
 }
 
-// ===========================================
-// 📋 FORM STYLES
-// ===========================================
 .login-form {
   .form-group {
     margin-bottom: var(--space-4);
@@ -526,10 +520,7 @@
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
 }
-
-// ===========================================
-// 📱 RESPONSIVE DESIGN
-// ===========================================
+    
 @media (max-width: 1024px) {
   .login-content {
     grid-template-columns: 1fr;

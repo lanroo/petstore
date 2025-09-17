@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
@@ -10,7 +10,8 @@ import { AuthService, LoginCredentials, AuthUser } from '../../../../core/servic
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, MatIconModule],
   templateUrl: './login.component.html',
-  styleUrl: './login.component.scss'
+  styleUrl: './login.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class LoginComponent implements OnInit {
   loginForm: FormGroup;
@@ -23,7 +24,8 @@ export class LoginComponent implements OnInit {
     private fb: FormBuilder,
     private authService: AuthService,
     private router: Router,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private cdr: ChangeDetectorRef
   ) {
     this.loginForm = this.createForm();
   }
@@ -65,11 +67,13 @@ export class LoginComponent implements OnInit {
           } else {
             this.errorMessage = response.message || 'Erro ao fazer login';
           }
+          this.cdr.markForCheck();
         },
         error: (error) => {
           this.isLoading = false;
           this.errorMessage = 'Erro de conexão. Tente novamente.';
           console.error('Login error:', error);
+          this.cdr.markForCheck();
         }
       });
     } else {

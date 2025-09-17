@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { PetService } from '../../../../core/services/pet.service';
 import { ImageService } from '../../../../core/services/image.service';
@@ -11,7 +11,8 @@ import { UserService } from '../../../../core/services/user.service';
   selector: 'app-pet-detail',
   standalone: false,
   templateUrl: './pet-detail.component.html',
-  styleUrl: './pet-detail.component.scss'
+  styleUrl: './pet-detail.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class PetDetailComponent implements OnInit, OnDestroy {
   pet: Pet | null = null;
@@ -30,7 +31,8 @@ export class PetDetailComponent implements OnInit, OnDestroy {
     private petService: PetService,
     private imageService: ImageService,
     private notificationService: NotificationService,
-    private userService: UserService
+    private userService: UserService,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
@@ -54,10 +56,12 @@ export class PetDetailComponent implements OnInit, OnDestroy {
         this.pet = pet;
         this.loading = false;
         this.checkIfFavorite();
+        this.cdr.markForCheck();
       },
       error: (error) => {
         this.error = error.message || 'Erro ao carregar detalhes do pet';
         this.loading = false;
+        this.cdr.markForCheck();
       }
     });
   }
@@ -82,6 +86,7 @@ export class PetDetailComponent implements OnInit, OnDestroy {
   nextImage(): void {
     if (this.pet && this.pet.photos && this.pet.photos.length > 1) {
       this.currentImageIndex = (this.currentImageIndex + 1) % this.pet.photos.length;
+      this.cdr.markForCheck();
     }
   }
 
@@ -90,11 +95,13 @@ export class PetDetailComponent implements OnInit, OnDestroy {
       this.currentImageIndex = this.currentImageIndex === 0 
         ? this.pet.photos.length - 1 
         : this.currentImageIndex - 1;
+      this.cdr.markForCheck();
     }
   }
 
   selectImage(index: number): void {
     this.currentImageIndex = index;
+    this.cdr.markForCheck();
   }
 
   onImageError(event: Event): void {
@@ -126,18 +133,21 @@ export class PetDetailComponent implements OnInit, OnDestroy {
   openImageFullscreen(index: number): void {
     this.fullscreenImageIndex = index;
     this.showFullscreenModal = true;
-    document.body.style.overflow = 'hidden'; 
+    document.body.style.overflow = 'hidden';
+    this.cdr.markForCheck();
   }
 
   closeFullscreenModal(): void {
     this.showFullscreenModal = false;
     document.body.style.overflow = 'auto';
+    this.cdr.markForCheck();
   }
 
   nextFullscreenImage(event: Event): void {
     event.stopPropagation();
     if (this.pet && this.pet.photos && this.pet.photos.length > 1) {
       this.fullscreenImageIndex = (this.fullscreenImageIndex + 1) % this.pet.photos.length;
+      this.cdr.markForCheck();
     }
   }
 
@@ -147,12 +157,14 @@ export class PetDetailComponent implements OnInit, OnDestroy {
       this.fullscreenImageIndex = this.fullscreenImageIndex === 0 
         ? this.pet.photos.length - 1 
         : this.fullscreenImageIndex - 1;
+      this.cdr.markForCheck();
     }
   }
 
   selectFullscreenImage(index: number, event: Event): void {
     event.stopPropagation();
     this.fullscreenImageIndex = index;
+    this.cdr.markForCheck();
   }
 
   private checkIfFavorite(): void {
@@ -176,6 +188,7 @@ export class PetDetailComponent implements OnInit, OnDestroy {
       }
       localStorage.setItem('favoritePets', JSON.stringify(favorites));
     }
+    this.cdr.markForCheck();
   }
 
   getAgeCategory(pet: Pet): string {
@@ -194,6 +207,7 @@ export class PetDetailComponent implements OnInit, OnDestroy {
 
   switchTab(tab: 'info' | 'characteristics' | 'health' | 'adoption' | 'care'): void {
     this.activeTab = tab;
+    this.cdr.markForCheck();
   }
 
   navigateToAdoption(): void {

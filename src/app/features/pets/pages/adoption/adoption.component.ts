@@ -43,14 +43,9 @@ export class AdoptionComponent implements OnInit {
 
   ngOnInit(): void {
     this.route.params.subscribe(params => {
-      console.log('Route params:', params);
       this.petId = params['petId'] ? +params['petId'] : null;
-      console.log('🐾 Pet ID extracted:', this.petId);
       if (this.petId) {
-        console.log('Loading pet details for ID:', this.petId);
         this.loadPetDetails();
-      } else {
-        console.log('⚠️ No pet ID found in route');
       }
     });
     
@@ -71,31 +66,16 @@ export class AdoptionComponent implements OnInit {
 
   private loadPetDetails(): void {
     if (!this.petId) {
-      console.log('❌ No pet ID to load details');
       return;
     }
     
-    console.log('Starting to load pet details for ID:', this.petId);
     this.isLoading = true;
     this.petService.getPetById(this.petId).subscribe({
       next: (pet) => {
-        console.log('✅ Pet loaded successfully:', pet);
-        console.log('✅ Pet name:', pet?.name);
-        console.log('✅ Pet ID:', pet?.id);
         this.pet = pet;
         this.isLoading = false;
-        console.log('✅ Pet assigned to component:', this.pet);
-        console.log('✅ Template should now show pet name:', this.pet?.name);
-        console.log('✅ isLoading is now:', this.isLoading);
-        
-        // Forçar detecção de mudanças
-        setTimeout(() => {
-          console.log('🔄 After timeout - pet:', this.pet);
-          console.log('🔄 After timeout - pet name:', this.pet?.name);
-        }, 100);
       },
       error: (error) => {
-        console.error('Error loading pet details:', error);
         this.isLoading = false;
         this.router.navigate(['/pets/adoption']);
       }
@@ -108,19 +88,10 @@ export class AdoptionComponent implements OnInit {
   }
 
   onSubmit(): void {
-    console.log('onSubmit called');
-    console.log('Form valid:', this.adoptionForm.valid);
-    console.log('Pet ID:', this.petId);
-    console.log('Form value:', this.adoptionForm.value);
-    
     if (this.adoptionForm.valid && this.petId) {
       this.isSubmitting = true;
-      console.log('Starting submission...');
       
       const formData = this.adoptionForm.value;
-      
-      console.log('🔍 Pet object before sending:', this.pet);
-      console.log('🔍 Pet name:', this.pet?.name);
       
       const requestWithPetInfo = {
         ...formData,
@@ -134,23 +105,16 @@ export class AdoptionComponent implements OnInit {
         petDescription: (this.pet as any)?.description || ''
       };
       
-          console.log('🔍 Request with pet info:', requestWithPetInfo);
-          console.log('🔍 WhatsApp value being sent:', requestWithPetInfo.whatsapp);
-      
-      // Enviar sem user_id (não precisa estar logado)
       this.adoptionService.submitAdoptionRequest(this.petId, requestWithPetInfo, null).subscribe({
         next: (response: any) => {
-          console.log('Adoption request submitted successfully:', response);
           this.handleSuccessfulSubmission();
         },
         error: (error: any) => {
-          console.error('❌ Error submitting adoption request:', error);
           this.isSubmitting = false;
           alert('Erro ao enviar formulário. Tente novamente.');
         }
       });
     } else {
-      console.log('❌ Form invalid or no pet ID');
       this.markAllFieldsAsTouched();
     }
   }

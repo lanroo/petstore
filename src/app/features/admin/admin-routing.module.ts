@@ -12,7 +12,7 @@ const routes: Routes = [
   {
     path: 'dashboard',
     component: DashboardComponent,
-    canActivate: [AdminGuard] // Only admins can access
+    canActivate: [AdminGuard] 
   },
   {
     path: '',
