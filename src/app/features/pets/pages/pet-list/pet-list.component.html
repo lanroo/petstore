@@ -29,8 +29,8 @@
           <input 
             type="text" 
             class="search-input" 
-            [(ngModel)]="searchTerm" 
-(input)="onFilterChange()"
+            [ngModel]="searchTerm" 
+            (ngModelChange)="onSearchTermChange($event)"
             placeholder="Buscar pets por nome...">
           <mat-icon class="search-icon">search</mat-icon>
         </div>
@@ -74,6 +74,8 @@
       <span class="results-count">{{ totalPets || 0 }} pets encontrados</span>
     </div>
   </div>
+  
+  <div class="mobile-spacer"></div>
   
   <section class="pets-section">
     <div class="container">

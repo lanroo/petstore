@@ -21,7 +21,7 @@ export class PetListComponent implements OnInit, OnDestroy {
   readonly config = PET_LIST_CONFIG;
   
   private readonly destroy$ = new Subject<void>();
-  private readonly filterSubject$ = new Subject<void>();
+  private readonly filterSubject$ = new Subject<string>();
   private lastRequestTime = 0;
   
   pets: readonly Pet[] = [];
@@ -53,11 +53,13 @@ export class PetListComponent implements OnInit, OnDestroy {
   ) {
     this.filterSubject$
       .pipe(
-        debounceTime(50),
+        debounceTime(300),
         distinctUntilChanged(),
         takeUntil(this.destroy$)
       )
-      .subscribe(() => this.loadPets());
+      .subscribe(() => {
+        this.loadPets();
+      });
   }
 
   ngOnInit(): void {
@@ -105,6 +107,8 @@ export class PetListComponent implements OnInit, OnDestroy {
       this.pets = pets;
       this.totalPets = total || pets.length; 
       this.filteredPets = pets;
+      
+    this.applyLocalFilter();
     } else {
       this.pets = [];
       this.totalPets = 0;
@@ -122,16 +126,46 @@ export class PetListComponent implements OnInit, OnDestroy {
     this.cdr.markForCheck();
   }
 
+  onSearchTermChange(value: string): void {
+    this.searchTerm = value;
+    
+    this.applyLocalFilter();
+    this.onFilterChange();
+  }
+
   onFilterChange(): void {
     this.first = 0; 
     this.currentPage = 1;
-    this.filterSubject$.next();
+    this.cdr.markForCheck();
+    this.filterSubject$.next(this.searchTerm || '');
   }
 
   onSelectChange(): void {
     this.first = 0; 
     this.currentPage = 1;
     this.loadPets();
+  }
+
+
+  private applyLocalFilter(): void {
+    if (!this.searchTerm?.trim()) {
+      this.filteredPets = this.pets;
+      this.totalPets = this.pets.length;
+    } else {
+      const searchTerm = this.searchTerm.toLowerCase().trim();
+      this.filteredPets = this.pets.filter(pet => {
+        const matchesName = pet.name?.toLowerCase().includes(searchTerm);
+        const matchesDescription = pet.description?.toLowerCase().includes(searchTerm);
+        const matchesSpecies = pet.species?.toLowerCase().includes(searchTerm);
+        const matchesBreed = pet.breed?.toLowerCase().includes(searchTerm);
+        
+        return matchesName || matchesDescription || matchesSpecies || matchesBreed;
+      });
+      
+      this.totalPets = this.filteredPets.length;
+    }
+    
+    this.cdr.markForCheck();
   }
 
   private buildApiFilters(): any {
@@ -217,7 +251,7 @@ export class PetListComponent implements OnInit, OnDestroy {
   onPageChange(event: any): void {
     this.first = event.first;
     this.rows = event.rows;
-    this.currentPage = event.page; // Já vem 1-based do custom-pagination
+    this.currentPage = event.page; 
     this.pageSize = event.rows;
     this.loadPets(); 
   }
