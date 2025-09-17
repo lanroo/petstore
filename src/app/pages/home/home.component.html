@@ -1,5 +1,5 @@
-<section class="hero-section">
-  <div class="hero-background">
+<section class="hero-section" role="banner" aria-label="Seção principal de adoção de pets">
+  <div class="hero-background" aria-hidden="true">
     <div class="hero-pattern"></div>
     <div class="hero-gradient"></div>
   </div>
@@ -25,33 +25,26 @@
       
       
       <div class="hero-actions">
-        <button mat-raised-button class="hero-btn hero-btn-primary" routerLink="/pets">
+        <button 
+          mat-raised-button 
+          class="hero-btn hero-btn-primary" 
+          routerLink="/pets"
+          aria-label="Encontrar pet para adoção">
           <span>Encontrar Pet</span>
-          <mat-icon class="btn-arrow">arrow_forward</mat-icon>
+          <mat-icon class="btn-arrow" aria-hidden="true">arrow_forward</mat-icon>
         </button>
-        <button mat-button class="hero-btn hero-btn-secondary" routerLink="/pets">
-          <mat-icon class="btn-icon">play_circle</mat-icon>
+        <button 
+          mat-button 
+          class="hero-btn hero-btn-secondary" 
+          routerLink="/pets"
+          aria-label="Saiba como funciona o processo de adoção">
+          <mat-icon class="btn-icon" aria-hidden="true">play_circle</mat-icon>
           <span>Como funciona</span>
         </button>
       </div>
       
       <div class="hero-stats-detailed">
         <div class="stats-grid">
-          <div class="stat-card adopted-card">
-            <div class="stat-header">
-              <h3 class="stat-title">PETS ADOTADOS</h3>
-              <div class="stat-icon">
-                <mat-icon class="adopted-icon">pets</mat-icon>
-                <div class="checkmark">✓</div>
-              </div>
-            </div>
-            <div class="stat-content">
-              <div class="stat-main">
-                <span class="stat-number-large">{{ todayAdoptions }}</span>
-                <span class="stat-label-large">hoje</span>
-              </div>
-            </div>
-          </div>
 
           <div class="stat-card available-card">
             <div class="stat-header">
@@ -95,16 +88,6 @@
         <div class="hero-background-image"></div>
         
         <div class="floating-cards">
-          <div class="floating-card card-1">
-            <div class="card-icon">
-              <mat-icon>favorite</mat-icon>
-            </div>
-            <div class="card-content">
-              <span class="card-number">{{ todayAdoptions }}</span>
-              <span class="card-label">Adoções hoje</span>
-            </div>
-          </div>
-          
           <div class="floating-card card-2">
             <div class="card-icon">
               <mat-icon>pets</mat-icon>
@@ -140,14 +123,14 @@
   </div>
 </section>
   
-<section class="pets-for-adoption-section">
+<section class="pets-for-adoption-section" role="region" aria-labelledby="pets-section-title">
   <div class="container">
     <div class="section-header">
       <div class="section-badge">
-        <mat-icon>favorite</mat-icon>
+        <mat-icon aria-hidden="true">favorite</mat-icon>
         <span>Adoção Responsável</span>
       </div>
-      <h2 class="section-title">Pets para Adoção</h2>
+      <h2 id="pets-section-title" class="section-title">Pets para Adoção</h2>
       <p class="section-subtitle">Encontre seu novo melhor amigo entre nossos pets disponíveis</p>
     </div>
 
@@ -157,7 +140,9 @@
           mat-fab 
           class="nav-button prev"
           (click)="previousSlide()"
-          [disabled]="currentSlide === 0">
+          [disabled]="currentSlide === 0"
+          aria-label="Slide anterior"
+          [attr.aria-disabled]="currentSlide === 0">
           <mat-icon>chevron_left</mat-icon>
         </button>
         
@@ -165,20 +150,25 @@
           mat-fab 
           class="nav-button next"
           (click)="nextSlide()"
-          [disabled]="currentSlide >= maxSlide">
+          [disabled]="currentSlide >= maxSlide"
+          aria-label="Próximo slide"
+          [attr.aria-disabled]="currentSlide >= maxSlide">
           <mat-icon>chevron_right</mat-icon>
         </button>
 
         <div 
           class="carousel-scroll"
           #petsCarousel
+          role="region"
+          aria-label="Carrossel de pets disponíveis"
           (touchstart)="onTouchStart($event)"
           (touchmove)="onTouchMove($event)"
           (touchend)="onTouchEnd()"
           (mousedown)="onMouseDown($event)"
           (mousemove)="onMouseMove($event)"
           (mouseup)="onMouseUp()"
-          (mouseleave)="onMouseUp()">
+          (mouseleave)="onMouseUp()"
+          (keydown)="onKeyDown($event)">
           
           <div 
             class="cards-track"
@@ -188,14 +178,21 @@
             <div 
               *ngFor="let pet of availablePets; let i = index; trackBy: trackByPetId" 
               class="pet-card"
-              [routerLink]="['/pets', pet.id]">
+              [routerLink]="['/pets', pet.id]"
+              role="button"
+              [attr.aria-label]="'Ver detalhes do pet ' + (pet.name || 'Pet ' + (i + 1))"
+              tabindex="0"
+              (keydown.enter)="viewPet(pet.id, $event)"
+              (keydown.space)="viewPet(pet.id, $event)">
               
               <div class="card-image">
                 <img 
-                  [src]="getPetImage(pet)" 
+                  [src]="getPetImage(pet, 'medium')" 
                   [alt]="pet.name || 'Pet disponível'"
                   (error)="onImageError($event)"
-                  loading="lazy">
+                  loading="lazy"
+                  decoding="async"
+                  [style.background]="'#f3f4f6'">
                 
                 <div class="status-badge">
                   <mat-icon>check_circle</mat-icon>
@@ -244,10 +241,12 @@
 
       <div class="carousel-indicators">
         <button 
-          *ngFor="let dot of dots; let i = index"
+          *ngFor="let dot of dots; let i = index; trackBy: trackByIndex"
           class="indicator"
           [class.active]="i === currentSlide"
-          (click)="goToSlide(i)">
+          (click)="goToSlide(i)"
+          [attr.aria-label]="'Ir para slide ' + (i + 1)"
+          [attr.aria-current]="i === currentSlide ? 'true' : 'false'">
         </button>
       </div>
     </div>

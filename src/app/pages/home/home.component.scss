@@ -187,6 +187,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  transform: translateY(-40px) translateX(-60px);
+  margin-left: 60px;
 }
 
 
@@ -226,55 +228,57 @@
   height: 500px;
   pointer-events: none;
   z-index: 3;
+  transform: translateY(-40px) translateX(-60px);
 }
 
 .floating-card {
   position: absolute;
   background: var(--neutral-0);
-  border-radius: var(--radius-xl);
-  padding: var(--space-2);
+  border-radius: var(--radius-lg);
+  padding: 8px 12px;
   box-shadow: var(--shadow-md);
   border: 1px solid var(--primary-100);
   display: flex;
   align-items: center;
-  gap: var(--space-2);
+  gap: 8px;
   backdrop-filter: blur(10px);
   animation: float 6s ease-in-out infinite;
-  transform: scale(0.8);
+  transform: scale(0.7);
+  min-width: 90px;
 }
 
 .card-1 {
-  top: 10%;
-  left: -10%;
+  top: 8%;
+  left: 5%;
   animation-delay: 0s;
 }
 
 .card-2 {
-  top: 60%;
-  right: -15%;
+  top: 15%;
+  right: 15%;
   animation-delay: 2s;
 }
 
 .card-3 {
   bottom: 15%;
-  left: -5%;
+  left: 15%;
   animation-delay: 4s;
 }
 
 .card-icon {
-  width: 40px;
-  height: 40px;
+  width: 24px;
+  height: 24px;
   background: linear-gradient(135deg, var(--primary-600), var(--primary-500));
-  border-radius: var(--radius-xl);
+  border-radius: var(--radius-md);
   display: flex;
   align-items: center;
   justify-content: center;
   
   mat-icon {
     color: #fbbf24 !important;
-    font-size: 20px !important;
-    width: 20px !important;
-    height: 20px !important;
+    font-size: 12px !important;
+    width: 12px !important;
+    height: 12px !important;
   }
   
   ::ng-deep mat-icon {
@@ -289,14 +293,14 @@
 }
 
 .card-number {
-  font-size: var(--font-size-lg);
+  font-size: 13px;
   font-weight: var(--font-weight-bold);
   color: var(--neutral-800);
   line-height: 1;
 }
 
 .card-label {
-  font-size: var(--font-size-xs);
+  font-size: 9px;
   color: var(--neutral-500);
   font-weight: var(--font-weight-medium);
 }
@@ -309,6 +313,7 @@
   bottom: 0;
   pointer-events: none;
   z-index: 2;
+  transform: translateY(-40px) translateX(-60px);
 }
 
 .decoration-circle {
@@ -1746,6 +1751,14 @@
   .hero-image-wrapper {
     width: 280px;
     height: 280px;
+  }
+  
+  .hero-visual {
+    display: none !important;
+  }
+  
+  .hero-background-image {
+    display: none !important;
   }
   
   .floating-card {

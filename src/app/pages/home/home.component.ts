@@ -1,4 +1,4 @@
-import { Component, HostListener, OnInit, ViewChild, ElementRef, ChangeDetectorRef } from '@angular/core';
+import { Component, HostListener, OnInit, ViewChild, ElementRef, ChangeDetectorRef, ChangeDetectionStrategy } from '@angular/core';
 import { Router } from '@angular/router';
 import { PetService } from '../../core/services/pet.service';
 import { ImageService } from '../../core/services/image.service';
@@ -11,7 +11,8 @@ import { PetUtils } from '../../core/utils/pet.utils';
   selector: 'app-home',
   standalone: false,
   templateUrl: './home.component.html',
-  styleUrl: './home.component.scss'
+  styleUrl: './home.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class HomeComponent implements OnInit {
   @ViewChild('petsCarousel', { static: false }) petsCarousel!: ElementRef;
@@ -111,8 +112,8 @@ export class HomeComponent implements OnInit {
 
   onImageError = (event: Event): void => this.imageService.handleImageError(event);
 
-  getPetImage(pet: Pet): string {
-    return this.imageService.getPetImage(pet, 'small');
+  getPetImage(pet: Pet, size: 'small' | 'medium' | 'large' = 'small'): string {
+    return this.imageService.getPetImage(pet, size);
   }
 
   getPetType = PetUtils.getPetType;
@@ -121,11 +122,10 @@ export class HomeComponent implements OnInit {
   getPetBreed = PetUtils.getPetBreed;
   
   private loadFavorites(): void {
-    // Simple favorites loading from localStorage
     const stored = localStorage.getItem('favoritePets');
     this.favoritePets = stored ? new Set(JSON.parse(stored)) : new Set();
   }
-  
+
   private updateCarouselDimensions(): void {
     const width = window.innerWidth;
     
@@ -255,6 +255,27 @@ export class HomeComponent implements OnInit {
     this.touchStartX = 0;
     this.touchEndX = 0;
   }
+
+  onKeyDown(event: KeyboardEvent): void {
+    switch (event.key) {
+      case 'ArrowLeft':
+        event.preventDefault();
+        this.previousSlide();
+        break;
+      case 'ArrowRight':
+        event.preventDefault();
+        this.nextSlide();
+        break;
+      case 'Home':
+        event.preventDefault();
+        this.goToSlide(0);
+        break;
+      case 'End':
+        event.preventDefault();
+        this.goToSlide(this.maxSlide);
+        break;
+    }
+  }
   
   toggleFavorite(petId: number | undefined, event: Event): void {
     event.stopPropagation();
@@ -303,5 +324,9 @@ export class HomeComponent implements OnInit {
   
   trackByPetId(index: number, pet: Pet): number | undefined {
     return pet.id;
+  }
+
+  trackByIndex(index: number): number {
+    return index;
   }
 }
