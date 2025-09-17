@@ -266,7 +266,7 @@ A aplicação está pronta para deploy com:
 ## Configuração da API
 
 ✅ **API CONFIGURADA**: Este projeto já está configurado para usar uma API:
-- **URL Base**: Definida em `src/environments/environment.ts`
+- **URL Base**: Definida em `src/environments/environment.ts` (API_URL=)
 - **Endpoints**: Pets, adoções, usuários e loja
 - **Autenticação**: Sistema de login via API com endpoints `/api/auth/login`
 
